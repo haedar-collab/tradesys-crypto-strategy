@@ -58,6 +58,8 @@ export function computeRelativeStrength(asset, benchmark, parameters = {}) {
   assertSeries(asset, "asset");
   assertSeries(benchmark, "benchmark");
   const P = { ...DEFAULT_RS_PARAMETERS, ...parameters };
+  const expectedIntervalMs = parameters.expectedIntervalMs ?? 86_400_000;
+  if (!Number.isFinite(expectedIntervalMs) || expectedIntervalMs <= 0) throw new RangeError("expectedIntervalMs must be positive and finite");
   for (const key of ["rsW7", "rsW30", "rsW90"]) {
     if (!Number.isFinite(P[key]) || P[key] < 0) throw new RangeError(`${key} must be non-negative and finite`);
   }
