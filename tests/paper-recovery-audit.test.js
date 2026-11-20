@@ -8,11 +8,11 @@ const order = (id, side = "BUY", quantity = 1) => ({
 });
 function fixture({ events = null, orders = [order("client_0001")], cash = 9_899,
   positions = [{ symbol: "BTCUSDT", quantity: 1 }] } = {}) {
-  const rows = events ?? [
+  const rows = [{ eventId: "session_start_001", type: "SESSION_STARTED", payload: { config: { mode: "PAPER_ONLY" } } }, ...(events ?? [
     { eventId: "submit_0001", type: "ORDER_SUBMITTED", payload: { clientOrderId: "client_0001" } },
     { eventId: "fill_0001", type: "ORDER_FILLED", payload: { clientOrderId: "client_0001", order: order("client_0001") } },
     { eventId: "risk_0001", type: "RISK_EVENT", payload: { state: { halted: false } } }
-  ];
+  ])];
   return {
     ledgerSnapshot: { status: "COMPLETE", eventCount: rows.length, lastSequence: rows.length,
       lastHash: "a".repeat(64), events: rows.map((e, i) => ({ sequence: i + 1, ...e })) },
