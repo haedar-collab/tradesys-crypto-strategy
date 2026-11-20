@@ -120,3 +120,22 @@ test("fails closed on a pre-existing lock instead of silently stealing it", asyn
     assert.equal(lock.token, "unknown-owner");
   } finally { await rm(f.dir, { recursive: true, force: true }); }
 });
+
+
+test("fails closed on a crash-truncated JSONL tail and releases the acquired lock", async () => {
+  const f = await fixture();
+  try {
+    const ledger = await createPersistentPaperLedger({ filePath: f.filePath });
+    await ledger.append(event("fill_event_crash_01"));
+    await ledger.close();
+    await writeFile(f.filePath, (await readFile(f.filePath, "utf8")) + '{"sequence":2,"eventId":');
+    await assert.rejects(
+      createPersistentPaperLedger({ filePath: f.filePath }),
+      /invalid JSON at line 2/
+    );
+    await assert.rejects(
+      readFile(f.filePath + ".lock", "utf8"),
+      { code: "ENOENT" }
+    );
+  } finally { await rm(f.dir, { recursive: true, force: true }); }
+});
