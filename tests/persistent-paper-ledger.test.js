@@ -161,8 +161,9 @@ test("rejects a complete-looking final JSON record without its newline delimiter
 
 test("exclusive ledger lock is enforced across separate Node.js processes", async () => {
   const f = await fixture();
+  const moduleUrl = new URL("../src/paper/persistent-paper-ledger.js", import.meta.url).href;
   const script = [
-    'import { createPersistentPaperLedger } from "./src/paper/persistent-paper-ledger.js";',
+    'const { createPersistentPaperLedger } = await import(' + JSON.stringify(moduleUrl) + ');',
     'const ledger = await createPersistentPaperLedger({ filePath: process.argv[1] });',
     'process.stdout.write("READY\\n");',
     'process.stdin.once("data", async () => { await ledger.close(); process.exit(0); });'
