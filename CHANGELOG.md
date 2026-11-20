@@ -23,3 +23,5 @@ Latest CI run: 35 tests passed, 0 failed. These are extraction increments, not a
 - Added same-bar TP1-to-breakeven stop handling and fail-closed portfolio correlation inputs.
 - Added single-symbol event-driven spot backtest with next-bar entries, entry-bar processing, fees, slippage, spot-equity cap, and conservative OHLC exit policy.
 - Added deterministic regression tests for the new orchestration and simulator. This remains a research implementation, not a validated profitable strategy.
+
+- Added aligned multi-symbol Spot portfolio simulation with position-count, exposure and correlation gates.
