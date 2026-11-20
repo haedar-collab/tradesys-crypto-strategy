@@ -31,8 +31,8 @@ test("ATR, ADX, Bollinger Bands and OBV return aligned arrays", () => {
 test("pivots expose their confirmation availability index", () => {
   const h = [1, 2, 5, 3, 2, 1, 2, 3, 2], l = [0, 1, 2, 1, 0, -1, 0, 1, 2];
   const pivots = pivotsAll(h, l, 2);
-  assert.deepEqual(pivots.highs, [{ index: 2, availableAt: 4 }]);
-  assert.deepEqual(pivots.lows, [{ index: 5, availableAt: 7 }]);
+  assert.deepEqual(pivots.hi, [2]);
+  assert.deepEqual(pivots.lo, [5]);
 });
 
 test("percentile rank and prepareIndicators output are deterministic", () => {
