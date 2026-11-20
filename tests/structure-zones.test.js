@@ -26,7 +26,10 @@ test("invalidates bullish order block after a close below its low", () => {
     l: [8, 7, 6, 9, 11, 10, 6, 8],
     c: [9, 9, 9, 11, 12, 12, 6, 12]
   });
-  assert.deepEqual(findBullishOrderBlocks(p, [{ dir: 1, type: "BOS", from: 1, i: 4 }]), []);
+  const event = [{ dir: 1, type: "BOS", from: 1, i: 4 }];
+  assert.equal(findBullishOrderBlocks(series({o:p.o.slice(0,5),h:p.h.slice(0,5),l:p.l.slice(0,5),c:p.c.slice(0,5)}),event).length,1,
+    "the order block exists before the later invalidation candle");
+  assert.deepEqual(findBullishOrderBlocks(p, event), [], "the later close invalidates it only from that point onward");
 });
 
 test("tracks partial FVG fill and excludes a fully filled gap", () => {
@@ -36,9 +39,11 @@ test("tracks partial FVG fill and excludes a fully filled gap", () => {
     l: [9, 10, 12, 11.5, 11],
     c: [10, 11, 12.5, 12, 12]
   });
+  const prefix = series({o:partial.o.slice(0,4),h:partial.h.slice(0,4),l:partial.l.slice(0,4),c:partial.c.slice(0,4)});
+  assert.deepEqual(findBullishFvgs(prefix), [{ lo: 10, hi: 11, t: 120_000, idx: 2 }]);
   assert.deepEqual(findBullishFvgs(partial), [{ lo: 10, hi: 11, t: 120_000, idx: 2 }]);
   partial.l[4] = 9;
-  assert.deepEqual(findBullishFvgs(partial), []);
+  assert.deepEqual(findBullishFvgs(partial), [], "future fill removes the FVG from the later snapshot, not the earlier one");
 });
 
 test("detects equal highs, sell-side liquidity, and sweep-and-reclaim", () => {
