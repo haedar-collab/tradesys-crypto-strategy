@@ -40,7 +40,7 @@ test("tracks partial FVG fill and excludes a fully filled gap", () => {
     c: [10, 11, 12.5, 12, 12]
   });
   const prefix = series({o:partial.o.slice(0,4),h:partial.h.slice(0,4),l:partial.l.slice(0,4),c:partial.c.slice(0,4)});
-  assert.deepEqual(findBullishFvgs(prefix), [{ lo: 10, hi: 11, t: 120_000, idx: 2 }]);
+  assert.deepEqual(findBullishFvgs(prefix), [{ lo: 10, hi: 11.5, t: 120_000, idx: 2 }]);
   assert.deepEqual(findBullishFvgs(partial), [{ lo: 10, hi: 11, t: 120_000, idx: 2 }]);
   partial.l[4] = 9;
   assert.deepEqual(findBullishFvgs(partial), [], "future fill removes the FVG from the later snapshot, not the earlier one");
