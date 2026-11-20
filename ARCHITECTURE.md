@@ -78,3 +78,5 @@ The extracted regime module deliberately preserves the current application's reg
 - The 1H trigger distinguishes actual OHLC zone intersection from a candle entirely beyond the zone, and returns explicit zone states `UNTOUCHED`, `TOUCHED`, `RECLAIMED`, or `BROKEN`. A close below the ATR invalidation buffer inside the trigger lookback blocks the setup.
 
 - Anti-lookahead regression tests compare confirmed structure events and daily regime outputs from historical prefixes against the same timestamps in full-history runs. These tests do not yet cover the full SMC zone/trigger/plan pipeline.
+
+- `zoneQuality`, `zoneOrigin`, and `zoneVisits` accept an explicit `asOf` index. Departure and retest scoring must be bounded to this cutoff when replaying historical decisions. Zone visits are based on OHLC range intersection.
