@@ -1,9 +1,8 @@
 /**
  * Single-symbol, long-only spot event-driven backtest.
- * Signals are evaluated at candle close and can enter no earlier than next bar open.
- * OHLC ambiguity follows advanceLongPosition's stop-first policy.
- * Fees and adverse slippage are charged on every executed tranche.
- *
+ * Signals are evaluated at candle close and enter no earlier than next bar open.
+ * Entry-bar OHLC is processed after the simulated open. Ambiguous exits are
+ * conservative; fees and adverse slippage are charged on every executed tranche.
  * This is a deterministic research simulator, not an exchange fill model.
  */
 import { advanceLongPosition } from "../risk/trade-plan.js";
@@ -51,38 +50,45 @@ export function runEventBacktest(input) {
 
   let equity=initialCapital, peak=initialCapital, maxDrawdownPct=0, active=null;
   const trades=[], skipped=[];
+  const processActiveBar=(index,bar)=>{
+    if(!active) return;
+    const update=advanceLongPosition(active.state,{low:bar.l,high:bar.h});
+    if(update.status==="WAIT_DATA") throw new Error("exit state machine rejected validated position/bar");
+    for(const exit of update.exits||[]) {
+      const isStop=exit.reason.includes("STOP") || exit.reason.includes("BREAKEVEN");
+      const rawFill=isStop && bar.o<exit.price ? bar.o : exit.price;
+      const fill=rawFill*(1-slipRate);
+      const qty=active.quantity*exit.fraction;
+      const gross=(fill-active.entryFill)*qty;
+      const fee=fill*qty*feeRate;
+      active.grossPnl+=gross;
+      active.exitFees+=fee;
+      active.exitEvents.push({index,time:bar.t,reason:exit.reason,price:fill,quantity:qty,grossPnl:gross,fee});
+    }
+    active.state=update;
+    if(update.status==="CLOSED") {
+      const netPnl=active.grossPnl-active.entryFee-active.exitFees;
+      equity+=netPnl;
+      trades.push({
+        signalIndex:active.signal.index,entryIndex:active.entryIndex,exitIndex:index,
+        entryTime:active.entryTime,exitTime:bar.t,entry:active.entryFill,
+        quantity:active.quantity,notional:active.notional,stop:active.signal.plan.stop,
+        tp1:active.signal.plan.tp1,tp2:active.signal.plan.tp2,tp3:active.signal.plan.tp3,
+        grossPnl:active.grossPnl,fees:active.entryFee+active.exitFees,netPnl,
+        returnPct:netPnl/active.notional*100,exitEvents:active.exitEvents,status:"CLOSED"
+      });
+      active=null;
+      peak=Math.max(peak,equity);
+      maxDrawdownPct=Math.max(maxDrawdownPct,(peak-equity)/peak*100);
+    }
+  };
+
   for(let i=1;i<bars.length;i++) {
     const bar=bars[i];
     if(active) {
-      const update=advanceLongPosition(active.state,{low:bar.l,high:bar.h});
-      if(update.status==="WAIT_DATA") throw new Error("exit state machine rejected validated position/bar");
-      for(const exit of update.exits||[]) {
-        const isStop=exit.reason.includes("STOP") || exit.reason.includes("BREAKEVEN");
-        const rawFill=isStop && bar.o<exit.price ? bar.o : exit.price;
-        const fill=rawFill*(1-slipRate);
-        const qty=active.quantity*exit.fraction;
-        const gross=(fill-active.entryFill)*qty;
-        const fee=fill*qty*feeRate;
-        active.grossPnl+=gross;
-        active.exitFees+=fee;
-        active.exitEvents.push({index:i,time:bar.t,reason:exit.reason,price:fill,quantity:qty,grossPnl:gross,fee});
-      }
-      active.state=update;
-      if(update.status==="CLOSED") {
-        const netPnl=active.grossPnl-active.entryFee-active.exitFees;
-        equity+=netPnl;
-        trades.push({
-          signalIndex:active.signal.index,entryIndex:active.entryIndex,exitIndex:i,
-          entryTime:active.entryTime,exitTime:bar.t,entry:active.entryFill,
-          quantity:active.quantity,notional:active.notional,stop:active.signal.plan.stop,
-          tp1:active.signal.plan.tp1,tp2:active.signal.plan.tp2,tp3:active.signal.plan.tp3,
-          grossPnl:active.grossPnl,fees:active.entryFee+active.exitFees,netPnl,
-          returnPct:netPnl/active.notional*100,exitEvents:active.exitEvents,status:"CLOSED"
-        });
-        active=null;
-        peak=Math.max(peak,equity);
-        maxDrawdownPct=Math.max(maxDrawdownPct,(peak-equity)/peak*100);
-      }
+      const pending=byIndex.get(i-1)||[];
+      for(const signal of pending) skipped.push({index:signal.index,reason:"POSITION_ALREADY_OPEN"});
+      processActiveBar(i,bar);
       continue;
     }
 
@@ -105,7 +111,7 @@ export function runEventBacktest(input) {
     }
     const riskBudget=equity*riskPct/100;
     const stopPct=(entryFill-plan.stop)/entryFill;
-    const notional=Math.min(equity,riskBudget/stopPct);
+    const notional=Math.min(equity/(1+feeRate),riskBudget/stopPct);
     if(notional<=0) {
       skipped.push({index:signal.index,reason:"NO_AVAILABLE_SPOT_CAPITAL"});
       continue;
@@ -116,6 +122,9 @@ export function runEventBacktest(input) {
       grossPnl:0,exitFees:0,exitEvents:[],
       state:{entry:entryFill,stop:plan.stop,tp1:plan.tp1,tp2:plan.tp2,tp3:plan.tp3,stage:0,remaining:1,status:"OPEN"}
     };
+    // The signal candle is never used for entry; the next bar is processed from
+    // its open onward so a stop/target on the entry bar is not silently ignored.
+    processActiveBar(i,bar);
   }
 
   const openPosition=active?{
