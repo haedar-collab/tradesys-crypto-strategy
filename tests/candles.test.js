@@ -38,3 +38,9 @@ test("rejects stale latest candle", () => {
   assert.equal(result.status, "FAIL");
   assert.ok(result.errors.some(e => e.code === "KLINE_STALE"));
 });
+
+test("rejects descending timestamps instead of silently sorting", () => {
+  const result = normalizeCandles([row(60_000, 119_999), row(0, 59_999)], { now: 180_000 });
+  assert.equal(result.status, "FAIL");
+  assert.ok(result.errors.some(e => e.code === "KLINE_ORDER"));
+});
