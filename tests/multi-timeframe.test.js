@@ -8,7 +8,7 @@ function h4Series() {
 }
 function h1Series() {
   const n=80, o=Array(n).fill(96), c=Array(n).fill(96), h=Array(n).fill(96.4), l=Array(n).fill(95.8);
-  l[70]=96.2; h[68]=96.5;
+  l[70]=95.9; h[68]=96.5;
   for(let i=72;i<n;i++){o[i]=97;c[i]=97.5;h[i]=98;l[i]=96.8;}
   return {n,t:Array.from({length:n},(_,i)=>i),ct:Array.from({length:n},(_,i)=>i),o,c,h,l,atr:Array(n).fill(.5),piv:{hi:[68],lo:[66]}};
 }
