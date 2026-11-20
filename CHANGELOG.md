@@ -52,3 +52,6 @@ Latest CI run: 35 tests passed, 0 failed. These are extraction increments, not a
 
 - Added a multi-position recovery test: the drawdown block persists through a partial rebound and allows a new entry only after the configured recovery threshold is reached.
 - Latest GitHub Actions CI: 117 tests passed, 0 failed (run #341).
+
+- Added multi-asset correlation stress tests for negative correlation, multiple active positions, threshold-boundary behavior, and fail-closed handling of incomplete return history.
+- Latest GitHub Actions CI: 121 tests passed, 0 failed (run #351).
