@@ -31,7 +31,7 @@ export function buildLongPlan(input, options = {}) {
 
 export function advanceLongPosition(position, bar) {
   if(!position||!bar||![position.stop,position.entry,position.tp1,position.tp2,position.tp3,bar.high,bar.low].every(Number.isFinite)||
-    bar.low>bar.high||position.stop>=position.entry) {
+    bar.low>bar.high||position.stop>position.entry) {
     return {status:"WAIT_DATA",reasons:["INVALID_POSITION_OR_BAR"]};
   }
   if(position.status==="CLOSED") return {...position,exits:[]};
