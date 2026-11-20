@@ -118,7 +118,7 @@ export function runPortfolioBacktest(input){
    if(sizing.status!=="SIZED"){
     skipped.push({symbol,index:signal.index,reason:sizing.reasons.join("|")});continue;
    }
-   const notional=Math.min(sizing.size,equity/(1+feeRate));
+   const notional=Math.min(sizing.size,markedEquity/(1+feeRate));
    const quantity=notional/entryFill,entryFee=notional*feeRate;
    active.set(symbol,{
     signal,entryIndex:i,entryFill,notional,quantity,entryFee,grossPnl:0,exitFees:0,exitEvents:[],
