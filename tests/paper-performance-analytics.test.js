@@ -45,7 +45,7 @@ test("returns null for undefined ratios when no closed trades or no losses exist
 
 test("rejects invalid input instead of manufacturing metrics", () => {
   assert.throws(() => buildPaperPerformanceReport({ initialEquity: 0, events: [] }), /initialEquity/);
-  assert.throws(() => buildPaperPerformanceReport({ initialEquity: 100, events: [{}] }), /array/);
+  assert.throws(() => buildPaperPerformanceReport({ initialEquity: 100, events: [{ type: "ORDER_FILLED", payload: {} }] }), /ORDER_FILLED/);
   assert.throws(() => buildPaperPerformanceReport({
     initialEquity: 100, events: [], equitySnapshots: [{ timestamp: -1, equity: 100 }]
   }), /snapshot/);
