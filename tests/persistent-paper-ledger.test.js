@@ -202,7 +202,7 @@ test("an abruptly terminated lock owner leaves a stale lock that blocks recovery
     'await createPersistentPaperLedger({ filePath: process.argv[1] });',
     'process.stdout.write("READY\\n");',
     'process.stdin.once("data", () => process.exit(77));'
-  ].join("\\n");
+  ].join("\n");
   let child;
   try {
     child = spawn(process.execPath, ["--input-type=module", "-e", script, f.filePath], {
