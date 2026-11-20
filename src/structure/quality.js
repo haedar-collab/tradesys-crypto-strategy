@@ -12,7 +12,7 @@ function validate(p) {
 export function zoneVisits(p, lo, hi, from, side) {
   validate(p);
   if (![lo, hi].every(Number.isFinite) || lo >= hi || !Number.isInteger(from) ||
-      from < 0 || from >= p.n || !["demand", "supply"].includes(side)) {
+      from < 0 || from > p.n || !["demand", "supply"].includes(side)) {
     throw new RangeError("invalid zone visit arguments");
   }
   let visits = 0, inside = false, ongoing = false;
