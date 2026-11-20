@@ -2,39 +2,41 @@
 
 ## Purpose
 
-Test the existing multi-symbol Spot portfolio simulator against deterministic adverse price-path shocks. The goal is to expose concentration and drawdown fragility, not to predict crash probabilities.
+Evaluate the multi-symbol Binance Spot portfolio simulator under deterministic adverse price paths, rising cross-asset correlation, and a modeled recovery path. This is a robustness experiment, not a probability forecast.
 
-## Implementation
+## Implemented
 
-- `src/backtest/portfolio-stress.js` provides `runPortfolioStress(input, scenarios)`.
-- Each scenario applies a multiplicative OHLC price shock from a specified aligned bar index onward.
-- Multiple symbols can be shocked together, or independently, to examine concentrated exposure.
-- Signals and trade plans are held fixed so the experiment isolates price-path and portfolio-risk response.
-- Reports ending equity, net return, maximum drawdown, closed trades, remaining open positions, skipped entries, and drawdown guard state.
+- `src/backtest/portfolio-stress.js` exposes `runPortfolioStress(input, scenarios)`.
+- Per-symbol OHLC shocks apply from a selected aligned bar index.
+- Optional linear recovery returns the shock multiplier to baseline at `recoveryEndIndex`.
+- Optional correlation stress blends each asset's daily return series toward the equal-weight cross-asset mean. A blend of 1 creates identical return series.
+- Reports pairwise correlation summary, ending equity, net return, max drawdown, trades, open positions, skipped entries, and drawdown-guard state.
+- Signals are held fixed to isolate price-path and portfolio-risk-gate behavior.
 
-## Example scenarios
+## Example scenario design
 
-- Baseline path: no shock.
-- Single-asset shocks: -8%, -20%, -35%.
-- Broad market shock: apply -10% to every active asset at the same index.
-- Asymmetric shock: BTC -10%, high-beta altcoins -25% at the same index.
-- Recovery path: model recovery by supplying later OHLC bars in the source dataset; a single permanent shock is not a recovery model.
+- Baseline: no shock and no correlation blend.
+- Concentration: one altcoin -8%, -20%, and -35%.
+- Broad market: BTC and all held altcoins shocked together.
+- Correlation spike: correlationBlend 0.5 and 1.0.
+- Asymmetric stress: BTC -10%, high-beta altcoins -25%.
+- Recovery: shock then linear recovery to the original price factor by a later bar.
 
-## Important limitations
+## Interpretation and limitations
 
-- This is a deterministic price-path shock, not a probability model or historical crash replay.
-- Correlation metadata (`dailyReturns`) is not recomputed after shocks. A correlation-regime stress test is still required.
-- The model does not simulate order-book depth, market impact, liquidity gaps beyond the OHLC bars, delistings, exchange outages, or cross-asset contagion.
-- Existing risk gates may prevent entries; report skipped signals and open exposure alongside returns.
-- Do not interpret these scenarios as a guarantee of maximum possible loss.
+1. Correlation blending modifies the return metadata used by the portfolio gate; it does not synthesize a historically observed crisis regime.
+2. Price shocks alter OHLC paths but signals and trade plans remain fixed. This intentionally does not model signal regeneration or endogenous strategy behavior.
+3. Recovery is a deterministic linear multiplier path, not a forecast or a model of volatility during recovery.
+4. No order-book depth, spread widening, market impact, queue priority, delisting, exchange outage, or forced liquidation cascade is simulated.
+5. The model must not be described as measuring a guaranteed maximum loss.
 
 ## Validation
 
-Run `npm test` on Node.js 20+. The new tests cover downside response, immutable inputs, invalid scenarios, and invalid runner output.
+Run `npm test` with Node.js 20+. Tests cover downside shocks, correlation blending, recovery path, immutable baseline input, and invalid scenario/data rejection.
 
 ## Exit criteria
 
-- [ ] CI passes.
-- [ ] Run single-asset and broad-market shocks against representative historical periods.
-- [ ] Verify exposure caps, concurrent-position limits, and drawdown blocks under stress.
-- [ ] Add correlation-regime and recovery-path scenarios before strategy validation is considered complete.
+- [ ] CI passes on the latest commit.
+- [ ] Run against representative multi-asset historical data with aligned bars and returns.
+- [ ] Review exposure cap, max positions, correlation block, and drawdown guard under simultaneous stress.
+- [ ] Record actual scenario results before declaring portfolio stress testing complete.
