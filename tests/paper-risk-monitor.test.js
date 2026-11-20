@@ -33,7 +33,8 @@ test("fails closed for missing or invalid position marks", () => {
 
 test("kill switch latches after a risk breach and blocks entries after recovery", () => {
   const monitor = createPaperRiskMonitor();
-  const breached = monitor.evaluate(snap(9_600));
+  monitor.evaluate(snap(10_000));
+  const breached = monitor.evaluate(snap(9_600, [], 1_800_000_000_001));
   assert.equal(breached.halted, true);
   const recovered = monitor.evaluate(snap(9_800, [], 1_800_000_000_001));
   assert.equal(recovered.allowNewEntries, false);
@@ -49,8 +50,9 @@ test("manual kill switch activates and requires explicit reset", () => {
 
 test("cannot reset while a hard risk threshold remains breached", () => {
   const monitor = createPaperRiskMonitor();
+  monitor.evaluate(snap(10_000));
   monitor.activate("OPERATOR_STOP");
-  assert.throws(() => monitor.reset(snap(8_000)), /risk limits remain breached/);
+  assert.throws(() => monitor.reset(snap(8_000, [], 1_800_000_000_001)), /risk limits remain breached/);
 });
 
 test("daily baseline rolls at UTC date boundary", () => {
@@ -63,7 +65,8 @@ test("daily baseline rolls at UTC date boundary", () => {
 
 test("records kill-switch audit events", () => {
   const monitor = createPaperRiskMonitor();
-  monitor.evaluate(snap(9_600));
+  monitor.evaluate(snap(10_000));
+  monitor.evaluate(snap(9_600, [], 1_800_000_000_001));
   assert.ok(monitor.status().events.some(e => e.type === "KILL_SWITCH_ACTIVATED"));
 });
 
