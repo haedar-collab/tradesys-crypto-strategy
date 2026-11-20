@@ -176,3 +176,22 @@ test("prevents a second persistent session from opening the same ledger concurre
     await second.close();
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
+
+
+test("serializes concurrent duplicate submissions to one durable fill", async () => {
+  const f = fixture(), dir = await f.dirPromise, filePath = join(dir, "events.jsonl");
+  try {
+    const paper = await createPersistentPaperSession({ filePath, now: f.now });
+    const input = await orderInput(f.now, "session_concurrent_01");
+    const [first, second, third] = await Promise.all([
+      paper.submitMarketOrder(input),
+      paper.submitMarketOrder(input),
+      paper.submitMarketOrder(input)
+    ]);
+    assert.deepEqual(first, second);
+    assert.deepEqual(second, third);
+    const state = await paper.snapshot();
+    assert.equal(state.ledger.events.filter(e => e.type === "ORDER_FILLED").length, 1);
+    await paper.close();
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});
