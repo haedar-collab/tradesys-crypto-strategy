@@ -159,7 +159,7 @@ test("single-asset and one-symbol portfolio agree on gap-through-stop fills",()=
 });
 
 test("single-asset and one-symbol portfolio share drawdown reduction before the next entry",()=>{
- const rows=[[100,101,99,100],[100,101,93,94],[100,101,99,100],[100,103,99,102],[102,103,99,101]];
+ const rows=[[100,101,99,100],[100,101,93,94],[100,101,99,100],[100,101,99,100],[100,101,99,100]];
  const candles=bars(rows);
  const widerPlan={entry:100,stop:94,tp1:106,tp2:112,tp3:118};
  const signals=[{index:0,plan:{...widerPlan}},{index:1,plan:{...widerPlan}}];
