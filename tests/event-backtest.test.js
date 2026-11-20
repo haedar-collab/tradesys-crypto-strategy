@@ -21,7 +21,7 @@ test("enters on the bar after the signal close and processes that entry bar",()=
 
 test("charges entry and per-tranche exit fees plus adverse slippage",()=>{
  const result=runEventBacktest({
-  bars:bars([[100,101,99,100],[100,104,100.1,103],[100,104,94,96]]),
+  bars:bars([[100,101,99,100],[100,104,99.9,103],[100,104,94,96]]),
   signals:[signal()],feeBps:10,slippageBps:5
  });
  assert.equal(result.tradeCount,1);
