@@ -101,7 +101,7 @@ export function rankRelativeStrength(items, topPercent = 20) {
   if (!Number.isFinite(topPercent) || topPercent <= 0 || topPercent > 100) throw new RangeError("topPercent must be > 0 and <= 100");
   const valid = items.filter(item => item && item.status === "PASS" && Number.isFinite(item.score))
     .map(item => ({ ...item }))
-    .sort((a, b) => b.score - a.score || String(a.symbol || "").localeCompare(String(b.symbol || "")));
+    .sort((a, b) => b.score - a.score); // stable sort preserves incoming volume order for score ties
   const topN = valid.length ? Math.max(1, Math.ceil(valid.length * topPercent / 100)) : 0;
   return valid.map((item, index) => ({ ...item, rank: index + 1, top: index < topN }));
 }
