@@ -21,6 +21,7 @@ test("insufficient history returns no regime", () => {
 
 test("classifies weak sideways regime with legacy fallback", () => {
   const p = prepared();
+  p.c[200] = 106;
   const result = classifyRegimeAt(p, 200, { emaSlow: 200 });
   assert.equal(result.reg, "Sideways");
   assert.equal(result.weak, true);
@@ -57,7 +58,7 @@ test("classifies capitulation ahead of generic downtrend when all capitulation r
   const p = prepared();
   for (let i = 195; i <= 200; i++) p.c[i] = 100 - (i - 195) * 5;
   p.rsi[200] = 10;
-  p.v[196] = 3000; p.v[197] = 3000; p.v[198] = 3000; p.v[199] = 3000; p.v[200] = 3000;
+  p.v[196] = 5000; p.v[197] = 5000; p.v[198] = 5000; p.v[199] = 5000; p.v[200] = 5000;
   const result = classifyRegimeAt(p, 200, { emaSlow: 200, capDrop: 20, rsiCap: 25, capVolMult: 2.5 });
   assert.equal(result.reg, "Kapitulasi");
 });
