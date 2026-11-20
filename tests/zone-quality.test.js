@@ -37,7 +37,7 @@ test("allows a zone with no candles after its origin",()=>{
  const p=makeSeries();
  const q=zoneQuality(p,{lo:8,hi:9.5,idx:p.n-1},1,"demand",p.n);
  assert.equal(q.prior,0);
- assert.equal(q.ongoing,false);
+ assert.equal(q.inNow,false);
 });
 
 test("rejects invalid zones and side values",()=>{
