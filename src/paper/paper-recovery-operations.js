@@ -1,5 +1,6 @@
-import { open, readFile, stat, access } from "node:fs/promises";
-import { resolve } from "node:path";
+import { open, readFile, stat, access, link, unlink } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+import { randomUUID } from "node:crypto";
 import { verifyPaperLedger } from "./persistent-paper-ledger.js";
 import { prepareLegacyPaperLedgerMigration, validateLegacyMigrationConfig } from "./legacy-paper-ledger-migration.js";
 
@@ -86,8 +87,19 @@ export async function exportPaperRecoveryReport({ report, filePath, format = "js
   if (typeof filePath !== "string" || !filePath.trim()) throw new TypeError("filePath is required");
   const path = resolve(filePath);
   const content = formatPaperRecoveryReport(report, { format });
-  const handle = await open(path, "wx", 0o600);
-  try { await handle.writeFile(content, "utf8"); await handle.sync(); }
-  finally { await handle.close(); }
+  const tempPath = path + ".export-" + randomUUID() + ".tmp";
+  let tempCreated = false;
+  try {
+    const handle = await open(tempPath, "wx", 0o600);
+    tempCreated = true;
+    try { await handle.writeFile(content, "utf8"); await handle.sync(); }
+    finally { await handle.close(); }
+    // Hard-link publication is atomic and fails if the destination already exists.
+    await link(tempPath, path);
+    await unlink(tempPath);
+    tempCreated = false;
+  } finally {
+    if (tempCreated) await unlink(tempPath).catch(() => {});
+  }
   return Object.freeze({ status: "REPORT_EXPORTED", filePath: path, format, byteLength: Buffer.byteLength(content, "utf8") });
 }
