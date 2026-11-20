@@ -87,6 +87,9 @@ test("latched kill switch blocks fresh entries but does not prevent an existing 
       quantity: 0.01, quote: entryQuote, strategyAcceptance: ACCEPT
     });
     assert.equal(buy.status, "FILLED");
+    // Establish a fresh durable portfolio mark so the attempted BUY is rejected
+    // for the latched kill switch rather than for missing risk data.
+    await session.markToMarket({ BTCUSDT: quote(clock.now(), 100, 101) });
 
     await session.activateKillSwitch("STRESS_TEST_OPERATOR_STOP");
     await assert.rejects(session.submitMarketOrder({
