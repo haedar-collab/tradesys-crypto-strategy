@@ -22,9 +22,9 @@ test("reports negative/positive return sign changes as parameter fragility",()=>
 });
 test("uses selected metric for descriptive ranking without selecting deployment parameters",()=>{
  const r=runParameterSensitivity(sample=>({netReturnPct:sample.riskPct,
- maxDrawdownPct:sample.riskPct*2,profitFactor:1}),input,[{riskPct:.5},{riskPct:1}],{metric:"maxDrawdownPct"});
- assert.equal(r.results[r.summary.bestScenarioIndex].parameters.riskPct,1);
- assert.equal(r.results[r.summary.worstScenarioIndex].parameters.riskPct,.5);
+ maxDrawdownPct:sample.riskPct*2,profitFactor:1}),input,[{riskPct:.5},{riskPct:1}],{metric:"maxDrawdownPct",direction:"minimize"});
+ assert.equal(r.results[r.summary.bestScenarioIndex].parameters.riskPct,.5);
+ assert.equal(r.results[r.summary.worstScenarioIndex].parameters.riskPct,1);
  assert.equal(r.assumptions.noOptimization.includes("does not choose"),true);
 });
 test("rejects malformed scenarios and incomplete backtest metrics",()=>{
