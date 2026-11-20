@@ -19,7 +19,8 @@ It does **not** own market-data fetching, UI, browser storage, notifications, ex
 - [x] Initial bullish order-block, FVG, and liquidity-level primitives.
 - [x] Initial 1H zone-touch, BOS/CHoCH, and sweep-and-reclaim trigger module.
 - [x] Initial supply/demand zone quality scoring and deterministic demand-zone selection.
-- [ ] Integrated multi-timeframe SMC decision engine and full zone lifecycle state machine.
+- [x] Initial fail-closed long-only SMC decision gate with HTF, zone-quality, trigger, chase-distance, and R:R checks.
+- [ ] Full multi-timeframe SMC orchestration and zone lifecycle state machine.
 - [ ] Entry/exit and portfolio risk modules.
 - [ ] Event-driven backtest and out-of-sample validation.
 - [ ] Application adapter integration.
@@ -34,7 +35,7 @@ The extracted indicator and regime modules are initial implementations. They mus
 - `src/indicators/` — deterministic technical indicators.
 - `src/regime/` — benchmark market-regime classification.
 - `src/relative-strength/` — aligned asset-versus-BTC performance scoring and deterministic ranking.
-- `src/structure/` — confirmed-pivot market-structure events, SMC zone/liquidity primitives, zone quality/selection, and 1H trigger logic.
+- `src/structure/` — confirmed-pivot market-structure events, SMC zone/liquidity primitives, zone quality/selection, 1H trigger logic, and SMC decision gate.
 - `src/` — additional pure strategy modules.
 - `fixtures/` and `tests/` — deterministic scenarios, regression, and anti-lookahead tests.
 - `research/` — audit findings and validation reports.
