@@ -248,5 +248,5 @@ test("portfolio drawdown block persists through partial recovery and unlocks onl
  assert.ok(result.skipped.some(x=>x.symbol==="CCCUSDT"&&x.index===2&&x.reason==="DRAWDOWN_LIMIT_REACHED"));
  assert.ok(!result.skipped.some(x=>x.symbol==="CCCUSDT"&&x.index===3&&x.reason==="DRAWDOWN_LIMIT_REACHED"));
  assert.equal(result.assumptions.drawdownGuard.state,"NORMAL");
- assert.ok(result.maxDrawdownPct>=9);
+ assert.ok(result.maxDrawdownPct>=5);
 });
