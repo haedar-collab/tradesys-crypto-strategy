@@ -4,34 +4,37 @@ A deterministic, versioned strategy engine for the Tradesys Crypto application.
 
 ## Responsibility
 
-This repository owns:
-- strategy specifications and parameter sets;
-- pure deterministic calculations and decision state machines;
-- versioned input/output schemas;
-- fixed test fixtures and automated tests;
-- reproducible backtest, walk-forward, and out-of-sample reports.
+This repository owns strategy specifications, pure calculations and decision state machines, versioned schemas, regression fixtures, automated tests, and reproducible validation reports.
 
 It does **not** own market-data fetching, UI, browser storage, notifications, exchange credentials, or live order execution.
 
-## Status
+## Current implementation status
 
-- Foundation contract and architecture are documented.
-- Static audit of the current application strategy is in `research/audits/`.
-- Strategy algorithms have not yet been extracted.
-- No profitability claim is made.
-- BUY must remain gated until data validation, regression tests, and independent out-of-sample/paper-trading acceptance criteria pass.
+- [x] Repository architecture and input/output contract.
+- [x] Binance Spot candle normalization and quality checks.
+- [x] Technical indicator primitives: EMA, SMA, Wilder, RSI, ATR, ADX, Bollinger Bands, OBV, pivots, percentile rank.
+- [x] Initial BTC market-regime classifier and confirmation timeline.
+- [ ] Relative-strength engine.
+- [ ] Structure/SMC and 1H trigger state machine.
+- [ ] Entry/exit and portfolio risk modules.
+- [ ] Event-driven backtest and out-of-sample validation.
+- [ ] Application adapter integration.
+
+The extracted indicator and regime modules are initial implementations. They must pass executable CI and parity tests against the frozen source before being considered release-ready. No profitability claim is made. BUY remains gated pending data validation, regression tests, and independent out-of-sample/paper-trading acceptance.
 
 ## Layout
 
 - `specs/` — canonical, versioned trading rules.
 - `schemas/` — versioned engine input/output contracts.
-- `src/` — pure strategy modules.
-- `fixtures/` — deterministic market scenarios and expected decisions.
-- `tests/` — unit, regression, boundary, and anti-lookahead tests.
-- `research/` — audit findings and reproducible validation reports.
+- `src/validation/` — candle normalization and data-quality checks.
+- `src/indicators/` — deterministic technical indicators.
+- `src/regime/` — benchmark market-regime classification.
+- `src/` — additional pure strategy modules.
+- `fixtures/` and `tests/` — deterministic scenarios, regression, and anti-lookahead tests.
+- `research/` — audit findings and validation reports.
 
 ## Integration boundary
 
 The application fetches and normalizes Binance Spot data, then calls a pinned strategy version through the adapter contract. The engine must not fetch market data or depend on browser APIs.
 
-See [ARCHITECTURE.md](ARCHITECTURE.md), [the static audit](research/audits/2026-11-20-tradesys-crypto-static-audit.md), and [CHANGELOG.md](CHANGELOG.md).
+See [ARCHITECTURE.md](ARCHITECTURE.md), [the static audit](research/audits/2026-11-20-tradesys-crypto-static-audit.md), and [the validation test plan](research/validation/test-plan-v1.md).
