@@ -146,6 +146,10 @@ export function runEventBacktest(input) {
       const dd=(peak-markedEquity)/peak*100;
       maxDrawdownPct=Math.max(maxDrawdownPct,dd);
       drawdownBlocked=dd>=ddLimitPct;
+    } else {
+      const dd=peak>0?(peak-equity)/peak*100:0;
+      maxDrawdownPct=Math.max(maxDrawdownPct,dd);
+      drawdownBlocked=dd>=ddLimitPct;
     }
   }
 
