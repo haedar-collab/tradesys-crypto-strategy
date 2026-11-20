@@ -52,3 +52,5 @@ The extracted regime module deliberately preserves the current application's reg
 - `src/structure/events.js`: confirmed-pivot BOS/CHoCH event stream with legacy event ordering and trend-state semantics. Order blocks, FVG, liquidity sweeps, zone lifecycle, and 1H trigger logic remain separate extraction tasks.
 
 - `src/structure/zones.js`: bullish order-block discovery/invalidation, unfilled bullish FVG discovery with partial-fill handling, equal-high buy-side liquidity, sell-side liquidity, and sweep/reclaim detection. Zone selection, zone quality, and final SMC signal policy remain higher-level responsibilities.
+
+- `src/structure/ltf-trigger.js`: 1H demand-zone touch detection, invalidation, bullish BOS/CHoCH confirmation, and swing-low sweep/reclaim confirmation. It preserves the legacy trigger priority and requires the 4H zone context to be supplied by the caller.
