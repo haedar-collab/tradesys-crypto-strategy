@@ -17,6 +17,9 @@ function validateEvent(input) {
 }
 
 function verifyLines(text) {
+  if (text.length > 0 && !text.endsWith("\n")) {
+    throw new Error("ledger final record is not newline-terminated; manual recovery required");
+  }
   const rows = text.split("\n").filter(Boolean);
   let previousHash = GENESIS;
   const ids = new Set();
