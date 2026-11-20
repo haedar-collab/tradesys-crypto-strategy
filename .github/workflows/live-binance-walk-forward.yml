@@ -1,0 +1,41 @@
+name: Live Binance Walk-Forward Replay
+on:
+  push:
+    branches: [feature/app-data-contract-v1]
+    paths:
+      - 'scripts/live-binance-walk-forward.mjs'
+      - 'src/integration/**'
+      - 'src/engine/**'
+      - 'src/backtest/**'
+      - '.github/workflows/live-binance-walk-forward.yml'
+  workflow_dispatch:
+    inputs:
+      symbol:
+        description: Binance Spot symbol
+        required: true
+        default: BTCUSDT
+permissions:
+  contents: read
+jobs:
+  walk-forward:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/app-data-contract-v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch Binance Spot candles and run hourly walk-forward replay
+        env:
+          SYMBOL: ${{ inputs.symbol }}
+          OUTPUT_FILE: artifacts/binance-btcusdt-walk-forward.json
+        run: node scripts/live-binance-walk-forward.mjs
+      - name: Upload walk-forward report
+        uses: actions/upload-artifact@v4
+        with:
+          name: binance-live-walk-forward
+          path: artifacts/binance-btcusdt-walk-forward.json
+          if-no-files-found: error
+          retention-days: 7
