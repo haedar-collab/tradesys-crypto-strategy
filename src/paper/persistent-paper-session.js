@@ -32,6 +32,7 @@ export async function createPersistentPaperSession({
   let clock = now();
   if (!Number.isSafeInteger(clock) || clock < 0) throw new TypeError("now must return UTC epoch milliseconds");
   const ledger = await createPersistentPaperLedger({ filePath });
+  try {
   const broker = createPaperBroker({
     initialCash, feeBps, slippageBps, maxQuoteAgeMs, now: () => clock
   });
@@ -296,4 +297,9 @@ export async function createPersistentPaperSession({
     riskStatus: () => riskMonitor.status(),
     filePath: ledger.filePath
   });
+  } catch (error) {
+    // If recovery or baseline initialization fails, do not strand the ledger lock.
+    await ledger.close().catch(() => {});
+    throw error;
+  }
 }
