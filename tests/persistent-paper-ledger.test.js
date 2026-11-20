@@ -167,7 +167,7 @@ test("exclusive ledger lock is enforced across separate Node.js processes", asyn
     'const ledger = await createPersistentPaperLedger({ filePath: process.argv[1] });',
     'process.stdout.write("READY\\n");',
     'process.stdin.once("data", async () => { await ledger.close(); process.exit(0); });'
-  ].join("\\n");
+  ].join("\n");
   let child;
   try {
     child = spawn(process.execPath, ["--input-type=module", "-e", script, f.filePath], {
@@ -182,7 +182,7 @@ test("exclusive ledger lock is enforced across separate Node.js processes", asyn
       createPersistentPaperLedger({ filePath: f.filePath }),
       /locked by another process/
     );
-    child.stdin.write("close\\n");
+    child.stdin.write("close\n");
     const [code] = await once(child, "exit");
     assert.equal(code, 0);
     const reopened = await createPersistentPaperLedger({ filePath: f.filePath });
