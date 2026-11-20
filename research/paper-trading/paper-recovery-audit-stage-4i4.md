@@ -17,6 +17,30 @@
 - `REVIEW`: unresolved write-ahead intent(s) or other non-critical error(s); operator investigation required.
 - `FAIL`: critical integrity or reconciliation mismatch; do not activate the session.
 
+
+## Stage 4I.6 — Legacy ledger migration utility
+- Added `src/paper/legacy-paper-ledger-migration.js` for offline, copy-forward migration of verified pre-header ledgers.
+- The source ledger is protected by an exclusive migration lock while it is read and remains byte-for-byte unchanged. The destination must be a different, non-existing path; creation uses no-overwrite semantics.
+- Migration requires the complete original `PAPER_ONLY` configuration as explicit operator input. It does not infer initial cash, fee, slippage, quote-age, or risk limits.
+- The migration header records the source SHA-256, source event count, format version, and migration timestamp. All legacy events retain their event IDs, types, timestamps, and payloads while being re-sequenced and re-hashed into the new chain.
+- Corrupt, truncated, unsupported, already-migrated, or locked source ledgers are rejected. A destination collision is never overwritten.
+- The migrated copy must still pass normal session recovery audit. A structurally valid migration is not proof that historical configuration or external execution truth has been established.
+
+## Operator migration procedure
+1. Stop the paper application and confirm all writers are stopped.
+2. Preserve the original ledger and its lock metadata in a separate backup location.
+3. Identify the exact historical session configuration from reliable records. If any value is unknown, stop; do not guess.
+4. Run the migration utility with the original source path, a new destination path, and the complete explicit configuration.
+5. Verify the returned source SHA-256 against the preserved original and inspect the migration metadata in the new first event.
+6. Open the migrated copy with the normal session initializer. If recovery returns `REVIEW` or `FAIL`, do not activate it; investigate separately.
+7. Keep the original ledger read-only until the migrated copy has been independently reviewed.
+
+## Migration limitations
+- This utility is not an automatic upgrade path and does not repair old event payloads.
+- It does not establish external exchange fills, reconstruct missing risk history, or decide whether an ambiguous order was executed.
+- The migration creates a new hash chain; its source hash binds the copy to the exact original bytes but does not certify that original data was truthful.
+- No migration operation writes to or deletes the source ledger.
+
 ## Stale lock recovery — manual-only procedure
 1. Stop the application and all worker processes that could access the exact ledger path.
 2. Confirm operationally that no process or host is still writing to that ledger. Do not rely on PID alone; PID reuse and host boundaries make it insufficient proof.
