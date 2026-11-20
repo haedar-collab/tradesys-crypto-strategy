@@ -31,3 +31,5 @@ Latest CI run: 35 tests passed, 0 failed. These are extraction increments, not a
 - Tightened 1H demand-zone touch semantics to require actual OHLC intersection and separated untouched/touched/reclaimed/broken states.
 - Added contiguous daily-history validation for 7/30/90-day relative-strength calculations.
 - CI regression suite expanded to 93 passing tests.
+- Added historical-prefix anti-lookahead tests for confirmed structure events and daily regime decisions.
+- CI regression suite expanded to 95 passing tests.
