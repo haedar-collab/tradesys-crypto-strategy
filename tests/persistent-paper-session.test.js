@@ -161,3 +161,18 @@ test("mark-to-market breach persists the kill switch and it survives restart", a
     await session.close();
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
+
+
+test("prevents a second persistent session from opening the same ledger concurrently", async () => {
+  const f = fixture(), dir = await f.dirPromise, filePath = join(dir, "events.jsonl");
+  try {
+    const first = await createPersistentPaperSession({ filePath, now: f.now });
+    await assert.rejects(
+      createPersistentPaperSession({ filePath, now: f.now }),
+      /locked by another process/
+    );
+    await first.close();
+    const second = await createPersistentPaperSession({ filePath, now: f.now });
+    await second.close();
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});
