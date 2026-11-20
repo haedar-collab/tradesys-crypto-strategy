@@ -114,7 +114,7 @@ export function runEventBacktest(input) {
     }
     if(drawdownBlocked) { skipped.push({index:signal.index,reason:"MARKED_DRAWDOWN_LIMIT_REACHED"}); continue; }\n    const riskBudget=markedEquity*riskPct/100;
     const stopPct=(entryFill-plan.stop)/entryFill;
-    const notional=Math.min(markedEquity/(1+feeRate),riskBudget/stopPct);
+    const notional=Math.min(equity/(1+feeRate),riskBudget/stopPct);
     if(notional<=0) {
       skipped.push({index:signal.index,reason:"NO_AVAILABLE_SPOT_CAPITAL"});
       continue;
