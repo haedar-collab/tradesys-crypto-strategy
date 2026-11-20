@@ -17,7 +17,8 @@ It does **not** own market-data fetching, UI, browser storage, notifications, ex
 - [x] Initial relative-strength scoring and universe ranking module.
 - [x] Initial confirmed-pivot BOS/CHoCH event engine.
 - [x] Initial bullish order-block, FVG, and liquidity-level primitives.
-- [ ] Zone lifecycle/quality, 1H trigger state machine, and integrated SMC decision engine.
+- [x] Initial 1H zone-touch, BOS/CHoCH, and sweep-and-reclaim trigger module.
+- [ ] Zone lifecycle/quality and integrated SMC decision engine.
 - [ ] Entry/exit and portfolio risk modules.
 - [ ] Event-driven backtest and out-of-sample validation.
 - [ ] Application adapter integration.
@@ -32,7 +33,7 @@ The extracted indicator and regime modules are initial implementations. They mus
 - `src/indicators/` — deterministic technical indicators.
 - `src/regime/` — benchmark market-regime classification.
 - `src/relative-strength/` — aligned asset-versus-BTC performance scoring and deterministic ranking.
-- `src/structure/` — confirmed-pivot market-structure events and initial SMC zone/liquidity primitives.
+- `src/structure/` — confirmed-pivot market-structure events, SMC zone/liquidity primitives, and 1H trigger logic.
 - `src/` — additional pure strategy modules.
 - `fixtures/` and `tests/` — deterministic scenarios, regression, and anti-lookahead tests.
 - `research/` — audit findings and validation reports.
