@@ -24,8 +24,8 @@ It does **not** own market-data fetching, UI, browser storage, notifications, ex
 - [x] Initial position sizing, regime exposure, position-count, duplicate-symbol, and correlation risk gates.
 - [x] Initial entry/exit plan and partial-profit state machine with same-bar breakeven stop handling.
 - [ ] Portfolio stress controls, trailing/forced exit policy, and application risk-state integration.
-- [x] Initial single-symbol event-driven spot backtest with next-bar entry, fees, slippage, conservative OHLC exits, and regression fixtures.
-- [ ] Multi-symbol portfolio simulation, walk-forward/out-of-sample validation, parameter sensitivity, and realistic execution calibration.
+- [x] Initial single-symbol and aligned multi-symbol event-driven Spot backtests with next-bar entry, fees, slippage, conservative OHLC exits, portfolio exposure/correlation gates, and regression fixtures.
+- [ ] Walk-forward/out-of-sample validation, parameter sensitivity, spread/market-impact calibration, and exchange-realistic execution.
 - [ ] Application adapter integration.
 
 The extracted indicator and regime modules are initial implementations. They must pass executable CI and parity tests against the frozen source before being considered release-ready. No profitability claim is made. BUY remains gated pending data validation, regression tests, and independent out-of-sample/paper-trading acceptance.
@@ -41,7 +41,7 @@ The extracted indicator and regime modules are initial implementations. They mus
 - `src/structure/` — confirmed-pivot market-structure events, SMC zone/liquidity primitives, zone quality/selection, 1H trigger logic, and SMC decision gate.
 - `src/risk/` — pure position sizing, portfolio exposure/correlation gates, and trade-plan/exit state machine.
 - `src/engine/` — conservative multi-timeframe strategy orchestration.
-- `src/backtest/` — event-driven single-symbol spot simulator; research-only until broader execution and out-of-sample validation.
+- `src/backtest/` — single-symbol and aligned multi-symbol event-driven Spot simulators; research-only until execution calibration and out-of-sample validation.
 - `src/` — additional pure strategy modules.
 - `fixtures/` and `tests/` — deterministic scenarios, regression, and anti-lookahead tests.
 - `research/` — audit findings and validation reports.
