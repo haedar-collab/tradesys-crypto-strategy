@@ -179,3 +179,16 @@ The test suite now replays historical prefixes and compares:
 - raw and effective daily regime decisions on selected prefixes against the same timestamps in the full history.
 
 This is targeted evidence for pivot confirmation and regime causality. It is not yet a complete anti-lookahead proof for order blocks, FVGs, zone quality, 1H triggers, trade-plan construction, or application-side caching/frozen plans.
+
+
+### Zone-quality historical as-of remediation
+
+Zone quality and retest scoring now accept an explicit `asOf` candle index. Departure-strength calculation and visit counting are bounded to that historical cutoff. A demand/supply visit requires actual OHLC range intersection, not merely a wick that has crossed one zone boundary while the candle remains wholly beyond the other boundary.
+
+Regression evidence:
+- quality at a historical cutoff matches a physically truncated data series;
+- mutating candles after the cutoff does not alter the earlier quality result;
+- zone visit counting excludes non-intersecting candles and bars after the cutoff;
+- OB invalidation and FVG fill are tested as later-snapshot state changes, without erasing earlier historical snapshots.
+
+This closes one identified zone-quality lookahead path in the extracted engine. It does not close the complete SMC/plan/application pipeline.
