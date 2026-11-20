@@ -21,6 +21,7 @@ function validBars(bars) {
 function validateSignal(signal, barsLength) {
   return signal && Number.isInteger(signal.index) && signal.index>=0 && signal.index<barsLength-1 &&
     signal.plan && [signal.plan.entry,signal.plan.stop,signal.plan.tp1,signal.plan.tp2,signal.plan.tp3].every(Number.isFinite) &&
+    signal.plan.stop>0 && signal.plan.entry>0 && signal.plan.tp1>0 && signal.plan.tp2>0 && signal.plan.tp3>0 &&
     signal.plan.stop<signal.plan.entry && signal.plan.entry<signal.plan.tp1 &&
     signal.plan.tp1<signal.plan.tp2 && signal.plan.tp2<signal.plan.tp3;
 }
@@ -134,16 +135,16 @@ export function runEventBacktest(input) {
     unrealizedPnl:(bars[bars.length-1].c-active.entryFill)*active.quantity*active.state.remaining,
     status:"OPEN"
   }:null;
-  const grossWins=trades.filter(t=>t.netPnl>0).reduce((s,t)=>s+t.netPnl,0);
-  const grossLosses=Math.abs(trades.filter(t=>t.netPnl<0).reduce((s,t)=>s+t.netPnl,0));
+  const netWins=trades.filter(t=>t.netPnl>0).reduce((s,t)=>s+t.netPnl,0);
+  const netLosses=Math.abs(trades.filter(t=>t.netPnl<0).reduce((s,t)=>s+t.netPnl,0));
   const wins=trades.filter(t=>t.netPnl>0).length;
   return {
     status:"COMPLETE",
     initialCapital,endingEquity:equity,netPnl:equity-initialCapital,
     netReturnPct:(equity/initialCapital-1)*100,
     tradeCount:trades.length,winRatePct:trades.length?wins/trades.length*100:0,
-    profitFactor:grossLosses?grossWins/grossLosses:(grossWins?Infinity:0),
-    maxDrawdownPct,trades,skipped,openPosition,
+    profitFactor:netLosses?netWins/netLosses:null,
+    maxDrawdownPct,maxDrawdownBasis:"realized closed-trade equity; excludes open-position mark-to-market",trades,skipped,openPosition,
     assumptions:{entry:"next bar open after signal close",feeBps,slippageBps,
       sameBarAmbiguity:"stop-first; TP1 followed by same-bar breakeven touch exits remainder at breakeven",
       spotOnly:true,positionConcurrency:1}
