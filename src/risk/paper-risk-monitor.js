@@ -46,7 +46,7 @@ export function evaluatePaperRisk(input, limits = {}) {
  */
 export function createPaperRiskMonitor({
   dailyLossLimitPct = 3, maxDrawdownPct = 10, maxExposurePct = 80,
-  now = () => Date.now()
+  now = () => Date.now(), initialState = null
 } = {}) {
   const limits = { dailyLossLimitPct, maxDrawdownPct, maxExposurePct };
   if (![dailyLossLimitPct, maxDrawdownPct, maxExposurePct].every(Number.isFinite) ||
@@ -55,9 +55,21 @@ export function createPaperRiskMonitor({
       maxExposurePct <= 0 || maxExposurePct > 100 || typeof now !== "function") {
     throw new RangeError("invalid paper risk monitor configuration");
   }
-  let peakEquity = null, dayStartEquity = null, dayKey = null;
-  let halted = false, haltReasons = [], haltAt = null;
-  const events = [];
+  if (initialState !== null && (!initialState || typeof initialState !== "object" ||
+      (initialState.peakEquity !== null && !positive(initialState.peakEquity)) ||
+      (initialState.dayStartEquity !== null && !positive(initialState.dayStartEquity)) ||
+      typeof initialState.halted !== "boolean" ||
+      !Array.isArray(initialState.haltReasons) ||
+      !Array.isArray(initialState.events))) {
+    throw new TypeError("initialState is invalid");
+  }
+  let peakEquity = initialState?.peakEquity ?? null;
+  let dayStartEquity = initialState?.dayStartEquity ?? null;
+  let dayKey = initialState?.dayKey ?? null;
+  let halted = initialState?.halted ?? false;
+  let haltReasons = [...(initialState?.haltReasons ?? [])];
+  let haltAt = initialState?.haltAt ?? null;
+  const events = (initialState?.events ?? []).map(e => Object.freeze(structuredClone(e)));
   const emit = (type, payload) => events.push(Object.freeze({ type, at: now(), ...structuredClone(payload) }));
 
   function evaluate(snapshot) {
