@@ -54,3 +54,13 @@ test("rejects unordered bars and invalid signal plans",()=>{
  assert.throws(()=>runEventBacktest({bars:[{t:1,o:1,h:2,l:.5,c:1},{t:1,o:1,h:2,l:.5,c:1}],signals:[]}),RangeError);
  assert.throws(()=>runEventBacktest({bars:bars([[100,101,99,100],[100,101,99,100]]),signals:[{index:0,plan:{entry:100,stop:101,tp1:105,tp2:110,tp3:115}}]}),TypeError);
 });
+
+test("blocks a new entry after marked drawdown reaches the configured limit",()=>{
+ const result=runEventBacktest({
+  bars:bars([[100,101,99,100],[100,101,94,95],[100,101,99,100],[100,101,99,100]]),
+  signals:[signal(0),signal(2)],riskPct:50,ddLimitPct:1,feeBps:0,slippageBps:0
+ });
+ assert.equal(result.tradeCount,1);
+ assert.ok(result.maxDrawdownPct>=1);
+ assert.ok(result.skipped.some(x=>x.index===2&&x.reason==="MARKED_DRAWDOWN_LIMIT_REACHED"));
+});
