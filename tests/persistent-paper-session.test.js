@@ -62,15 +62,13 @@ test("integrated order submission is idempotent across calls and restarts", asyn
 test("recovery completes a write-ahead submission interrupted before fill event", async () => {
   const f = fixture(), dir = await f.dirPromise, filePath = join(dir, "events.jsonl");
   try {
-    const session = await createPersistentPaperSession({ filePath, now: f.now });
     const input = await orderInput(f.now, "session_buy_0003");
-    // Simulate durable intent written before the process crashes.
+    // Simulate a process that durably wrote intent and crashed before broker execution.
     const ledger = await (await import("../src/paper/persistent-paper-ledger.js")).createPersistentPaperLedger({ filePath });
     const { createHash } = await import("node:crypto");
     const eventId = "paper_" + createHash("sha256").update(input.clientOrderId).digest("hex").slice(0, 32) + "_submitted";
     await ledger.append({ eventId, type: "ORDER_SUBMITTED", timestamp: f.now(), payload: { clientOrderId: input.clientOrderId, orderInput: input } });
     await ledger.close();
-    await session.close();
 
     const recovered = await createPersistentPaperSession({ filePath, now: f.now });
     const state = await recovered.snapshot();
