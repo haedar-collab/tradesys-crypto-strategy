@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildCausalMultiTimeframeContext,evaluateCausalMultiTimeframeSetup,CAUSAL_MTF_INTERVALS } from "../src/engine/causal-mtf.js";
+import { buildCausalMultiTimeframeContext,evaluateCausalMultiTimeframeSetup,CAUSAL_MTF_INTERVALS,classifyContextBias } from "../src/engine/causal-mtf.js";
 
 const now=Date.UTC(2026,10,20,12,0,0);
 function series(key,count,interval){
@@ -68,4 +68,13 @@ test("requires explicit evaluation timestamp and returns a guarded strategy deci
  assert.ok(["WAIT","BUY_CANDIDATE"].includes(result.status));
  assert.equal(result.contextBuild.status,"READY");
  assert.equal(result.contextBuild.temporal.status,"PASS");
+});
+
+test("classifies conflicting EMA and structure evidence as Mixed, not Neutral",()=>{
+ assert.equal(classifyContextBias(-1,110,100),"Mixed");
+ assert.equal(classifyContextBias(1,90,100),"Mixed");
+ assert.equal(classifyContextBias(-1,90,100),"Bearish");
+ assert.equal(classifyContextBias(1,110,100),"Bullish");
+ assert.equal(classifyContextBias(0,110,100),"Neutral");
+ assert.equal(classifyContextBias(-1,null,100),"Neutral");
 });
