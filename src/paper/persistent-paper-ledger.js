@@ -1,6 +1,6 @@
-import { mkdir, open, readFile } from "node:fs/promises";
+import { mkdir, open, readFile, unlink } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 
 const GENESIS = "0".repeat(64);
 const TYPES = new Set(["SESSION_STARTED","ORDER_SUBMITTED","ORDER_FILLED","ORDER_REJECTED","POSITION_MARKED","RISK_EVENT","SESSION_STOPPED"]);
@@ -44,10 +44,57 @@ export async function createPersistentPaperLedger({ filePath } = {}) {
   if (typeof filePath !== "string" || !filePath.trim()) throw new TypeError("filePath is required");
   const path = resolve(filePath);
   await mkdir(dirname(path), { recursive: true });
+
+  // Exclusive lifetime lock: never allow two processes to append to the same
+  // JSONL chain. Stale locks deliberately require operator review; auto-stealing
+  // a lock could corrupt a ledger while its original writer is still alive.
+  const lockPath = path + ".lock";
+  const lockToken = randomUUID();
+  let lockHandle;
+  try {
+    lockHandle = await open(lockPath, "wx", 0o600);
+  } catch (error) {
+    if (error.code === "EEXIST") {
+      throw new Error("ledger is locked by another process or has a stale lock; manual review required");
+    }
+    throw error;
+  }
+  try {
+    await lockHandle.writeFile(JSON.stringify({
+      token: lockToken, pid: process.pid, createdAt: Date.now()
+    }) + "\\n", "utf8");
+    await lockHandle.sync();
+  } catch (error) {
+    await lockHandle.close().catch(() => {});
+    await unlink(lockPath).catch(() => {});
+    throw error;
+  }
+
+  let lockReleased = false;
+  async function releaseLock() {
+    if (lockReleased) return;
+    lockReleased = true;
+    await lockHandle.close().catch(() => {});
+    try {
+      const current = JSON.parse(await readFile(lockPath, "utf8"));
+      if (current.token === lockToken) await unlink(lockPath);
+    } catch (error) {
+      if (error.code !== "ENOENT" && !(error instanceof SyntaxError)) throw error;
+    }
+  }
+
   let raw;
   try { raw = await readFile(path, "utf8"); }
-  catch (error) { if (error.code !== "ENOENT") throw error; raw = ""; }
-  const recovered = verifyLines(raw);
+  catch (error) {
+    if (error.code !== "ENOENT") {
+      await releaseLock();
+      throw error;
+    }
+    raw = "";
+  }
+  let recovered;
+  try { recovered = verifyLines(raw); }
+  catch (error) { await releaseLock(); throw error; }
   let sequence = recovered.events.length;
   let previousHash = recovered.lastHash;
   const ids = recovered.ids;
@@ -80,7 +127,7 @@ export async function createPersistentPaperLedger({ filePath } = {}) {
     return operation;
   }
   const appended = [];
-  async function close() { await queue; closed = true; }
+  async function close() { await queue; if (closed) return; closed = true; await releaseLock(); }
   async function snapshot() {
     await queue;
     const text = await readFile(path, "utf8").catch((error) => error.code === "ENOENT" ? "" : Promise.reject(error));
