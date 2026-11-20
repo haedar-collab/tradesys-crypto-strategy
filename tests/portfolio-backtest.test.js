@@ -127,3 +127,33 @@ test("single-asset and one-symbol portfolio simulators agree after partial exits
  assert.ok(Math.abs(single.trades[0].netPnl-portfolio.trades[0].netPnl)<1e-8);
  assert.ok(Math.abs(single.endingEquity-portfolio.endingEquity)<1e-8);
 });
+
+test("single-asset and one-symbol portfolio agree on partial TP1 open-position accounting",()=>{
+ const rows=[[100,101,99,100],[100,106,101,105],[105,106,102,104]];
+ const candles=bars(rows),oneSignal=signal(0);
+ const single=runEventBacktest({bars:candles,signals:[oneSignal],initialCapital:10000,riskPct:1,feeBps:12,slippageBps:7});
+ const portfolio=runPortfolioBacktest({
+  assets:{AAAUSDT:{bars:candles,signals:[oneSignal],dailyReturns:[.01,.02,.03]}},
+  initialCapital:10000,riskPct:1,regimeCapPct:100,maxPositions:1,feeBps:12,slippageBps:7
+ });
+ assert.equal(single.tradeCount,0);
+ assert.equal(portfolio.tradeCount,0);
+ assert.equal(single.openPosition.remaining,.6);
+ assert.equal(portfolio.openPositions[0].remaining,.6);
+ assert.ok(Math.abs(single.endingEquity-portfolio.endingEquity)<1e-8);
+});
+
+test("single-asset and one-symbol portfolio agree on gap-through-stop fills",()=>{
+ const rows=[[100,101,99,100],[100,103,99,102],[90,92,88,90],[90,92,89,91]];
+ const candles=bars(rows),oneSignal=signal(0);
+ const single=runEventBacktest({bars:candles,signals:[oneSignal],initialCapital:10000,riskPct:1,feeBps:12,slippageBps:7});
+ const portfolio=runPortfolioBacktest({
+  assets:{AAAUSDT:{bars:candles,signals:[oneSignal],dailyReturns:[.01,.02,.03,.04]}},
+  initialCapital:10000,riskPct:1,regimeCapPct:100,maxPositions:1,feeBps:12,slippageBps:7
+ });
+ assert.equal(single.tradeCount,1);
+ assert.equal(portfolio.tradeCount,1);
+ assert.equal(single.trades[0].exitEvents[0].price,portfolio.trades[0].exitEvents[0].price);
+ assert.ok(Math.abs(single.trades[0].netPnl-portfolio.trades[0].netPnl)<1e-8);
+ assert.ok(Math.abs(single.endingEquity-portfolio.endingEquity)<1e-8);
+});
