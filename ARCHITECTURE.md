@@ -45,3 +45,6 @@ No profitability claim or live execution authorization follows from unit tests o
 - `src/regime/index.js`: BTC daily regime classifier and N-bar effective regime timeline.
 
 The extracted regime module deliberately preserves the current application's regime labels, rule ordering, fallback behavior, and transition behavior. This is parity-first extraction, not a strategy redesign. Known legacy behaviors remain documented for separate decisions, including initial regime seeding before confirmation and the current pivot confirmation filter.
+
+
+- `src/relative-strength/index.js`: aligned daily asset-versus-BTC relative-return scoring (7/30/90-day weighted score), five-day score snapshot, ratio trend check, and deterministic top-percentile ranking. The application still owns the Binance symbol universe, exchange eligibility filters, quote-volume thresholds, stablecoin/tokenized-stock exclusions, and external float enrichment.
