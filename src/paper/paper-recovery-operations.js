@@ -1,6 +1,6 @@
 import { open, readFile, stat, access, link, unlink } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import { randomUUID } from "node:crypto";
+import { randomUUID, createHash } from "node:crypto";
 import { verifyPaperLedger } from "./persistent-paper-ledger.js";
 import { prepareLegacyPaperLedgerMigration, validateLegacyMigrationConfig } from "./legacy-paper-ledger-migration.js";
 
@@ -102,4 +102,58 @@ export async function exportPaperRecoveryReport({ report, filePath, format = "js
     if (tempCreated) await unlink(tempPath).catch(() => {});
   }
   return Object.freeze({ status: "REPORT_EXPORTED", filePath: path, format, byteLength: Buffer.byteLength(content, "utf8") });
+}
+
+
+/**
+ * Read-only backup verification. It checks stable reads, ledger hash chains,
+ * and byte-for-byte SHA-256 equality. A present lock yields REVIEW because
+ * the caller cannot assume the source was quiescent when copied.
+ */
+export async function verifyPaperLedgerBackup({ sourcePath, backupPath } = {}) {
+  if (typeof sourcePath !== "string" || !sourcePath.trim() ||
+      typeof backupPath !== "string" || !backupPath.trim()) {
+    throw new TypeError("sourcePath and backupPath are required");
+  }
+  const source = resolve(sourcePath), backup = resolve(backupPath);
+  if (source === backup) throw new Error("source and backup paths must differ");
+
+  async function stableRead(path) {
+    const before = await stat(path);
+    const raw = await readFile(path);
+    const after = await stat(path);
+    if (before.size !== after.size || before.mtimeMs !== after.mtimeMs ||
+        before.ino !== after.ino || raw.length !== after.size) {
+      throw new Error("file changed while being verified: " + path);
+    }
+    return raw;
+  }
+  async function lockPresent(path) {
+    try { await access(path + ".lock"); return true; }
+    catch (error) { if (error.code === "ENOENT") return false; throw error; }
+  }
+
+  const [sourceRaw, backupRaw, sourceLocked, backupLocked] = await Promise.all([
+    stableRead(source), stableRead(backup), lockPresent(source), lockPresent(backup)
+  ]);
+  const sourceSha256 = createHash("sha256").update(sourceRaw).digest("hex");
+  const backupSha256 = createHash("sha256").update(backupRaw).digest("hex");
+  let sourceLedgerValid = false, backupLedgerValid = false;
+  let sourceEventCount = null, backupEventCount = null;
+  let sourceLedgerError = null, backupLedgerError = null;
+  try { sourceEventCount = verifyPaperLedger(sourceRaw.toString("utf8")).events.length; sourceLedgerValid = true; }
+  catch (error) { sourceLedgerError = error.message; }
+  try { backupEventCount = verifyPaperLedger(backupRaw.toString("utf8")).events.length; backupLedgerValid = true; }
+  catch (error) { backupLedgerError = error.message; }
+  const byteIdentical = sourceSha256 === backupSha256 && sourceRaw.length === backupRaw.length;
+  const status = !sourceLedgerValid || !backupLedgerValid ? "INVALID" :
+    !byteIdentical ? "MISMATCH" : sourceLocked || backupLocked ? "REVIEW" : "PASS";
+  return Object.freeze({
+    status, sourcePath: source, backupPath: backup,
+    sourceSha256, backupSha256, sourceByteLength: sourceRaw.length,
+    backupByteLength: backupRaw.length, sourceEventCount, backupEventCount,
+    sourceLedgerValid, backupLedgerValid, byteIdentical, sourceLocked, backupLocked,
+    sourceLedgerError, backupLedgerError,
+    note: "Read-only verification only. PASS confirms byte identity and valid local hash chains; it does not prove external execution truth or storage durability."
+  });
 }
