@@ -27,6 +27,43 @@ function validateConfig(config) {
 }
 
 /**
+ * Pure migration planner shared by dry-run and execution. It performs no I/O.
+ */
+export function prepareLegacyPaperLedgerMigration({ raw, config, migrationTimestamp = Date.now() } = {}) {
+  if (typeof raw !== "string") throw new TypeError("raw source ledger text is required");
+  validateConfig(config);
+  if (!Number.isSafeInteger(migrationTimestamp) || migrationTimestamp < 0) throw new TypeError("migrationTimestamp must be a UTC epoch millisecond integer");
+  const verified = verifyPaperLedger(raw);
+  if (verified.events.some(event => event.type === "SESSION_STARTED")) throw new Error("source ledger already has a session header; it is not a legacy ledger");
+  for (const event of verified.events) {
+    if (!TYPES.has(event.type) || typeof event.eventId !== "string" || !/^[A-Za-z0-9_-]{8,80}$/.test(event.eventId) ||
+        !Number.isSafeInteger(event.timestamp) || !event.payload || typeof event.payload !== "object" || Array.isArray(event.payload)) {
+      throw new Error("legacy ledger contains an unsupported or malformed event; migration aborted");
+    }
+  }
+  const sourceSha256 = hash(raw);
+  const migrationId = "legacy_migration_" + hash(sourceSha256 + canonical(config)).slice(0, 32);
+  let previousHash = GENESIS;
+  const migrated = [];
+  const headerBody = { sequence: 1, eventId: migrationId, type: "SESSION_STARTED", timestamp: migrationTimestamp,
+    payload: { config: structuredClone(config), migration: { formatVersion: 1, sourceSha256, sourceEventCount: verified.events.length, migratedAt: migrationTimestamp } },
+    previousHash };
+  const header = { ...headerBody, hash: hash(canonical(headerBody)) };
+  migrated.push(header); previousHash = header.hash;
+  for (const legacy of verified.events) {
+    const body = { sequence: migrated.length + 1, eventId: legacy.eventId, type: legacy.type,
+      timestamp: legacy.timestamp, payload: structuredClone(legacy.payload), previousHash };
+    const row = { ...body, hash: hash(canonical(body)) };
+    migrated.push(row); previousHash = row.hash;
+  }
+  const output = migrated.map(canonical).join("\n") + "\n";
+  const check = verifyPaperLedger(output);
+  if (check.events.length !== migrated.length || check.lastHash !== previousHash) throw new Error("planned migration verification failed");
+  return Object.freeze({ output, sourceSha256, sourceEventCount: verified.events.length,
+    migratedEventCount: check.events.length, lastHash: check.lastHash });
+}
+
+/**
  * Offline, copy-forward migration. The source is locked exclusively while read,
  * never modified, and the destination is created without overwrite semantics.
  */
@@ -50,41 +87,18 @@ export async function migrateLegacyPaperLedger({ sourcePath, destinationPath, co
   try {
     await lock.writeFile(JSON.stringify({ token, pid: process.pid, createdAt: Date.now(), purpose: "LEGACY_LEDGER_MIGRATION" }) + "\n", "utf8");
     await lock.sync();
-    const raw = await readFile(source, "utf8");
-    const verified = verifyPaperLedger(raw);
-    if (verified.events.some(event => event.type === "SESSION_STARTED")) throw new Error("source ledger already has a session header; it is not a legacy ledger");
-    for (const event of verified.events) {
-      if (!TYPES.has(event.type) || typeof event.eventId !== "string" || !/^[A-Za-z0-9_-]{8,80}$/.test(event.eventId) ||
-          !Number.isSafeInteger(event.timestamp) || !event.payload || typeof event.payload !== "object" || Array.isArray(event.payload)) {
-        throw new Error("legacy ledger contains an unsupported or malformed event; migration aborted");
-      }
-    }
-    const sourceSha256 = hash(raw);
-    const migrationId = "legacy_migration_" + hash(sourceSha256 + canonical(config)).slice(0, 32);
-    let previousHash = GENESIS;
-    const migrated = [];
-    const headerBody = { sequence: 1, eventId: migrationId, type: "SESSION_STARTED", timestamp: migrationTimestamp,
-      payload: { config: structuredClone(config), migration: { formatVersion: 1, sourceSha256, sourceEventCount: verified.events.length, migratedAt: migrationTimestamp } },
-      previousHash };
-    const header = { ...headerBody, hash: hash(canonical(headerBody)) };
-    migrated.push(header); previousHash = header.hash;
-    for (const legacy of verified.events) {
-      const body = { sequence: migrated.length + 1, eventId: legacy.eventId, type: legacy.type,
-        timestamp: legacy.timestamp, payload: structuredClone(legacy.payload), previousHash };
-      const row = { ...body, hash: hash(canonical(body)) };
-      migrated.push(row); previousHash = row.hash;
-    }
-    const output = migrated.map(canonical).join("\n") + "\n";
+    const plan = prepareLegacyPaperLedgerMigration({ raw: await readFile(source, "utf8"), config, migrationTimestamp });
     await mkdir(dirname(destination), { recursive: true });
     tempPath = destination + ".migration-" + randomUUID() + ".tmp";
     const temp = await open(tempPath, "wx", 0o600);
-    try { await temp.writeFile(output, "utf8"); await temp.sync(); } finally { await temp.close(); }
+    try { await temp.writeFile(plan.output, "utf8"); await temp.sync(); } finally { await temp.close(); }
     await link(tempPath, destination);
     await unlink(tempPath); tempPath = undefined;
     const check = verifyPaperLedger(await readFile(destination, "utf8"));
-    if (check.events.length !== migrated.length || check.lastHash !== previousHash) throw new Error("migrated ledger verification failed");
+    if (check.events.length !== plan.migratedEventCount || check.lastHash !== plan.lastHash) throw new Error("migrated ledger verification failed");
     return Object.freeze({ status: "MIGRATED_COPY_CREATED", sourcePath: source, destinationPath: destination,
-      sourceSha256, sourceEventCount: verified.events.length, migratedEventCount: check.events.length, lastHash: check.lastHash });
+      sourceSha256: plan.sourceSha256, sourceEventCount: plan.sourceEventCount,
+      migratedEventCount: check.events.length, lastHash: check.lastHash });
   } finally {
     if (tempPath) await unlink(tempPath).catch(() => {});
     await lock.close().catch(() => {});
