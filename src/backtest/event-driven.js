@@ -6,6 +6,7 @@
  * This is a deterministic research simulator, not an exchange fill model.
  */
 import { advanceLongPosition } from "../risk/trade-plan.js";
+import { markPosition } from "./mark-to-market.js";
 
 function validBars(bars) {
   if (!Array.isArray(bars) || bars.length < 2) throw new TypeError("at least two OHLC bars are required");
@@ -39,9 +40,10 @@ export function runEventBacktest(input) {
   const slippageBps=input.slippageBps??5;
   const minRR=input.minRR??1.5;
   const maxEntryDriftPct=input.maxEntryDriftPct??1;
-  if (![initialCapital,riskPct,feeBps,slippageBps,minRR,maxEntryDriftPct].every(Number.isFinite) ||
+  const ddLimitPct=input.ddLimitPct??10;
+  if (![initialCapital,riskPct,feeBps,slippageBps,minRR,maxEntryDriftPct,ddLimitPct].every(Number.isFinite) ||
       initialCapital<=0 || riskPct<=0 || riskPct>100 || feeBps<0 || slippageBps<0 ||
-      minRR<=0 || maxEntryDriftPct<0) throw new RangeError("invalid backtest parameters");
+      minRR<=0 || maxEntryDriftPct<0 || ddLimitPct<=0 || ddLimitPct>=100) throw new RangeError("invalid backtest parameters");
   const feeRate=feeBps/10000, slipRate=slippageBps/10000;
   const byIndex=new Map();
   for (const signal of [...signals].sort((a,b)=>a.index-b.index)) {
@@ -49,7 +51,7 @@ export function runEventBacktest(input) {
     byIndex.get(signal.index).push(signal);
   }
 
-  let equity=initialCapital, peak=initialCapital, maxDrawdownPct=0, active=null;
+  let equity=initialCapital, peak=initialCapital, maxDrawdownPct=0, active=null, drawdownBlocked=false;
   const trades=[], skipped=[];
   const processActiveBar=(index,bar)=>{
     if(!active) return;
@@ -110,9 +112,9 @@ export function runEventBacktest(input) {
       skipped.push({index:signal.index,reason:"ENTRY_RR_BELOW_MINIMUM"});
       continue;
     }
-    const riskBudget=equity*riskPct/100;
+    if(drawdownBlocked) { skipped.push({index:signal.index,reason:"MARKED_DRAWDOWN_LIMIT_REACHED"}); continue; }\n    const riskBudget=markedEquity*riskPct/100;
     const stopPct=(entryFill-plan.stop)/entryFill;
-    const notional=Math.min(equity/(1+feeRate),riskBudget/stopPct);
+    const notional=Math.min(markedEquity/(1+feeRate),riskBudget/stopPct);
     if(notional<=0) {
       skipped.push({index:signal.index,reason:"NO_AVAILABLE_SPOT_CAPITAL"});
       continue;
@@ -144,9 +146,9 @@ export function runEventBacktest(input) {
     netReturnPct:(equity/initialCapital-1)*100,
     tradeCount:trades.length,winRatePct:trades.length?wins/trades.length*100:0,
     profitFactor:netLosses?netWins/netLosses:null,
-    maxDrawdownPct,maxDrawdownBasis:"realized closed-trade equity; excludes open-position mark-to-market",trades,skipped,openPosition,
+    maxDrawdownPct,maxDrawdownBasis:"marked equity at each closed-bar close, including estimated liquidation costs",trades,skipped,openPosition,
     assumptions:{entry:"next bar open after signal close",feeBps,slippageBps,
       sameBarAmbiguity:"stop-first; TP1 followed by same-bar breakeven touch exits remainder at breakeven",
-      spotOnly:true,positionConcurrency:1}
+      spotOnly:true,positionConcurrency:1,ddLimitPct}
   };
 }
