@@ -19,3 +19,17 @@ test("summarizes bias and upstream gate distributions without changing rows", ()
   assert.deepEqual(rows,before);
 });
 test("rejects empty input", () => assert.throws(() => auditBiasRootCause([]), /non-empty/));
+
+test("counts all WAIT rows and preserves first blocking gate", () => {
+  const rows = [
+    {contextReady:false,gate:"DAILY_NOT_READY"},
+    {contextReady:false,gate:"DAILY_NOT_READY"},
+    {contextReady:true,weekly:"Neutral",daily:"Neutral",regime:{effective:"Downtrend"},h4Structure:"Bearish",gate:"DAILY_BIAS_NOT_BULLISH"}
+  ];
+  const result = auditBiasRootCause(rows);
+  assert.equal(result.evaluationCount,3);
+  assert.equal(result.contextReadyCount,1);
+  assert.equal(result.distributions.reasons.DAILY_NOT_READY,2);
+  assert.equal(result.distributions.reasons.DAILY_BIAS_NOT_BULLISH,1);
+  assert.equal(result.nonBullishContextCount,1);
+});
