@@ -1,4 +1,6 @@
 import test from "node:test";
+import { spawn } from "node:child_process";
+import { once } from "node:events";
 import assert from "node:assert/strict";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -154,4 +156,38 @@ test("rejects a complete-looking final JSON record without its newline delimiter
       /not newline-terminated/
     );
   } finally { await rm(f.dir, { recursive: true, force: true }); }
+});
+
+
+test("exclusive ledger lock is enforced across separate Node.js processes", async () => {
+  const f = await fixture();
+  const script = [
+    'import { createPersistentPaperLedger } from "./src/paper/persistent-paper-ledger.js";',
+    'const ledger = await createPersistentPaperLedger({ filePath: process.argv[1] });',
+    'process.stdout.write("READY\\n");',
+    'process.stdin.once("data", async () => { await ledger.close(); process.exit(0); });'
+  ].join("\\n");
+  let child;
+  try {
+    child = spawn(process.execPath, ["--input-type=module", "-e", script, f.filePath], {
+      cwd: process.cwd(), stdio: ["pipe", "pipe", "pipe"]
+    });
+    const ready = await Promise.race([
+      once(child.stdout, "data"),
+      once(child, "exit").then(([code]) => { throw new Error("lock-holder child exited early: " + code); })
+    ]);
+    assert.match(String(ready[0]), /READY/);
+    await assert.rejects(
+      createPersistentPaperLedger({ filePath: f.filePath }),
+      /locked by another process/
+    );
+    child.stdin.write("close\\n");
+    const [code] = await once(child, "exit");
+    assert.equal(code, 0);
+    const reopened = await createPersistentPaperLedger({ filePath: f.filePath });
+    await reopened.close();
+  } finally {
+    if (child && child.exitCode === null) child.kill("SIGKILL");
+    await rm(f.dir, { recursive: true, force: true });
+  }
 });
