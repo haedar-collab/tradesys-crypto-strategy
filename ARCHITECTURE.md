@@ -76,3 +76,5 @@ The extracted regime module deliberately preserves the current application's reg
 
 - Relative-strength inputs must share the same latest timestamp and a contiguous daily observation sequence. The default interval is 86,400,000 ms; callers with a different daily candle convention may set `expectedIntervalMs`. A missing aligned daily interval returns `WAIT_DATA / HISTORY_GAP`, rather than treating the next available observation as an exact 7/30/90-day bar.
 - The 1H trigger distinguishes actual OHLC zone intersection from a candle entirely beyond the zone, and returns explicit zone states `UNTOUCHED`, `TOUCHED`, `RECLAIMED`, or `BROKEN`. A close below the ATR invalidation buffer inside the trigger lookback blocks the setup.
+
+- Anti-lookahead regression tests compare confirmed structure events and daily regime outputs from historical prefixes against the same timestamps in full-history runs. These tests do not yet cover the full SMC zone/trigger/plan pipeline.
