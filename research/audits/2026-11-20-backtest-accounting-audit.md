@@ -4,11 +4,13 @@
 
 Static review of `src/backtest/event-driven.js` and `src/backtest/portfolio.js` on `foundation/v1-contract`. This is a code-level audit, not a runtime execution or profitability assessment.
 
-## Findings
+## Findings and remediation status
+
+The original findings below were addressed in code on `foundation/v1-contract` with marked-equity accounting, per-bar drawdown checks, and terminal marked equity. This is a static implementation status only; it is not yet runtime-verified. The acceptance tests listed below remain the release gate.
 
 ### BTA-001 — Drawdown is calculated from realized closed-trade equity only
 
-**Severity:** High
+**Severity:** High — remediation implemented; runtime verification pending
 
 Both simulators update peak equity and maximum drawdown only when a position closes. The portfolio simulator also evaluates its drawdown gate using this realized-only equity and peak.
 
@@ -37,7 +39,7 @@ The single-symbol simulator returns `endingEquity` based on closed trades only a
 
 ### BTA-003 — Single-symbol backtest has no drawdown admission guard
 
-**Severity:** Medium
+**Severity:** Medium — remediation implemented; runtime verification pending
 
 The single-symbol simulator has no peak-to-trough drawdown state machine, unlike the portfolio simulator.
 
@@ -60,4 +62,4 @@ The single-symbol simulator has no peak-to-trough drawdown state machine, unlike
 
 ## Release decision
 
-Backtest outputs remain research-only until BTA-001 through BTA-003 are fixed and the acceptance tests pass. Existing unit-test success does not cover these accounting limitations.
+Backtest outputs remain research-only until the current branch passes CI and the acceptance tests below are verified. The implementation has been updated, but the tests have not yet been executed against the latest commits. No profitability claim follows from these code changes.
