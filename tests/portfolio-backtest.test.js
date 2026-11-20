@@ -129,7 +129,7 @@ test("single-asset and one-symbol portfolio simulators agree after partial exits
 });
 
 test("single-asset and one-symbol portfolio agree on partial TP1 open-position accounting",()=>{
- const rows=[[100,101,99,100],[100,106,99,105],[105,106,102,104]];
+ const rows=[[100,101,99,100],[100,104,99,102],[102,106,101,105],[105,106,102,104]];
  const candles=bars(rows),oneSignal=signal(0);
  const single=runEventBacktest({bars:candles,signals:[oneSignal],initialCapital:10000,riskPct:1,feeBps:12,slippageBps:7});
  const portfolio=runPortfolioBacktest({
