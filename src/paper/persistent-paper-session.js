@@ -175,6 +175,7 @@ export async function createPersistentPaperSession({
 
   async function evaluateEntryRisk(input) {
     if (input.side === "SELL") return { allowed: true, reason: "EXIT_ORDERS_REMAIN_ALLOWED" };
+    if (input.riskGate?.allowed === false) return { allowed: false, reason: "UPSTREAM_RISK_VETO" };
     const snapshot = projectedBuySnapshot(input);
     if (!snapshot) return { allowed: false, reason: "RISK_DATA_UNAVAILABLE" };
     const result = riskMonitor.evaluate(snapshot);
@@ -241,7 +242,13 @@ export async function createPersistentPaperSession({
       payload: mark
     });
     latestMark = entry;
-    return clone(mark);
+    const risk = riskMonitor.evaluate({
+      equity: mark.equity,
+      positions: mark.marks,
+      timestamp: clock
+    });
+    await persistRiskState("MARK_TO_MARKET_EVALUATION");
+    return Object.freeze({ ...clone(mark), risk: clone(risk) });
   }
 
   async function activateKillSwitch(reason = "MANUAL_KILL_SWITCH") {
