@@ -36,3 +36,9 @@ Latest CI run: 35 tests passed, 0 failed. These are extraction increments, not a
 - Added explicit historical `asOf` boundaries to zone quality, departure strength and retest counting; zone visits now require actual OHLC intersection.
 - Added regression tests for historical zone-quality stability, future-candle mutation, and OB/FVG snapshots before later invalidation/fill.
 - CI regression suite expanded to 98 passing tests.
+
+
+- Added marked-equity drawdown checks and terminal marked-equity reporting to single-symbol and aligned portfolio simulators.
+- Fixed single-symbol drawdown admission when a stop closes on the entry bar.
+- Added single-symbol/one-symbol portfolio parity coverage for open positions, partial TP1, gap-through-stop fills and completed trades.
+- Latest GitHub Actions CI: 113 tests passed, 0 failed. Research-only status remains; broader risk-state parity and out-of-sample validation are not complete.
