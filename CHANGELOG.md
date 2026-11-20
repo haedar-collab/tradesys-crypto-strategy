@@ -15,4 +15,4 @@
 - Added unit fixtures for candle validation, indicators, regime transitions, and relative strength.
 - Added GitHub Actions Node.js test workflow.
 
-These are extraction increments, not a production release. CI and parity validation remain mandatory.
+Latest CI run: 35 tests passed, 0 failed. These are extraction increments, not a production release. Full integration, broader parity validation, and strategy-performance validation remain mandatory.
