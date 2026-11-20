@@ -32,7 +32,7 @@ test("integrated session persists broker fills and restores cash and positions a
     const input = await orderInput(f.now);
     await session.submitMarketOrder(input);
     const before = await session.snapshot();
-    assert.equal(before.ledger.eventCount, 4);
+    assert.equal(before.ledger.eventCount, 5);
     assert.equal(before.broker.positions[0].quantity, 0.25);
     const cashBefore = before.broker.cash;
     await session.close();
@@ -41,7 +41,7 @@ test("integrated session persists broker fills and restores cash and positions a
     const after = await session.snapshot();
     assert.equal(after.broker.positions[0].quantity, 0.25);
     assert.equal(after.broker.cash, cashBefore);
-    assert.equal(after.ledger.eventCount, 5);
+    assert.equal(after.ledger.eventCount, 6);
     await session.close();
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
@@ -66,18 +66,17 @@ test("recovery rejects an interrupted write-ahead submission instead of auto-exe
   try {
     const input = await orderInput(f.now, "session_buy_0003");
     const ledger = await (await import("../src/paper/persistent-paper-ledger.js")).createPersistentPaperLedger({ filePath });
+    await ledger.append({ eventId: "session_start_0001", type: "SESSION_STARTED", timestamp: f.now(), payload: { config: { mode: "PAPER_ONLY", initialCash: 10_000, feeBps: 10, slippageBps: 5, maxQuoteAgeMs: 5_000, riskMarkMaxAgeMs: 60_000, dailyLossLimitPct: 3, maxDrawdownPct: 10, maxExposurePct: 80 } } });
     const { createHash } = await import("node:crypto");
     const eventId = "paper_" + createHash("sha256").update(input.clientOrderId).digest("hex").slice(0, 32) + "_submitted";
     await ledger.append({ eventId, type: "ORDER_SUBMITTED", timestamp: f.now(), payload: { clientOrderId: input.clientOrderId, orderInput: input } });
     await ledger.close();
 
-    const recovered = await createPersistentPaperSession({ filePath, now: f.now });
-    const state = await recovered.snapshot();
-    assert.equal(state.broker.positions.length, 0);
-    assert.ok(state.ledger.events.some(e => e.type === "ORDER_REJECTED" &&
-      /manual review required/.test(e.payload.message)));
-    await assert.rejects(recovered.submitMarketOrder(input), /manual review required/);
-    await recovered.close();
+    await assert.rejects(createPersistentPaperSession({ filePath, now: f.now }), error => {
+      assert.equal(error.recoveryAudit.status, "REVIEW");
+      assert.ok(error.recoveryAudit.findings.some(x => x.code === "INTERRUPTED_ORDER_REQUIRES_MANUAL_REVIEW"));
+      return true;
+    });
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
 
@@ -208,8 +207,9 @@ test("recovery rejects a submission interrupted after its durable risk check", a
     riskMonitor.evaluate({ equity: 10_000, positions: [], timestamp: f.now() });
     const state = { ...riskMonitor.status(), events: [] };
     const { createHash } = await import("node:crypto");
+    await ledger.append({ eventId: "session_start_0002", type: "SESSION_STARTED", timestamp: f.now(), payload: { config: { mode: "PAPER_ONLY", initialCash: 10_000, feeBps: 10, slippageBps: 5, maxQuoteAgeMs: 5_000, riskMarkMaxAgeMs: 60_000, dailyLossLimitPct: 3, maxDrawdownPct: 10, maxExposurePct: 80 } } });
     const digest = createHash("sha256").update(JSON.stringify({
-      reason: "ORDER_ENTRY_CHECK", timestamp: f.now(), sequence: 1, state
+      reason: "ORDER_ENTRY_CHECK", timestamp: f.now(), sequence: 2, state
     })).digest("hex");
     const submittedId = "paper_" + createHash("sha256").update(input.clientOrderId).digest("hex").slice(0, 32) + "_submitted";
     await ledger.append({
@@ -222,15 +222,10 @@ test("recovery rejects a submission interrupted after its durable risk check", a
     });
     await ledger.close();
 
-    const recovered = await createPersistentPaperSession({ filePath, now: f.now });
-    const snapshot = await recovered.snapshot();
-    assert.equal(snapshot.broker.positions.length, 0);
-    assert.equal(snapshot.risk.peakEquity, 10_000);
-    assert.ok(snapshot.ledger.events.some(e =>
-      e.type === "ORDER_REJECTED" &&
-      e.payload.clientOrderId === input.clientOrderId &&
-      /manual review required/.test(e.payload.message)
-    ));
-    await recovered.close();
+    await assert.rejects(createPersistentPaperSession({ filePath, now: f.now }), error => {
+      assert.equal(error.recoveryAudit.status, "REVIEW");
+      assert.ok(error.recoveryAudit.findings.some(x => x.code === "INTERRUPTED_ORDER_REQUIRES_MANUAL_REVIEW"));
+      return true;
+    });
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
