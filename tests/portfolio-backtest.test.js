@@ -239,7 +239,7 @@ test("portfolio drawdown block persists through partial recovery and unlocks onl
    BBBUSDT:asset(rows,[wideStopSignal(0)],[5,4,3,2,1]),
    CCCUSDT:asset(rows,[wideStopSignal(2),wideStopSignal(3)],[1,3,2,5,4])
   },
-  initialCapital:10000,riskPct:10,ddLimitPct:5,ddRecoverPct:2,
+  initialCapital:10000,riskPct:6,ddLimitPct:5,ddRecoverPct:2,
   ddReducedMultiplier:.5,regimeCapPct:100,maxPositions:3,corrMax:1,
   feeBps:0,slippageBps:0
  });
