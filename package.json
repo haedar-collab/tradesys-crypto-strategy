@@ -1,0 +1,14 @@
+{
+  "name": "@haedar-collab/tradesys-crypto-strategy",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic strategy engine for Tradesys Crypto",
+  "scripts": {
+    "test": "node --test",
+    "test:coverage": "node --experimental-test-coverage --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
