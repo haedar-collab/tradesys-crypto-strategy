@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/haedar-collab/tradesys-crypto-strategy/schemas/input.schema.json",
+  "title": "Tradesys Strategy Input v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "as_of", "venue", "universe", "market", "context", "account"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "as_of": { "type": "string", "format": "date-time" },
+    "venue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exchange", "market_type"],
+      "properties": { "exchange": { "const": "BINANCE" }, "market_type": { "const": "SPOT" } }
+    },
+    "universe": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["symbol", "quote_asset", "status"],
+        "properties": {
+          "symbol": { "type": "string", "pattern": "^[A-Z0-9]+$" },
+          "quote_asset": { "type": "string" },
+          "status": { "type": "string", "enum": ["TRADING", "HALT", "BREAK"] },
+          "filters": { "type": "object" }
+        }
+      }
+    },
+    "market": { "type": "object", "description": "Normalized OHLCV by symbol/timeframe; UTC millisecond timestamps.", "additionalProperties": true },
+    "context": { "type": "object", "description": "Benchmark regime inputs, event risk, and optional reference metrics.", "additionalProperties": true },
+    "account": {
+      "type": "object",
+      "required": ["equity_quote", "risk_per_trade_pct", "max_exposure_pct"],
+      "properties": {
+        "equity_quote": { "type": "number", "exclusiveMinimum": 0 },
+        "risk_per_trade_pct": { "type": "number", "minimum": 0, "maximum": 1 },
+        "max_exposure_pct": { "type": "number", "minimum": 0, "maximum": 1 },
+        "open_positions": { "type": "array", "items": { "type": "object" } }
+      }
+    }
+  }
+}

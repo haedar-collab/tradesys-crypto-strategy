@@ -1,0 +1,38 @@
+# Strategy Engine Architecture
+
+## Responsibility
+Canonical home for versioned strategy rules and deterministic decisions consumed by `tradesys-crypto`.
+
+## Dependency rule
+The engine accepts normalized market snapshots and user risk constraints. It returns structured analysis, evidence, invalidation, and risk decisions. It must not call external APIs, read browser storage or secrets, send notifications, place orders, or mutate application state.
+
+## Pipeline
+1. Validate schema, timestamps, candle ordering, closure state, and data freshness.
+2. Determine market regime from supplied benchmark context.
+3. Evaluate eligible universe and relative strength.
+4. Evaluate multi-timeframe structure and SMC evidence.
+5. Score setup quality and wait for explicit trigger confirmation.
+6. Calculate invalidation, entry, stop, targets, and reward/risk.
+7. Apply account-level risk constraints.
+8. Emit a decision with rule IDs, strategy version, and audit metadata.
+
+Critical validation failure produces `WAIT_DATA` or `BLOCKED`, never BUY.
+
+## Modules
+- `src/validation/` — input and data-quality checks.
+- `src/regime/` — market regime classification.
+- `src/universe/` — eligibility and relative strength.
+- `src/structure/` — market structure and SMC primitives.
+- `src/setups/` — setup and trigger state machine.
+- `src/risk/` — sizing constraints and risk gates.
+- `src/engine/` — orchestration and output assembly.
+
+## Validation requirements
+- No lookahead: pivots and swings become usable only after confirmation.
+- Confirmed signals use closed candles; forming candles are display-only.
+- Backtests model fees, spread, slippage, fill assumptions, and ambiguous OHLC bars conservatively.
+- Use chronological out-of-sample and walk-forward evaluation.
+- Report results by symbol, regime, and time period.
+- Preserve strategy version and parameter hash for every result.
+
+No profitability claim or live execution authorization follows from unit tests or a backtest alone.
