@@ -61,10 +61,13 @@ test("reports marked ending equity separately from realized equity for open posi
 test("marked drawdown is reflected in portfolio equity while positions remain open",()=>{
  const rows=[[100,101,99,100],[100,101,97,98],[98,99,97,98],[98,99,97,98]];
  const result=runPortfolioBacktest({
-  assets:{AAAUSDT:asset(rows,[signal(0),signal(1)],[.01,.02,.03])},
+  assets:{
+   AAAUSDT:asset(rows,[signal(0)],[.01,.02,.03]),
+   BBBUSDT:asset(rows,[signal(1)],[.02,.01,.03])
+  },
   riskPct:50,ddLimitPct:1,ddRecoverPct:.5,regimeCapPct:100,maxPositions:3,
   feeBps:0,slippageBps:0
  });
  assert.ok(result.maxDrawdownPct>=1);
- assert.ok(result.skipped.some(x=>x.reason==="DRAWDOWN_LIMIT_REACHED"));
+ assert.ok(result.skipped.some(x=>x.symbol==="BBBUSDT"&&x.reason==="DRAWDOWN_LIMIT_REACHED"));
 });
