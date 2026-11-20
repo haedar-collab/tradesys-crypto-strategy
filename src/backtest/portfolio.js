@@ -103,7 +103,7 @@ export function runPortfolioBacktest(input){
    drawdownState=ddGate.state;
    if(!ddGate.allowNewEntries){skipped.push({symbol,index:signal.index,reason:"DRAWDOWN_LIMIT_REACHED"});continue;}
    const riskGate=evaluatePortfolioRisk({
-    equity,regimeCapPct,maxPositions,candidateSymbol:symbol,openPositions,
+    equity:markedEquity,regimeCapPct,maxPositions,candidateSymbol:symbol,openPositions,
     candidateReturns:input.assets[symbol].dailyReturns,corrMax
    });
    if(!riskGate.allowed){
