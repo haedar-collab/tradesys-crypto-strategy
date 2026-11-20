@@ -5,7 +5,7 @@
  */
 const REGIMES = ["BULLISH","BEARISH","SIDEWAYS"];
 function validateBars(bars) {
-  if (!Array.isArray(bars) || bars.length < 10) throw new TypeError("at least 10 bars are required");
+  if (!Array.isArray(bars) || bars.length < 2) throw new TypeError("at least 2 bars are required");
   for (let i=0;i<bars.length;i++) {
     const b=bars[i];
     if (!b || !Number.isFinite(b.t) || !Number.isFinite(b.c) || b.c<=0 || (i && b.t<=bars[i-1].t)) throw new RangeError("invalid or unordered close at index "+i);
@@ -24,6 +24,7 @@ export function labelCausalRegimes(bars,{lookback=20,trendThresholdPct=3}={}) {
 }
 export function splitChronologicalDataset(bars,{trainPct=0.6,validationPct=0.2,purgeBars=20,embargoBars=1}={}) {
   validateBars(bars);
+  if(bars.length < 10) throw new TypeError("at least 10 bars are required for dataset splitting");
   if(!Number.isFinite(trainPct)||!Number.isFinite(validationPct)||trainPct<=0||validationPct<=0||trainPct+validationPct>=1) throw new RangeError("trainPct and validationPct must be positive and sum to less than one");
   if(!Number.isInteger(purgeBars)||purgeBars<0||!Number.isInteger(embargoBars)||embargoBars<0) throw new RangeError("purgeBars and embargoBars must be non-negative integers");
   const n=bars.length,trainEnd=Math.floor(n*trainPct),validationEnd=Math.floor(n*(trainPct+validationPct));
