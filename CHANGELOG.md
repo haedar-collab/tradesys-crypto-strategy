@@ -16,3 +16,10 @@
 - Added GitHub Actions Node.js test workflow.
 
 Latest CI run: 35 tests passed, 0 failed. These are extraction increments, not a production release. Full integration, broader parity validation, and strategy-performance validation remain mandatory.
+
+
+## 0.2.0 — Strategy orchestration and research backtest
+- Added conservative Weekly/Daily/benchmark-regime/4H/1H orchestration.
+- Added same-bar TP1-to-breakeven stop handling and fail-closed portfolio correlation inputs.
+- Added single-symbol event-driven spot backtest with next-bar entries, entry-bar processing, fees, slippage, spot-equity cap, and conservative OHLC exit policy.
+- Added deterministic regression tests for the new orchestration and simulator. This remains a research implementation, not a validated profitable strategy.
