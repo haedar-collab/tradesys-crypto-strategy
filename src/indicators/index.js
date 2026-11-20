@@ -156,7 +156,7 @@ export function pivotsAll(high, low, leftRight = 3) {
   assertPeriod(leftRight);
   assertNumericArray(high, "high"); assertNumericArray(low, "low");
   if (high.length !== low.length) throw new RangeError("high and low arrays must have equal lengths");
-  const highs = [], lows = [];
+  const hi = [], lo = [];
   for (let i = leftRight; i < high.length - leftRight; i++) {
     if (high[i] == null || low[i] == null) continue;
     let isHigh = true, isLow = true;
@@ -166,10 +166,12 @@ export function pivotsAll(high, low, leftRight = 3) {
       if (high[j] >= high[i]) isHigh = false;
       if (low[j] <= low[i]) isLow = false;
     }
-    if (isHigh) highs.push({ index: i, availableAt: i + leftRight });
-    if (isLow) lows.push({ index: i, availableAt: i + leftRight });
+    // Preserve the original Tradesys contract: pivot arrays contain numeric bar indices.
+    // A pivot is only knowable once its right-side confirmation bars have closed.
+    if (isHigh) hi.push(i);
+    if (isLow) lo.push(i);
   }
-  return { highs, lows };
+  return { hi, lo };
 }
 
 export function pctRank(values, index, window) {
