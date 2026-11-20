@@ -90,3 +90,28 @@ export function evaluatePortfolioRisk(input) {
     activeCount:active.length,correlatedWith,highestCorrelation
   };
 }
+
+
+/**
+ * Hysteretic drawdown control for new entries. A blocked state only recovers
+ * after drawdown falls to ddRecoverPct or below; all percentages use peak equity.
+ */
+export function evaluateDrawdownRisk(input) {
+  if(!input||!finitePositive(input.equity)||!finitePositive(input.peakEquity)||input.equity>input.peakEquity)
+    return {status:"WAIT_DATA",state:"UNKNOWN",allowNewEntries:false,multiplier:0,reasons:["INVALID_EQUITY_OR_PEAK"]};
+  const ddLimitPct=input.ddLimitPct??10, ddRecoverPct=input.ddRecoverPct??5;
+  const reducedMultiplier=input.reducedMultiplier??0.5;
+  if(!Number.isFinite(ddLimitPct)||!Number.isFinite(ddRecoverPct)||!Number.isFinite(reducedMultiplier)||
+    ddRecoverPct<0||ddLimitPct<=ddRecoverPct||ddLimitPct>100||reducedMultiplier<=0||reducedMultiplier>1)
+    return {status:"BLOCKED",state:"UNKNOWN",allowNewEntries:false,multiplier:0,reasons:["INVALID_DRAWDOWN_PARAMETERS"]};
+  const drawdownPct=(input.peakEquity-input.equity)/input.peakEquity*100;
+  const previous=input.previousState??"NORMAL";
+  if(!["NORMAL","REDUCED","BLOCKED"].includes(previous))
+    return {status:"BLOCKED",state:"UNKNOWN",allowNewEntries:false,multiplier:0,reasons:["INVALID_PREVIOUS_DRAWDOWN_STATE"]};
+  let state="NORMAL";
+  if(drawdownPct>=ddLimitPct || (previous==="BLOCKED"&&drawdownPct>ddRecoverPct)) state="BLOCKED";
+  else if(drawdownPct>=ddRecoverPct) state="REDUCED";
+  const multiplier=state==="NORMAL"?1:state==="REDUCED"?reducedMultiplier:0;
+  return {status:state==="BLOCKED"?"BLOCKED":"ALLOWED",state,allowNewEntries:state!=="BLOCKED",multiplier,drawdownPct,
+    reasons:state==="BLOCKED"?["DRAWDOWN_LIMIT_REACHED"]:state==="REDUCED"?["DRAWDOWN_SIZE_REDUCTION"]:[]};
+}
