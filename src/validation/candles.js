@@ -102,7 +102,6 @@ export function normalizeCandles(rows, options = {}) {
     normalized.push({ ...c, closed });
   });
 
-  normalized.sort((a, b) => a.openTime - b.openTime);
   const deduped = [];
   for (const candle of normalized) {
     const previous = deduped[deduped.length - 1];
@@ -111,7 +110,7 @@ export function normalizeCandles(rows, options = {}) {
       continue;
     }
     if (previous && candle.openTime < previous.openTime) {
-      errors.push(issue("KLINE_ORDER", "Candle timestamps must be strictly increasing.", "error"));
+      errors.push(issue("KLINE_ORDER", "Input candle timestamps are descending; input must already be chronological.", "error"));
       continue;
     }
     deduped.push(candle);
