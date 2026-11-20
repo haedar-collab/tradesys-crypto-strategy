@@ -27,6 +27,7 @@ It does **not** own market-data fetching, UI, browser storage, notifications, ex
 - [x] Initial single-symbol and aligned multi-symbol event-driven Spot backtests with next-bar entry, fees, slippage, conservative OHLC exits, portfolio exposure/correlation gates, and regression fixtures.
 - [x] 1H zone-intersection / invalidation / reclaim state tests and contiguous daily RS history checks.
 - [x] Prefix-based anti-lookahead regression checks for confirmed structure events and daily regime decisions.
+- [x] Historical as-of zone-quality/retest scoring and OB/FVG snapshot regression checks.
 - [ ] Walk-forward/out-of-sample validation, parameter sensitivity, spread/market-impact calibration, and exchange-realistic execution.
 - [ ] Application adapter integration.
 
