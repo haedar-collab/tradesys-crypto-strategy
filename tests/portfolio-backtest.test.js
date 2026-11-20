@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { runPortfolioBacktest } from "../src/backtest/portfolio.js";
+import { runEventBacktest } from "../src/backtest/event-driven.js";
 
 const plan={entry:100,stop:95,tp1:105,tp2:110,tp3:115};
 function bars(rows){return rows.map((r,i)=>({t:i*60_000,o:r[0],h:r[1],l:r[2],c:r[3]}));}
@@ -85,4 +86,42 @@ test("rechecks marked drawdown after each same-bar portfolio entry",()=>{
  assert.equal(result.trades.length,0);
  assert.ok(result.openPositions.some(x=>x.symbol==="AAAUSDT"));
  assert.ok(result.skipped.some(x=>x.symbol==="BBBUSDT"&&x.reason==="DRAWDOWN_LIMIT_REACHED"));
+});
+
+test("single-asset and one-symbol portfolio simulators agree on terminal marked equity",()=>{
+ const rows=[[100,101,99,100],[100,104,99,102],[102,104,101,103]];
+ const candles=bars(rows);
+ const oneSignal=signal(0);
+ const single=runEventBacktest({
+  bars:candles,signals:[oneSignal],initialCapital:10000,riskPct:1,
+  feeBps:10,slippageBps:5
+ });
+ const portfolio=runPortfolioBacktest({
+  assets:{AAAUSDT:{bars:candles,signals:[oneSignal],dailyReturns:[.01,.02,.03]}},
+  initialCapital:10000,riskPct:1,regimeCapPct:100,maxPositions:1,
+  feeBps:10,slippageBps:5
+ });
+ assert.equal(single.tradeCount,0);
+ assert.equal(portfolio.tradeCount,0);
+ assert.ok(Math.abs(single.endingEquity-portfolio.endingEquity)<1e-8);
+ assert.ok(Math.abs(single.markedEndingEquity-portfolio.markedEndingEquity)<1e-8);
+});
+
+test("single-asset and one-symbol portfolio simulators agree after partial exits and final closure",()=>{
+ const rows=[[100,101,99,100],[100,104,99,102],[102,111,101,110],[110,116,101,114]];
+ const candles=bars(rows);
+ const oneSignal=signal(0);
+ const single=runEventBacktest({
+  bars:candles,signals:[oneSignal],initialCapital:10000,riskPct:1,
+  feeBps:10,slippageBps:5
+ });
+ const portfolio=runPortfolioBacktest({
+  assets:{AAAUSDT:{bars:candles,signals:[oneSignal],dailyReturns:[.01,.02,.03,.04]}},
+  initialCapital:10000,riskPct:1,regimeCapPct:100,maxPositions:1,
+  feeBps:10,slippageBps:5
+ });
+ assert.equal(single.tradeCount,1);
+ assert.equal(portfolio.tradeCount,1);
+ assert.ok(Math.abs(single.trades[0].netPnl-portfolio.trades[0].netPnl)<1e-8);
+ assert.ok(Math.abs(single.endingEquity-portfolio.endingEquity)<1e-8);
 });
