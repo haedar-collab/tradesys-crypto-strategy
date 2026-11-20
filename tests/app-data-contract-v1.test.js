@@ -1,0 +1,6 @@
+import test from "node:test";import assert from "node:assert/strict";import {validateStrategyDataContract,runStrategyContractReplay} from "../src/integration/app-data-contract-v1.js";
+const candle={openTime:0,closeTime:59,open:1,high:2,low:1,close:2,volume:3,closed:true};
+const payload={schema_version:"1.0.0",as_of:"1970-01-01T00:00:00.100Z",venue:{exchange:"BINANCE",market_type:"SPOT"},universe:[{symbol:"BTCUSDT",quote_asset:"USDT",status:"TRADING"}],market:{BTCUSDT:{weekly:[candle],daily:[candle],h4:[candle],h1:[candle]}},context:{evaluation_times_ms:[100],data_mode:"HISTORICAL_RESEARCH"},account:{equity_quote:1,risk_per_trade_pct:0,max_exposure_pct:0,open_positions:[]}};
+test("validates application contract v1",()=>assert.equal(validateStrategyDataContract(payload).status,"PASS"));
+test("rejects unsupported version, bad venue and future-open candle",()=>{const p=structuredClone(payload);p.schema_version="2";p.venue.market_type="FUTURES";p.market.BTCUSDT.h1=[{...candle,closed:false}];assert.equal(validateStrategyDataContract(p).status,"FAIL");});
+test("invokes causal replay only for validated contract",()=>{const result=runStrategyContractReplay(payload,{minimumBars:{weekly:1,daily:1,h4:1,h1:1}});assert.equal(result.status,"COMPLETE");assert.equal(result.symbol,"BTCUSDT");assert.equal(result.mode,"historical-research-only");});
