@@ -4,8 +4,8 @@ import { evaluateLtfTrigger } from "../src/structure/ltf-trigger.js";
 
 function fixture() {
   const n=60;
-  const c=Array(n).fill(98),o=Array(n).fill(98),h=Array(n).fill(101),l=Array(n).fill(97);
-  l[50]=98;
+  const c=Array(n).fill(100),o=Array(n).fill(100),h=Array(n).fill(101),l=Array(n).fill(100);
+  c[50]=98;o[50]=98;h[50]=101;l[50]=98;
   return {n,t:Array.from({length:n},(_,i)=>i*3_600_000),
     ct:Array.from({length:n},(_,i)=>(i+1)*3_600_000-1),
     o,h,l,c,atr:Array(n).fill(2),piv:{hi:[],lo:[]}};
@@ -54,7 +54,7 @@ test("records a wick below the zone followed by a close back above as reclaim",(
 });
 
 test("marks the zone broken on any close below the invalidation buffer in lookback",()=>{
- const p=fixture();p.c[55]=94.5;p.c[59]=98;
+ const p=fixture();p.c[55]=94.5;p.l[55]=94;p.c[59]=98;
  const result=evaluateLtfTrigger(p,zone,4);
  assert.equal(result.state,"broken");assert.equal(result.zoneState,"BROKEN");
  assert.equal(result.invalidatedAt,p.t[55]);
