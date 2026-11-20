@@ -36,3 +36,12 @@ Critical validation failure produces `WAIT_DATA` or `BLOCKED`, never BUY.
 - Preserve strategy version and parameter hash for every result.
 
 No profitability claim or live execution authorization follows from unit tests or a backtest alone.
+
+
+## Extracted modules (initial)
+
+- `src/validation/candles.js`: normalizes Binance Spot klines, excludes forming candles by default, and reports timestamp, OHLC, volume, interval-gap, and staleness issues.
+- `src/indicators/index.js`: pure EMA/SMA/Wilder/RSI/ATR/ADX/Bollinger/OBV/pivot/percentile calculations.
+- `src/regime/index.js`: BTC daily regime classifier and N-bar effective regime timeline.
+
+The extracted regime module deliberately preserves the current application's regime labels, rule ordering, fallback behavior, and transition behavior. This is parity-first extraction, not a strategy redesign. Known legacy behaviors remain documented for separate decisions, including initial regime seeding before confirmation and the current pivot confirmation filter.
