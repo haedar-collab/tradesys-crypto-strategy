@@ -160,7 +160,7 @@ The following changes were implemented after the initial static audit. They redu
 | F-01 intrabar TP1/breakeven ambiguity | Partially addressed | Conservative exit state machine and event-driven simulators exist; fixed-bps costs are still simplified and require execution stress tests. |
 | F-02 pending regime transition | Addressed in the new MTF gate | The strategy orchestrator blocks unconfirmed regime inputs. The original application scan still needs adapter/parity verification. |
 | F-03 candle-quality gate | Partially addressed | Binance kline normalization validates OHLC, ordering, duplicates, interval gaps, staleness, and forming candles. Adapter must use it consistently before indicators. RS now rejects gaps in aligned daily history. |
-| F-04 pivot availability | Not fully closed | Existing confirmation logic is preserved; truncated-prefix replay and anti-lookahead tests are still required. |
+| F-04 pivot availability | Partially addressed | Added prefix-based regression checks proving structure events and daily regime outputs are unchanged when future bars are appended. Full SMC and entry/exit prefix replay remains open. |
 | F-05 1H zone touch semantics | Improved | 1H touch now requires true OHLC intersection; states distinguish untouched, touched, reclaimed, and broken; regression fixtures cover deep penetration, stale touches and invalidation. Full historical replay remains open. |
 | F-06 backtest release evidence | Partially addressed | Single-symbol and multi-symbol event simulators exist. Chronological holdout, walk-forward, parameter sensitivity, and exchange execution calibration remain open. |
 | F-07 provisional weekly context | Addressed in the new MTF gate | Provisional weekly context blocks new candidates. The app adapter must pass only completed weekly context. |
@@ -170,3 +170,12 @@ The following changes were implemented after the initial static audit. They redu
 - GitHub Actions run #195: 93 tests passed, 0 failed.
 - The test suite is unit/regression coverage, not historical strategy performance evidence.
 - No live order execution, profitability claim, or production-readiness claim is authorized by these results.
+
+
+### Anti-lookahead regression increment
+
+The test suite now replays historical prefixes and compares:
+- confirmed BOS/CHoCH event streams on every prefix against the full-history stream truncated at that bar;
+- raw and effective daily regime decisions on selected prefixes against the same timestamps in the full history.
+
+This is targeted evidence for pivot confirmation and regime causality. It is not yet a complete anti-lookahead proof for order blocks, FVGs, zone quality, 1H triggers, trade-plan construction, or application-side caching/frozen plans.
