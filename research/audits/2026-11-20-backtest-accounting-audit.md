@@ -6,7 +6,7 @@ Static review of `src/backtest/event-driven.js` and `src/backtest/portfolio.js` 
 
 ## Findings and remediation status
 
-The original findings below were addressed in code on `foundation/v1-contract` with marked-equity accounting, per-bar drawdown checks, and terminal marked equity. The implementation has now passed GitHub Actions CI on the latest branch revision (114 tests, 0 failures). The parity coverage includes terminal marked equity, partial TP1 open-position accounting, gap-through-stop fills, completed-trade PnL and single-/one-symbol shared hysteretic drawdown-reduction sizing. Full parity across multiple simultaneous positions, all fee/slippage configurations and terminal liquidation remains open.
+The original findings below were addressed in code on `foundation/v1-contract` with marked-equity accounting, per-bar drawdown checks, and terminal marked equity. The implementation has now passed GitHub Actions CI on the latest branch revision (116 tests, 0 failures). The parity coverage includes terminal marked equity, partial TP1 open-position accounting, gap-through-stop fills, completed-trade PnL and single-/one-symbol shared hysteretic drawdown-reduction sizing. Multi-position simultaneous-loss stress tests now verify that combined realized losses block a subsequent candidate and that combined open-position losses are marked before entry admission. Broader recovery-state parity, all fee/slippage configurations and terminal liquidation remain open.
 
 ### BTA-001 — Drawdown is calculated from realized closed-trade equity only
 
@@ -63,3 +63,10 @@ The single-symbol simulator has no peak-to-trough drawdown state machine, unlike
 ## Release decision
 
 Backtest outputs remain research-only until the current branch passes CI and the acceptance tests below are verified. The implementation has passed the current 113-test CI suite. Remaining acceptance tests—especially full drawdown-state parity and terminal liquidation accounting—must still pass before release. No profitability claim follows from these code changes.
+
+
+## Multi-position stress increment — 2026-11-20
+
+- Added deterministic tests with two concurrent positions losing together and a third candidate due for entry. The portfolio blocks the third entry after combined realized losses breach the drawdown limit.
+- Added a second test where two open positions produce combined marked losses; the candidate entry is blocked before a realized exit occurs.
+- CI run #324 passed: 116 tests, 0 failures. This verifies these specific stress paths only; it is not a comprehensive Monte Carlo, walk-forward, or market-impact validation.
