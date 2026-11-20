@@ -96,16 +96,11 @@ export async function createPersistentPaperSession({
     }
   }
 
-  // Complete submissions interrupted by a process crash before a terminal event.
+  // A write-ahead intent without a durable fill is ambiguous after a crash.
+  // Never auto-execute it during recovery; record a safe rejection for operator review.
   for (const [clientOrderId, input] of submitted) {
     if (filled.has(clientOrderId) || rejected.has(clientOrderId)) continue;
-    try {
-      const order = executeAtQuoteTime(input);
-      await persistFill(input, order);
-      lastFillTimestamp = Math.max(lastFillTimestamp, order.filledAt);
-    } catch (error) {
-      await persistRejection(input, error);
-    }
+    await persistRejection(input, new Error("submission interrupted before durable fill; manual review required"));
   }
   clock = now();
 
@@ -125,6 +120,12 @@ export async function createPersistentPaperSession({
       timestamp,
       payload: { reason, state }
     });
+  }
+
+  // Establish the original equity baseline only for a genuinely new session.
+  if (!latestRiskState && recovered.events.length === 0) {
+    riskMonitor.evaluate({ equity: initialCash, positions: [], timestamp: now() });
+    await persistRiskState("SESSION_START_BASELINE");
   }
 
   function currentRiskSnapshot() {
