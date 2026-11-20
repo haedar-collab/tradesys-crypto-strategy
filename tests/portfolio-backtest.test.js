@@ -71,3 +71,18 @@ test("marked drawdown is reflected in portfolio equity while positions remain op
  assert.ok(result.maxDrawdownPct>=1);
  assert.ok(result.skipped.some(x=>x.symbol==="BBBUSDT"&&x.reason==="DRAWDOWN_LIMIT_REACHED"));
 });
+
+test("rechecks marked drawdown after each same-bar portfolio entry",()=>{
+ const rows=[[100,101,99,100],[100,101,97,98],[98,99,97,98]];
+ const result=runPortfolioBacktest({
+  assets:{
+   AAAUSDT:asset(rows,[signal(0,2)],[.01,.02,.03]),
+   BBBUSDT:asset(rows,[signal(0,1)],[.02,.01,.03])
+  },
+  riskPct:50,ddLimitPct:1,ddRecoverPct:.5,regimeCapPct:100,maxPositions:3,
+  feeBps:0,slippageBps:0
+ });
+ assert.equal(result.trades.length,0);
+ assert.ok(result.openPositions.some(x=>x.symbol==="AAAUSDT"));
+ assert.ok(result.skipped.some(x=>x.symbol==="BBBUSDT"&&x.reason==="DRAWDOWN_LIMIT_REACHED"));
+});
