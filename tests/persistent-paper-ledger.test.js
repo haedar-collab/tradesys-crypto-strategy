@@ -139,3 +139,19 @@ test("fails closed on a crash-truncated JSONL tail and releases the acquired loc
     );
   } finally { await rm(f.dir, { recursive: true, force: true }); }
 });
+
+
+test("rejects a complete-looking final JSON record without its newline delimiter", async () => {
+  const f = await fixture();
+  try {
+    const ledger = await createPersistentPaperLedger({ filePath: f.filePath });
+    await ledger.append(event("fill_event_crash_02"));
+    await ledger.close();
+    const content = await readFile(f.filePath, "utf8");
+    await writeFile(f.filePath, content.slice(0, -1));
+    await assert.rejects(
+      createPersistentPaperLedger({ filePath: f.filePath }),
+      /not newline-terminated/
+    );
+  } finally { await rm(f.dir, { recursive: true, force: true }); }
+});
