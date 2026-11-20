@@ -25,3 +25,5 @@ Latest CI run: 35 tests passed, 0 failed. These are extraction increments, not a
 - Added deterministic regression tests for the new orchestration and simulator. This remains a research implementation, not a validated profitable strategy.
 
 - Added aligned multi-symbol Spot portfolio simulation with position-count, exposure and correlation gates.
+
+- Added a hysteretic drawdown guard with risk reduction and a hard new-entry block, integrated into portfolio backtesting.
