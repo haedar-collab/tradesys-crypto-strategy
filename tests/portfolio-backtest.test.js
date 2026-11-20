@@ -1,0 +1,59 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { runPortfolioBacktest } from "../src/backtest/portfolio.js";
+
+const plan={entry:100,stop:95,tp1:105,tp2:110,tp3:115};
+function bars(rows){return rows.map((r,i)=>({t:i*60_000,o:r[0],h:r[1],l:r[2],c:r[3]}));}
+function asset(rows,signals,dailyReturns){return {bars:bars(rows),signals,dailyReturns};}
+function signal(index=0,priority=0){return {index,priority,plan:{...plan}};}
+const commonRows=[[100,101,99,100],[100,104,99,102],[102,111,101,110],[110,116,101,114]];
+
+test("enforces max concurrent positions and regime exposure across symbols",()=>{
+ const result=runPortfolioBacktest({
+  assets:{
+   AAAUSDT:asset(commonRows,[signal(0,2)],[.01,.02,.03,.04]),
+   BBBUSDT:asset(commonRows,[signal(0,1)],[.02,.01,.04,.03])
+  },
+  maxPositions:1,regimeCapPct:80,feeBps:0,slippageBps:0
+ });
+ assert.equal(result.tradeCount,1);
+ assert.equal(result.trades[0].symbol,"AAAUSDT");
+ assert.ok(result.skipped.some(x=>x.symbol==="BBBUSDT"&&x.reason.includes("MAX_POSITIONS_REACHED")));
+});
+
+test("blocks a candidate correlated with an existing open asset",()=>{
+ const result=runPortfolioBacktest({
+  assets:{
+   AAAUSDT:asset(commonRows,[signal()],[1,2,3,4,5]),
+   BBBUSDT:asset(commonRows,[signal()],[2,4,6,8,10])
+  },
+  maxPositions:5,regimeCapPct:100,feeBps:0,slippageBps:0,corrMax:.8
+ });
+ assert.ok(result.skipped.some(x=>x.symbol==="BBBUSDT"&&x.reason.includes("CORRELATED_WITH_ACTIVE_POSITION")));
+});
+
+test("fails closed when correlation history is missing while another position is open",()=>{
+ const result=runPortfolioBacktest({
+  assets:{
+   AAAUSDT:asset(commonRows,[signal()],[1,2,3,4,5]),
+   BBBUSDT:asset(commonRows,[signal()],undefined)
+  },
+  maxPositions:5,regimeCapPct:100,feeBps:0,slippageBps:0
+ });
+ assert.ok(result.skipped.some(x=>x.symbol==="BBBUSDT"&&x.reason.includes("CORRELATION_DATA_UNAVAILABLE")));
+});
+
+test("rejects assets whose OHLC timestamps are not aligned",()=>{
+ const rows=[[100,101,99,100],[100,104,99,102]];
+ assert.throws(()=>runPortfolioBacktest({assets:{
+  AAAUSDT:asset(commonRows,[]),BBBUSDT:asset(rows,[])
+ }}),RangeError);
+});
+
+test("reports open positions separately from realized ending equity",()=>{
+ const rows=[[100,101,99,100],[100,104,99,102],[102,104,101,103]];
+ const result=runPortfolioBacktest({assets:{AAAUSDT:asset(rows,[signal()],[1,2,3])},feeBps:0,slippageBps:0});
+ assert.equal(result.tradeCount,0);
+ assert.equal(result.openPositions.length,1);
+ assert.equal(result.endingEquity,result.initialCapital);
+});
