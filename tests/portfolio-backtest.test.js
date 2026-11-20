@@ -232,7 +232,7 @@ test("portfolio drawdown block persists through partial recovery and unlocks onl
   [96,101,95,96],
   [100,101,99,100]
  ];
- const wideStopSignal=(index)=>({...signal(index),plan:{...plan,stop:80}});
+ const wideStopSignal=(index)=>({...signal(index),plan:{entry:100,stop:80,tp1:120,tp2:140,tp3:160}});
  const result=runPortfolioBacktest({
   assets:{
    AAAUSDT:asset(rows,[wideStopSignal(0)],[1,2,3,4,5]),
