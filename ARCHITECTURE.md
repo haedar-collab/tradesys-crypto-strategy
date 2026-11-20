@@ -59,3 +59,5 @@ The extracted regime module deliberately preserves the current application's reg
 - `src/structure/select-zone.js`: deterministic long-side demand-zone selection, prioritizing discount location and OB/FVG overlap before proximity, with nearest valid FVG fallback. It returns the candidate list for auditability.
 
 - `src/structure/decision.js`: fail-closed long-only SMC policy gate. It requires bullish Daily bias (configurable), non-bearish 4H structure, a valid unbroken zone, acceptable zone quality, an explicit entry trigger, bounded 1H chase distance, and minimum planned/current R:R. It emits `BUY_CANDIDATE` for research review only; it does not size positions or place orders.
+
+- `src/risk/portfolio.js`: fixed-fractional spot sizing from stop distance, regime/drawdown/event multipliers, available-exposure cap, Pearson return correlation, duplicate-symbol guard, max-position count, and regime exposure cap. The application must supply verified account equity, open/pending positions, and aligned return series; no balances or exchange state are fetched by this module.
