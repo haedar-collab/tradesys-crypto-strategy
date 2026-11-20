@@ -19,7 +19,7 @@ This stage adds an integration simulation for the existing paper-only session st
 
 - All 24 order executions are durable and reconstruct to the paper broker.
 - Each cycle has a durable POSITION_MARKED event.
-- Three restart boundaries recover with audit PASS.
+- Two restart boundaries recover with audit PASS.
 - Final broker inventory is flat and cash reconciliation passes.
 - Analytics report 12 realized SELL executions and 12 equity marks.
 - Fee totals and realized PnL are derived from recorded fills, not fabricated inputs.
