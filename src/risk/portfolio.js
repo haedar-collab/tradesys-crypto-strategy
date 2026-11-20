@@ -110,7 +110,7 @@ export function evaluateDrawdownRisk(input) {
     return {status:"BLOCKED",state:"UNKNOWN",allowNewEntries:false,multiplier:0,reasons:["INVALID_PREVIOUS_DRAWDOWN_STATE"]};
   let state="NORMAL";
   if(drawdownPct>=ddLimitPct || (previous==="BLOCKED"&&drawdownPct>ddRecoverPct)) state="BLOCKED";
-  else if(drawdownPct>=ddRecoverPct) state="REDUCED";
+  else if(drawdownPct>ddRecoverPct) state="REDUCED";
   const multiplier=state==="NORMAL"?1:state==="REDUCED"?reducedMultiplier:0;
   return {status:state==="BLOCKED"?"BLOCKED":"ALLOWED",state,allowNewEntries:state!=="BLOCKED",multiplier,drawdownPct,
     reasons:state==="BLOCKED"?["DRAWDOWN_LIMIT_REACHED"]:state==="REDUCED"?["DRAWDOWN_SIZE_REDUCTION"]:[]};
