@@ -223,3 +223,29 @@ test("marks combined open-position losses before allowing another portfolio entr
  assert.ok(result.skipped.some(x=>x.symbol==="CCCUSDT"&&x.reason==="DRAWDOWN_LIMIT_REACHED"));
  assert.equal(result.assumptions.drawdownGuard.state,"BLOCKED");
 });
+
+test("portfolio drawdown block persists through partial recovery and unlocks only at recovery threshold",()=>{
+ const rows=[
+  [100,101,99,100],
+  [100,101,99,100],
+  [100,101,89,90],
+  [96,101,95,96],
+  [100,101,99,100]
+ ];
+ const result=runPortfolioBacktest({
+  assets:{
+   AAAUSDT:asset(rows,[signal(0)],[1,2,3,4,5]),
+   BBBUSDT:asset(rows,[signal(0)],[5,4,3,2,1]),
+   CCCUSDT:asset(rows,[signal(2),signal(3)],[1,3,2,5,4])
+  },
+  initialCapital:10000,riskPct:10,ddLimitPct:5,ddRecoverPct:2,
+  ddReducedMultiplier:.5,regimeCapPct:100,maxPositions:3,corrMax:1,
+  feeBps:0,slippageBps:0
+ });
+ assert.equal(result.tradeCount,0);
+ assert.equal(result.openPositions.length,3);
+ assert.ok(result.skipped.some(x=>x.symbol==="CCCUSDT"&&x.index===2&&x.reason==="DRAWDOWN_LIMIT_REACHED"));
+ assert.ok(!result.skipped.some(x=>x.symbol==="CCCUSDT"&&x.index===3&&x.reason==="DRAWDOWN_LIMIT_REACHED"));
+ assert.equal(result.assumptions.drawdownGuard.state,"NORMAL");
+ assert.ok(result.maxDrawdownPct>=9);
+});
