@@ -47,3 +47,15 @@ The simulation's positive realized PnL is a fixture outcome produced by intentio
 `npm test`
 
 The test is deterministic and uses temporary local files only. It does not require API credentials or external paid services.
+
+## Replay hardening discovered by the simulation
+
+The restart scenario exposed a real integration defect: a BUY was executed by the broker using the persistent session's internally authorized risk-gate input, but the ledger previously retained only the caller's original order input. On restart, deterministic broker replay therefore lacked the trusted execution authorization and failed closed.
+
+The fill event now preserves both:
+- `orderInput`: the original caller request, retained for idempotency and audit context.
+- `executionInput`: the exact internally authorized input used by the paper broker.
+
+Recovery replays `executionInput` when present and falls back to `orderInput` for older ledger entries. This is a paper-broker replay detail; it does not grant an external caller the ability to bypass the persistent risk gate. The extended restart simulation covers the regression.
+
+Latest validation after this fix: 316 tests passed, 0 failed in CI run 44838023048.
