@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - "foundation/**"
+      - "feature/app-data-contract-v1"
   pull_request:
     branches:
       - main
