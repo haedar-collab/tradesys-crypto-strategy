@@ -176,3 +176,50 @@ test("single-asset and one-symbol portfolio share drawdown reduction before the 
  assert.ok(Math.abs(single.openPosition.notional-portfolio.openPositions[0].notional)<1e-8);
  assert.ok(Math.abs(single.openPosition.notional-9400*10*.5/100/0.06)<1e-8);
 });
+
+test("blocks new entries after simultaneous losses across multiple active positions breach portfolio drawdown",()=>{
+ const rows=[
+  [100,101,99,100],
+  [100,101,99,100],
+  [100,101,90,95],
+  [95,96,94,95]
+ ];
+ const result=runPortfolioBacktest({
+  assets:{
+   AAAUSDT:asset(rows,[signal(0)],[1,2,3,4]),
+   BBBUSDT:asset(rows,[signal(0)],[4,3,2,1]),
+   CCCUSDT:asset(rows,[signal(1)],[1,3,2,4])
+  },
+  initialCapital:10000,riskPct:2,ddLimitPct:3,ddRecoverPct:1.5,
+  regimeCapPct:90,maxPositions:3,corrMax:.8,feeBps:0,slippageBps:0
+ });
+ assert.equal(result.tradeCount,2);
+ assert.deepEqual(result.trades.map(t=>t.symbol).sort(),["AAAUSDT","BBBUSDT"]);
+ assert.equal(result.trades.reduce((sum,t)=>sum+t.netPnl,0),-400);
+ assert.ok(result.maxDrawdownPct>=4);
+ assert.ok(result.skipped.some(x=>x.symbol==="CCCUSDT"&&x.reason==="DRAWDOWN_LIMIT_REACHED"));
+ assert.equal(result.assumptions.drawdownGuard.state,"BLOCKED");
+});
+
+test("marks combined open-position losses before allowing another portfolio entry",()=>{
+ const rows=[
+  [100,101,99,100],
+  [100,101,99,100],
+  [100,101,97,98],
+  [98,99,97,98]
+ ];
+ const result=runPortfolioBacktest({
+  assets:{
+   AAAUSDT:asset(rows,[signal(0)],[1,2,3,4]),
+   BBBUSDT:asset(rows,[signal(0)],[4,3,2,1]),
+   CCCUSDT:asset(rows,[signal(1)],[1,3,2,4])
+  },
+  initialCapital:10000,riskPct:2,ddLimitPct:1,ddRecoverPct:.5,
+  regimeCapPct:90,maxPositions:3,corrMax:.8,feeBps:0,slippageBps:0
+ });
+ assert.equal(result.tradeCount,0);
+ assert.equal(result.openPositions.length,2);
+ assert.ok(result.maxDrawdownPct>=1);
+ assert.ok(result.skipped.some(x=>x.symbol==="CCCUSDT"&&x.reason==="DRAWDOWN_LIMIT_REACHED"));
+ assert.equal(result.assumptions.drawdownGuard.state,"BLOCKED");
+});
