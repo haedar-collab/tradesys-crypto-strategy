@@ -3,7 +3,6 @@
  * Purely local: no exchange connectivity, credentials, or order execution.
  */
 const positive = (v) => Number.isFinite(v) && v > 0;
-const finiteNonNegative = (v) => Number.isFinite(v) && v >= 0;
 
 export function evaluatePaperRisk(input, limits = {}) {
   const {
@@ -20,7 +19,6 @@ export function evaluatePaperRisk(input, limits = {}) {
     return Object.freeze({ status: "WAIT_DATA", allowed: false, reasons: ["INVALID_RISK_MONITOR_INPUT"] });
   }
   if (equity > peakEquity) reasons.push("EQUITY_EXCEEDS_PEAK_EQUITY");
-  if (equity > dayStartEquity * 100) reasons.push("INVALID_DAILY_EQUITY_REFERENCE");
   let exposure = 0;
   for (const p of openPositions) {
     if (!p || !positive(p.quantity) || !positive(p.markPrice)) {
