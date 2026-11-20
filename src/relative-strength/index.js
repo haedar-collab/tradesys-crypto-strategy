@@ -71,6 +71,11 @@ export function computeRelativeStrength(asset, benchmark, parameters = {}) {
   if (lastAssetTime !== lastBenchmarkTime || common[common.length - 1].time !== lastAssetTime) {
     return { status: "WAIT_DATA", reason: "AS_OF_MISMATCH", observations: common.length };
   }
+  for (let i = 1; i < common.length; i++) {
+    if (common[i].time - common[i - 1].time !== expectedIntervalMs) {
+      return { status: "WAIT_DATA", reason: "HISTORY_GAP", observations: common.length, gapAfter: common[i - 1].time, gapBefore: common[i].time };
+    }
+  }
   const ac = common.map(row => row.assetClose), bc = common.map(row => row.benchmarkClose);
   const index = common.length - 1;
   const current = weightedScore(ac, bc, index, P);
