@@ -4,7 +4,7 @@ import { evaluateLtfTrigger } from "../src/structure/ltf-trigger.js";
 
 function fixture() {
   const n=60;
-  const c=Array(n).fill(98),o=Array(n).fill(98),h=Array(n).fill(101),l=Array(n).fill(100);
+  const c=Array(n).fill(98),o=Array(n).fill(98),h=Array(n).fill(101),l=Array(n).fill(97);
   l[50]=98;
   return {n,t:Array.from({length:n},(_,i)=>i*3_600_000),
     ct:Array.from({length:n},(_,i)=>(i+1)*3_600_000-1),
