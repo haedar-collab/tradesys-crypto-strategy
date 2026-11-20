@@ -88,3 +88,35 @@ test("rejects appends after close and invalid timestamps", async () => {
     await reopened.close();
   } finally { await rm(f.dir, { recursive: true, force: true }); }
 });
+
+
+test("holds an exclusive process lock until close and releases it for the next owner", async () => {
+  const f = await fixture();
+  try {
+    const first = await createPersistentPaperLedger({ filePath: f.filePath });
+    await assert.rejects(
+      createPersistentPaperLedger({ filePath: f.filePath }),
+      /locked by another process/
+    );
+    await first.close();
+    const second = await createPersistentPaperLedger({ filePath: f.filePath });
+    await second.append(event("fill_event_lock_01"));
+    await second.close();
+  } finally { await rm(f.dir, { recursive: true, force: true }); }
+});
+
+test("fails closed on a pre-existing lock instead of silently stealing it", async () => {
+  const f = await fixture();
+  try {
+    await mkdir(join(f.dir, "paper"), { recursive: true });
+    await writeFile(f.filePath + ".lock", JSON.stringify({
+      token: "unknown-owner", pid: 12345, createdAt: 1
+    }));
+    await assert.rejects(
+      createPersistentPaperLedger({ filePath: f.filePath }),
+      /stale lock; manual review required/
+    );
+    const lock = JSON.parse(await readFile(f.filePath + ".lock", "utf8"));
+    assert.equal(lock.token, "unknown-owner");
+  } finally { await rm(f.dir, { recursive: true, force: true }); }
+});
