@@ -34,7 +34,7 @@ export function runStrategyEventBacktest(timeframes,evaluationTimes,options={}){
  const replay=runHistoricalMtfReplay(timeframes,evaluationTimes,replayOptions);
  const mapped=mapReplayCandidatesToSignals(timeframes.h1,replay.decisions);
  const bars=timeframes.h1.map(c=>({t:c.openTime,o:c.open,h:c.high,l:c.low,c:c.close}));
- const backtest=runEventBacktest({bars,signals:mapped.signals,...backtestOptions});
+ const backtest=runEventBacktest({...backtestOptions,bars,signals:mapped.signals});
  return {status:"COMPLETE",mode:"historical-strategy-event-backtest",symbol:options.symbol??null,
   replay:{evaluationCount:replay.evaluationCount,candidateCount:replay.candidateCount},
   signalMapping:{executableSignalCount:mapped.signals.length,unmapped:mapped.unmapped},
