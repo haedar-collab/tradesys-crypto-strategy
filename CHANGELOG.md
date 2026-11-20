@@ -27,3 +27,7 @@ Latest CI run: 35 tests passed, 0 failed. These are extraction increments, not a
 - Added aligned multi-symbol Spot portfolio simulation with position-count, exposure and correlation gates.
 
 - Added a hysteretic drawdown guard with risk reduction and a hard new-entry block, integrated into portfolio backtesting.
+
+- Tightened 1H demand-zone touch semantics to require actual OHLC intersection and separated untouched/touched/reclaimed/broken states.
+- Added contiguous daily-history validation for 7/30/90-day relative-strength calculations.
+- CI regression suite expanded to 93 passing tests.
