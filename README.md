@@ -24,14 +24,14 @@ It does **not** own market-data fetching, UI, browser storage, notifications, ex
 - [x] Initial position sizing, regime exposure, position-count, duplicate-symbol, and correlation risk gates.
 - [x] Initial entry/exit plan and partial-profit state machine with same-bar breakeven stop handling.
 - [ ] Portfolio stress controls, trailing/forced exit policy, and application risk-state integration.
-- [x] Initial single-symbol and aligned multi-symbol event-driven Spot backtests with next-bar entry, fees, slippage, conservative OHLC exits, portfolio exposure/correlation gates, marked-equity drawdown checks, and terminal marked-equity reporting. Latest accounting changes pass CI: 113 tests passed, 0 failed, including single-asset/one-symbol portfolio parity cases.
+- [x] Initial single-symbol and aligned multi-symbol event-driven Spot backtests with next-bar entry, fees, slippage, conservative OHLC exits, portfolio exposure/correlation gates, marked-equity drawdown checks, and terminal marked-equity reporting. Latest accounting changes pass CI: 114 tests passed, 0 failed, including single-asset/one-symbol portfolio parity and shared hysteretic drawdown-reduction tests.
 - [x] 1H zone-intersection / invalidation / reclaim state tests and contiguous daily RS history checks.
 - [x] Prefix-based anti-lookahead regression checks for confirmed structure events and daily regime decisions.
 - [x] Historical as-of zone-quality/retest scoring and OB/FVG snapshot regression checks.
 - [ ] Walk-forward/out-of-sample validation, parameter sensitivity, spread/market-impact calibration, and exchange-realistic execution.
 - [ ] Application adapter integration.
 
-Backtest accounting includes open-position mark-to-market and marked-equity drawdown admission checks. The latest branch passes 113 CI tests, including parity for open positions, partial TP1, gap-through-stop fills and completed trades. Broader parity and out-of-sample validation remain release gates. The extracted indicator and regime modules are initial implementations. They must pass executable CI and parity tests against the frozen source before being considered release-ready. No profitability claim is made. BUY remains gated pending data validation, regression tests, and independent out-of-sample/paper-trading acceptance.
+Backtest accounting includes open-position mark-to-market and marked-equity drawdown admission checks. The latest branch passes 114 CI tests, including parity for open positions, partial TP1, gap-through-stop fills, completed trades and drawdown-reduction sizing. Broader parity and out-of-sample validation remain release gates. The extracted indicator and regime modules are initial implementations. They must pass executable CI and parity tests against the frozen source before being considered release-ready. No profitability claim is made. BUY remains gated pending data validation, regression tests, and independent out-of-sample/paper-trading acceptance.
 
 ## Layout
 
