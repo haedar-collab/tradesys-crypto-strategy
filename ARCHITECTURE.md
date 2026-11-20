@@ -73,3 +73,6 @@ The extracted regime module deliberately preserves the current application's reg
 
 - `evaluateDrawdownRisk` in `src/risk/portfolio.js`: normal/reduced/blocked new-entry states with hysteresis. New entries are blocked at the drawdown limit and remain blocked until drawdown recovers to the configured recovery threshold; the reduced state scales risk before the hard limit.
 - The multi-symbol backtest applies the drawdown guard to new entries using realized equity and the realized equity peak. Open-position mark-to-market drawdown is not yet part of this guard.
+
+- Relative-strength inputs must share the same latest timestamp and a contiguous daily observation sequence. The default interval is 86,400,000 ms; callers with a different daily candle convention may set `expectedIntervalMs`. A missing aligned daily interval returns `WAIT_DATA / HISTORY_GAP`, rather than treating the next available observation as an exact 7/30/90-day bar.
+- The 1H trigger distinguishes actual OHLC zone intersection from a candle entirely beyond the zone, and returns explicit zone states `UNTOUCHED`, `TOUCHED`, `RECLAIMED`, or `BROKEN`. A close below the ATR invalidation buffer inside the trigger lookback blocks the setup.
