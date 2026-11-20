@@ -62,7 +62,7 @@ export async function createPersistentPaperLedger({ filePath } = {}) {
   try {
     await lockHandle.writeFile(JSON.stringify({
       token: lockToken, pid: process.pid, createdAt: Date.now()
-    }) + "\\n", "utf8");
+    }) + "\n", "utf8");
     await lockHandle.sync();
   } catch (error) {
     await lockHandle.close().catch(() => {});
