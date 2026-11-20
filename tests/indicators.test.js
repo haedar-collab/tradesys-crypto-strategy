@@ -28,7 +28,7 @@ test("ATR, ADX, Bollinger Bands and OBV return aligned arrays", () => {
   assert.equal(bbands(close, 20)[18], null);
 });
 
-test("pivots expose their confirmation availability index", () => {
+test("pivots preserve legacy numeric index arrays", () => {
   const h = [1, 2, 5, 3, 2, 1, 2, 3, 2], l = [0, 1, 2, 1, 0, -1, 0, 1, 2];
   const pivots = pivotsAll(h, l, 2);
   assert.deepEqual(pivots.hi, [2]);
