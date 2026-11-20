@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { runCausalReplay,runCausalFeatureReplay,assertCausalPrefixInvariant } from "../src/backtest/causal-replay.js";
+import { runCausalReplay,runCausalFeatureReplay,runCausalSignalReplay,assertCausalPrefixInvariant } from "../src/backtest/causal-replay.js";
 
 function barsOf(n=240){
  return Array.from({length:n},(_,i)=>{
@@ -62,4 +62,18 @@ test("feature replay is invariant to future-only candle changes",()=>{
  };
  const check=assertCausalPrefixInvariant(bars,evaluate,220,{warmupBars:210});
  assert.equal(check.status,"PASS");
+});
+
+test("causal signal replay builds a decision from each prefix-only feature snapshot",()=>{
+ const bars=barsOf(220);
+ const replay=runCausalSignalReplay(bars,ctx=>{
+  assert.equal(ctx.bars.length,ctx.index+1);
+  assert.equal(ctx.asOf,ctx.bars.at(-1).t);
+  return {timestamp:ctx.asOf,close:ctx.bars.at(-1).c,featureTimestamp:ctx.features.timestamp};
+ },input=>({status:"WAIT",candidate:false,asOf:input.timestamp,featureTimestamp:input.featureTimestamp}),{warmupBars:210});
+ assert.equal(replay.outputs.length,11);
+ for(const row of replay.outputs){
+  assert.equal(row.result.decision.asOf,row.asOf);
+  assert.equal(row.result.decision.featureTimestamp,row.asOf);
+ }
 });
