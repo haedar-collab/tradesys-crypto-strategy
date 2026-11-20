@@ -30,7 +30,7 @@ test("integrated session persists broker fills and restores cash and positions a
     const input = await orderInput(f.now);
     await session.submitMarketOrder(input);
     const before = await session.snapshot();
-    assert.equal(before.ledger.eventCount, 2);
+    assert.equal(before.ledger.eventCount, 4);
     assert.equal(before.broker.positions[0].quantity, 0.25);
     const cashBefore = before.broker.cash;
     await session.close();
@@ -39,7 +39,7 @@ test("integrated session persists broker fills and restores cash and positions a
     const after = await session.snapshot();
     assert.equal(after.broker.positions[0].quantity, 0.25);
     assert.equal(after.broker.cash, cashBefore);
-    assert.equal(after.ledger.eventCount, 3);
+    assert.equal(after.ledger.eventCount, 5);
     await session.close();
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
@@ -148,7 +148,7 @@ test("mark-to-market breach persists the kill switch and it survives restart", a
   const f = fixture(), dir = await f.dirPromise, filePath = join(dir, "events.jsonl");
   try {
     let session = await createPersistentPaperSession({ filePath, now: f.now });
-    await session.submitMarketOrder(await orderInput(f.now, "session_risk_mark_1"));
+    await session.submitMarketOrder({ ...await orderInput(f.now, "session_risk_mark_1"), quantity: 50 });
     const marked = await session.markToMarket({ BTCUSDT: quote(f.now(), 80, 81) });
     assert.equal(marked.risk.halted, true);
     assert.ok(marked.risk.reasons.includes("DAILY_LOSS_LIMIT_REACHED") ||
