@@ -56,7 +56,9 @@ test("reports marked ending equity separately from realized equity for open posi
  const result=runPortfolioBacktest({assets:{AAAUSDT:asset(rows,[signal()],[1,2,3])},feeBps:0,slippageBps:0});
  assert.equal(result.tradeCount,0);
  assert.equal(result.openPositions.length,1);
- assert.equal(result.endingEquity,result.initialCapital);
+ assert.equal(result.realizedEndingEquity,result.initialCapital);
+ assert.ok(result.markedEndingEquity>result.realizedEndingEquity);
+ assert.equal(result.endingEquity,result.markedEndingEquity);
 });
 
 test("marked drawdown is reflected in portfolio equity while positions remain open",()=>{
