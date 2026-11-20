@@ -61,7 +61,7 @@ test("marks the zone broken on any close below the invalidation buffer in lookba
 });
 
 test("a stale zone touch outside the 12-bar observation window is ignored",()=>{
- const p=fixture();p.l[50]=100;p.l[40]=98;
+ const p=fixture();p.l[50]=100;p.c[50]=100;p.o[50]=100;p.l[40]=98;
  const result=evaluateLtfTrigger(p,zone,4);
  assert.equal(result.state,"none");assert.equal(result.touchedAt,null);
 });
