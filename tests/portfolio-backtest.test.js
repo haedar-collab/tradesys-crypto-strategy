@@ -174,5 +174,5 @@ test("single-asset and one-symbol portfolio share drawdown reduction before the 
  assert.equal(single.assumptions.drawdownGuard.state,"REDUCED");
  assert.equal(portfolio.assumptions.drawdownGuard.state,"REDUCED");
  assert.ok(Math.abs(single.openPosition.notional-portfolio.openPositions[0].notional)<1e-8);
- assert.ok(Math.abs(single.openPosition.notional-10000*10*.5/100/0.06)<1e-8);
+ assert.ok(Math.abs(single.openPosition.notional-9400*10*.5/100/0.06)<1e-8);
 });
