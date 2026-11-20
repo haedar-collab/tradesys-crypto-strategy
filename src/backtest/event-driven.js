@@ -92,6 +92,12 @@ export function runEventBacktest(input) {
       const pending=byIndex.get(i-1)||[];
       for(const signal of pending) skipped.push({index:signal.index,reason:"POSITION_ALREADY_OPEN"});
       processActiveBar(i,bar);
+      if(active) {
+        const marked=markPosition({...active,remaining:active.state.remaining},bar.c,feeRate,slipRate);
+        const markedEquity=equity+marked.netContribution;
+        peak=Math.max(peak,markedEquity);
+        maxDrawdownPct=Math.max(maxDrawdownPct,(peak-markedEquity)/peak*100);
+      }
       continue;
     }
 
@@ -142,8 +148,10 @@ export function runEventBacktest(input) {
   const wins=trades.filter(t=>t.netPnl>0).length;
   return {
     status:"COMPLETE",
-    initialCapital,endingEquity:equity,netPnl:equity-initialCapital,
-    netReturnPct:(equity/initialCapital-1)*100,
+    initialCapital,realizedEndingEquity:equity,
+    endingEquity:equity+(active?markPosition({...active,remaining:active.state.remaining},bars.at(-1).c,feeRate,slipRate).netContribution:0),
+    netPnl:(equity+(active?markPosition({...active,remaining:active.state.remaining},bars.at(-1).c,feeRate,slipRate).netContribution:0))-initialCapital,
+    netReturnPct:((equity+(active?markPosition({...active,remaining:active.state.remaining},bars.at(-1).c,feeRate,slipRate).netContribution:0))/initialCapital-1)*100,
     tradeCount:trades.length,winRatePct:trades.length?wins/trades.length*100:0,
     profitFactor:netLosses?netWins/netLosses:null,
     maxDrawdownPct,maxDrawdownBasis:"marked equity at each closed-bar close, including estimated liquidation costs",trades,skipped,openPosition,
