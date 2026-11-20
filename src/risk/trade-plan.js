@@ -39,7 +39,7 @@ export function advanceLongPosition(position, bar) {
   const exits=[];
   const take=(fraction,price,reason)=>{
     const qty=Math.min(remaining,fraction);
-    if(qty>0){exits.push({fraction:qty,price,reason});remaining-=qty;}
+    if(qty>0){const rounded=Number(qty.toFixed(8));exits.push({fraction:rounded,price,reason});remaining=Math.max(0,Number((remaining-rounded).toFixed(8)));}
   };
   // Conservative OHLC ambiguity rule: test active stop before targets.
   if(bar.low<=stop){
