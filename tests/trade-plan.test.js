@@ -55,3 +55,20 @@ test("scales out TP1 TP2 and TP3 according to the fixed plan",()=>{
 test("rejects malformed OHLC bars",()=>{
  assert.equal(advanceLongPosition({entry:100,stop:95,tp1:105,tp2:110,tp3:115},{low:110,high:105}).status,"WAIT_DATA");
 });
+
+test("conservatively exits at breakeven when TP1 and the new stop are touched in one bar",()=>{
+ const p={entry:100,stop:95,tp1:105,tp2:110,tp3:115,stage:0,remaining:1,status:"OPEN"};
+ const r=advanceLongPosition(p,{low:99,high:106});
+ assert.equal(r.status,"CLOSED");
+ assert.equal(r.stage,1);
+ assert.equal(r.remaining,0);
+ assert.deepEqual(r.exits,[
+  {fraction:.4,price:105,reason:"TP1"},
+  {fraction:.6,price:100,reason:"BREAKEVEN_SAME_BAR"}
+ ]);
+});
+
+test("requires a finite positive current price when building a trade plan",()=>{
+ const p=buildLongPlan({zone:{lo:95,hi:97},atr:2,targetLevels:[102]});
+ assert.equal(p.status,"WAIT_DATA");
+});
