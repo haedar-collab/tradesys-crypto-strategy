@@ -36,7 +36,7 @@ test("blocks missing strategy approval, risk approval and stale quotes",()=>{
 
 test("blocks future quotes, insufficient cash and overselling",()=>{
  const {now,broker}=setup();
- assert.throws(()=>broker.submitMarketOrder({clientOrderId:"order_buy_0007",symbol:"BTCUSDT",side:"BUY",quantity:1,quote:quote(now()+1),strategyAcceptance:ACCEPT,riskGate:ALLOW}),/stale or future/);
+ assert.throws(()=>broker.submitMarketOrder({clientOrderId:"order_buy_0007",symbol:"BTCUSDT",side:"BUY",quantity:1,quote:quote(now()+1),strategyAcceptance:ACCEPT,riskGate:ALLOW}),/stale or from the future/);
  assert.throws(()=>broker.submitMarketOrder({clientOrderId:"order_buy_0008",symbol:"BTCUSDT",side:"BUY",quantity:100,quote:quote(now()),strategyAcceptance:ACCEPT,riskGate:ALLOW}),/insufficient paper cash/);
  assert.throws(()=>broker.submitMarketOrder({clientOrderId:"order_sell_0008",symbol:"BTCUSDT",side:"SELL",quantity:1,quote:quote(now()),strategyAcceptance:ACCEPT,riskGate:ALLOW}),/insufficient paper position/);
 });
