@@ -7,6 +7,7 @@
  */
 import { advanceLongPosition } from "../risk/trade-plan.js";
 import { markPosition } from "./mark-to-market.js";
+import { evaluateDrawdownRisk } from "../risk/portfolio.js";
 
 function validBars(bars) {
   if (!Array.isArray(bars) || bars.length < 2) throw new TypeError("at least two OHLC bars are required");
@@ -41,9 +42,11 @@ export function runEventBacktest(input) {
   const minRR=input.minRR??1.5;
   const maxEntryDriftPct=input.maxEntryDriftPct??1;
   const ddLimitPct=input.ddLimitPct??10;
-  if (![initialCapital,riskPct,feeBps,slippageBps,minRR,maxEntryDriftPct,ddLimitPct].every(Number.isFinite) ||
+  const ddRecoverPct=input.ddRecoverPct??5;
+  const ddReducedMultiplier=input.ddReducedMultiplier??0.5;
+  if (![initialCapital,riskPct,feeBps,slippageBps,minRR,maxEntryDriftPct,ddLimitPct,ddRecoverPct,ddReducedMultiplier].every(Number.isFinite) ||
       initialCapital<=0 || riskPct<=0 || riskPct>100 || feeBps<0 || slippageBps<0 ||
-      minRR<=0 || maxEntryDriftPct<0 || ddLimitPct<=0 || ddLimitPct>=100) throw new RangeError("invalid backtest parameters");
+      minRR<=0 || maxEntryDriftPct<0 || ddLimitPct<=0 || ddLimitPct>=100 || ddRecoverPct<0 || ddRecoverPct>=ddLimitPct || ddReducedMultiplier<=0 || ddReducedMultiplier>1) throw new RangeError("invalid backtest parameters");
   const feeRate=feeBps/10000, slipRate=slippageBps/10000;
   const byIndex=new Map();
   for (const signal of [...signals].sort((a,b)=>a.index-b.index)) {
@@ -51,7 +54,15 @@ export function runEventBacktest(input) {
     byIndex.get(signal.index).push(signal);
   }
 
-  let equity=initialCapital, peak=initialCapital, maxDrawdownPct=0, active=null, drawdownBlocked=false;
+  let equity=initialCapital, peak=initialCapital, maxDrawdownPct=0, active=null, drawdownState="NORMAL";
+  let drawdownGate=evaluateDrawdownRisk({equity,peakEquity:peak,ddLimitPct,ddRecoverPct,reducedMultiplier:ddReducedMultiplier,previousState:drawdownState});
+  const refreshDrawdown=markedEquity=>{
+    peak=Math.max(peak,markedEquity);
+    const dd=(peak-markedEquity)/peak*100;
+    maxDrawdownPct=Math.max(maxDrawdownPct,dd);
+    drawdownGate=evaluateDrawdownRisk({equity:markedEquity,peakEquity:peak,ddLimitPct,ddRecoverPct,reducedMultiplier:ddReducedMultiplier,previousState:drawdownState});
+    drawdownState=drawdownGate.state;
+  };
   const trades=[], skipped=[];
   const processActiveBar=(index,bar)=>{
     if(!active) return;
@@ -95,12 +106,9 @@ export function runEventBacktest(input) {
       if(active) {
         const marked=markPosition({...active,remaining:active.state.remaining},bar.c,feeRate,slipRate);
         const markedEquity=equity+marked.netContribution;
-        peak=Math.max(peak,markedEquity);
-        const dd=(peak-markedEquity)/peak*100;
-        maxDrawdownPct=Math.max(maxDrawdownPct,dd);
-        drawdownBlocked=dd>=ddLimitPct;
+        refreshDrawdown(markedEquity);
       } else {
-        drawdownBlocked=((peak-equity)/peak*100)>=ddLimitPct;
+        refreshDrawdown(equity);
       }
       continue;
     }
@@ -122,8 +130,8 @@ export function runEventBacktest(input) {
       skipped.push({index:signal.index,reason:"ENTRY_RR_BELOW_MINIMUM"});
       continue;
     }
-    if(drawdownBlocked) { skipped.push({index:signal.index,reason:"MARKED_DRAWDOWN_LIMIT_REACHED"}); continue; }
-    const riskBudget=equity*riskPct/100;
+    if(!drawdownGate.allowNewEntries) { skipped.push({index:signal.index,reason:"MARKED_DRAWDOWN_LIMIT_REACHED"}); continue; }
+    const riskBudget=equity*riskPct/100*drawdownGate.multiplier;
     const stopPct=(entryFill-plan.stop)/entryFill;
     const notional=Math.min(equity/(1+feeRate),riskBudget/stopPct);
     if(notional<=0) {
@@ -142,14 +150,9 @@ export function runEventBacktest(input) {
     if(active) {
       const marked=markPosition({...active,remaining:active.state.remaining},bar.c,feeRate,slipRate);
       const markedEquity=equity+marked.netContribution;
-      peak=Math.max(peak,markedEquity);
-      const dd=(peak-markedEquity)/peak*100;
-      maxDrawdownPct=Math.max(maxDrawdownPct,dd);
-      drawdownBlocked=dd>=ddLimitPct;
+      refreshDrawdown(markedEquity);
     } else {
-      const dd=peak>0?(peak-equity)/peak*100:0;
-      maxDrawdownPct=Math.max(maxDrawdownPct,dd);
-      drawdownBlocked=dd>=ddLimitPct;
+      refreshDrawdown(equity);
     }
   }
 
@@ -175,6 +178,6 @@ export function runEventBacktest(input) {
     maxDrawdownPct,maxDrawdownBasis:"marked equity at each closed-bar close, including estimated liquidation costs",trades,skipped,openPosition,
     assumptions:{entry:"next bar open after signal close",feeBps,slippageBps,
       sameBarAmbiguity:"stop-first; TP1 followed by same-bar breakeven touch exits remainder at breakeven",
-      spotOnly:true,positionConcurrency:1,ddLimitPct}
+      spotOnly:true,positionConcurrency:1,drawdownGuard:{limitPct:ddLimitPct,recoverPct:ddRecoverPct,reducedMultiplier:ddReducedMultiplier,state:drawdownState}}
   };
 }
