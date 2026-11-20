@@ -151,7 +151,7 @@ export async function createPersistentPaperSession({
   }
 
   // Establish the original equity baseline only for a genuinely new session.
-  if (!latestRiskState && recovered.events.length === 0) {
+  if (!latestRiskState && recovered.events.every(entry => entry.type === "SESSION_STARTED")) {
     riskMonitor.evaluate({ equity: initialCash, positions: [], timestamp: now() });
     await persistRiskState("SESSION_START_BASELINE");
   }
