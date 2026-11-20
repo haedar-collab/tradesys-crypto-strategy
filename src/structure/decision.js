@@ -23,6 +23,7 @@ export function evaluateSmcSetup(input, options = {}) {
 
   const inZone = price >= zone.lo && price <= zone.hi;
   const ltfConfirmed = input.ltf?.state === "confirmed";
+  if (ltfConfirmed && !Number.isFinite(input.ltf.close)) return { status:"WAIT_DATA",candidate:false,reasons:["LTF_CONFIRMATION_MISSING_CLOSE"] };
   const sweepConfirmed = input.liquiditySweep?.confirmed === true;
   const rejectionConfirmed = input.rejection4h === true;
   if (input.zoneQuality?.fresh) evidence.push("FRESH_ZONE");
@@ -34,6 +35,7 @@ export function evaluateSmcSetup(input, options = {}) {
   if (rejectionConfirmed) evidence.push("FOUR_HOUR_BULLISH_REJECTION");
 
   if (!inZone && !ltfConfirmed) reasons.push("PRICE_NOT_IN_ZONE");
+  if (ltfConfirmed && input.ltf.close > zone.hi + (options.maxLtfChaseAtr ?? 0.6) * atr4h) reasons.push("LTF_TRIGGER_TOO_FAR_FROM_ZONE");
   if (!ltfConfirmed && !sweepConfirmed && !(inZone && rejectionConfirmed)) reasons.push("NO_CONFIRMED_ENTRY_TRIGGER");
 
   const risk = plan.entry - plan.stop;
