@@ -71,9 +71,9 @@ export function evaluatePortfolioRisk(input) {
   const corrMax=input.corrMax??0.8;
   if(!Number.isFinite(corrMax)||corrMax< -1||corrMax>1) return {status:"BLOCKED",allowed:false,reasons:["INVALID_CORRELATION_THRESHOLD"]};
   let correlatedWith=null, highestCorrelation=null;
-  if(Array.isArray(candidateReturns)) {
+  if(active.some(item=>item.symbol===candidateSymbol)){correlatedWith=candidateSymbol;highestCorrelation=1;}
+  if(Array.isArray(candidateReturns) && !correlatedWith) {
     for(const item of active) {
-      if(item.symbol===candidateSymbol){correlatedWith=candidateSymbol;highestCorrelation=1;break;}
       const corr=pearsonCorrelation(candidateReturns,item.dailyReturns);
       if(corr!=null&&(highestCorrelation==null||corr>highestCorrelation)) highestCorrelation=corr;
       if(corr!=null&&corr>corrMax){correlatedWith=item.symbol;break;}
