@@ -5,7 +5,7 @@
  * checks are applied before every entry. No exchange or account I/O.
  */
 import { advanceLongPosition } from "../risk/trade-plan.js";
-import { calculatePositionSize, evaluatePortfolioRisk } from "../risk/portfolio.js";
+import { calculatePositionSize, evaluatePortfolioRisk, evaluateDrawdownRisk } from "../risk/portfolio.js";
 
 function validateBars(bars,symbol) {
   if(!Array.isArray(bars)||bars.length<2) throw new TypeError(`${symbol}: at least two bars required`);
@@ -41,9 +41,11 @@ export function runPortfolioBacktest(input){
  const regimeCapPct=input.regimeCapPct??80, maxPositions=input.maxPositions??5;
  const corrMax=input.corrMax??0.8, feeRate=(input.feeBps??10)/10000, slipRate=(input.slippageBps??5)/10000;
  const minRR=input.minRR??1.5, maxEntryDriftPct=input.maxEntryDriftPct??1;
+ const ddLimitPct=input.ddLimitPct??10, ddRecoverPct=input.ddRecoverPct??5, ddReducedMultiplier=input.ddReducedMultiplier??0.5;
  if(![initialCapital,riskPct,regimeCapPct,maxPositions,corrMax,feeRate,slipRate,minRR,maxEntryDriftPct].every(Number.isFinite)||
    initialCapital<=0||riskPct<=0||riskPct>100||regimeCapPct<0||regimeCapPct>100||
-   !Number.isInteger(maxPositions)||maxPositions<1||corrMax< -1||corrMax>1||feeRate<0||slipRate<0||minRR<=0||maxEntryDriftPct<0)
+   !Number.isInteger(maxPositions)||maxPositions<1||corrMax< -1||corrMax>1||feeRate<0||slipRate<0||minRR<=0||maxEntryDriftPct<0||
+   !Number.isFinite(ddLimitPct)||!Number.isFinite(ddRecoverPct)||!Number.isFinite(ddReducedMultiplier))
    throw new RangeError("invalid portfolio backtest parameters");
 
  const signalMap=new Map();
@@ -54,7 +56,7 @@ export function runPortfolioBacktest(input){
    signalMap.get(key).push({symbol,signal:s});
   }
  }
- let equity=initialCapital,peak=initialCapital,maxDrawdownPct=0;
+ let equity=initialCapital,peak=initialCapital,maxDrawdownPct=0,drawdownState="NORMAL";
  const active=new Map(),trades=[],skipped=[];
  const closeOrAdvance=(symbol,index,bar)=>{
   const p=active.get(symbol); if(!p)return;
@@ -96,6 +98,9 @@ export function runPortfolioBacktest(input){
    const openPositions=[...active.entries()].map(([sym,p])=>({
     symbol:sym,size:p.notional*p.state.remaining,dailyReturns:input.assets[sym].dailyReturns
    }));
+   const ddGate=evaluateDrawdownRisk({equity,peakEquity:peak,ddLimitPct,ddRecoverPct,reducedMultiplier:ddReducedMultiplier,previousState:drawdownState});
+   drawdownState=ddGate.state;
+   if(!ddGate.allowNewEntries){skipped.push({symbol,index:signal.index,reason:"DRAWDOWN_LIMIT_REACHED"});continue;}
    const riskGate=evaluatePortfolioRisk({
     equity,regimeCapPct,maxPositions,candidateSymbol:symbol,openPositions,
     candidateReturns:input.assets[symbol].dailyReturns,corrMax
@@ -106,7 +111,7 @@ export function runPortfolioBacktest(input){
    const sizing=calculatePositionSize({
     equity,riskPct,entry:entryFill,stop:plan.stop,availableExposure:riskGate.freeUsd,
     regimeMultiplier:signal.regimeMultiplier??1,
-    drawdownMultiplier:signal.drawdownMultiplier??1,
+    drawdownMultiplier:(signal.drawdownMultiplier??1)*ddGate.multiplier,
     eventMultiplier:signal.eventMultiplier??1
    });
    if(sizing.status!=="SIZED"){
@@ -137,6 +142,7 @@ export function runPortfolioBacktest(input){
   trades,skipped,openPositions,
   assumptions:{signal:"bar close",entry:"next bar open; entry bar is processed",
    feesAndSlippage:"applied on entry and each exit tranche",sameBarAmbiguity:"conservative stop-first",
+   drawdownGuard:{limitPct:ddLimitPct,recoverPct:ddRecoverPct,reducedMultiplier:ddReducedMultiplier,state:drawdownState},
    spotOnly:true,maxConcurrentPositions:maxPositions,regimeExposureCapPct:regimeCapPct,corrMax}
  };
 }
