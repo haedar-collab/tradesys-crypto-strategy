@@ -83,3 +83,17 @@ test("audit is deterministic and does not mutate inputs", () => {
   assert.deepEqual(first, second);
   assert.deepEqual(input, before);
 });
+
+
+test("recovered interrupted order rejection remains REVIEW until manual verification", () => {
+  const input = fixture({ events: [
+    { eventId: "submit_0001", type: "ORDER_SUBMITTED", payload: { clientOrderId: "client_0001" } },
+    { eventId: "reject_0001", type: "ORDER_REJECTED", payload: {
+      clientOrderId: "client_0001", message: "submission interrupted before durable fill; manual review required"
+    } },
+    { eventId: "risk_0001", type: "RISK_EVENT", payload: { state: { halted: false } } }
+  ], orders: [], cash: 10_000, positions: [] });
+  const report = auditPaperRecovery(input);
+  assert.equal(report.status, "REVIEW");
+  assert.ok(report.findings.some(x => x.code === "INTERRUPTED_ORDER_REQUIRES_MANUAL_REVIEW"));
+});
