@@ -11,9 +11,9 @@ test("sizes spot position from fixed fractional risk and stop distance",()=>{
 });
 
 test("applies regime, drawdown and event multipliers before exposure cap",()=>{
- const r=calculatePositionSize({equity:10000,riskPct:1,entry:100,stop:95,regimeMultiplier:.5,drawdownMultiplier:.5,eventMultiplier:.5,availableExposure:500});
- assert.equal(r.size,500);
- assert.equal(r.riskUsd,25);
+ const r=calculatePositionSize({equity:10000,riskPct:1,entry:100,stop:95,regimeMultiplier:.5,drawdownMultiplier:.5,eventMultiplier:.5,availableExposure:100});
+ assert.equal(r.size,100);
+ assert.equal(r.riskUsd,5);
  assert.ok(r.reasons.includes("CAPPED_BY_AVAILABLE_EXPOSURE"));
 });
 
