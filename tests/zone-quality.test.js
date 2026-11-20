@@ -60,7 +60,7 @@ test("zone quality is frozen to the requested historical as-of bar",()=>{
 
 test("zone visits count only true OHLC intersections and ignore future visits",()=>{
  const p=makeSeries();
- p.l[4]=7;p.h[4]=7.5; // Entirely below demand zone: not an intersection.
+ p.l[3]=10;p.l[4]=7;p.h[4]=7.5;p.l[7]=10; // Bar 4 is below the zone; bar 7 has left it.
  const result=zoneVisits(p,8,9.5,3,"demand",8);
  assert.deepEqual(result,{prior:1,ongoing:false});
 });
