@@ -58,17 +58,18 @@ Required correction:
 - Check timestamp monotonicity and uniqueness, expected interval continuity, finite positive OHLC, high/low consistency, non-negative volume, and explicit closed-candle state.
 - Critical failures must return `WAIT_DATA` / `BLOCKED`; do not silently compute indicators over malformed data.
 
-### F-04 — Pivot confirmation applies an additional delay
-Severity: Medium (signal timing)
+### F-04 — Pivot availability needs an explicit regression contract
+Severity: Medium (timing contract; not confirmed as a defect)
 
 Location: `pivotsAll`, `pivUpTo`, and `structureEvents`, approximately lines 994 and 1011–1013 / 1134 onward.
 
-`pivotsAll` only identifies a pivot after its right-side lookahead window exists. `pivUpTo` and `structureEvents` then require the pivot index to be at most `i - k` again. With the default `k=3`, this appears to add another three bars beyond the pivot's own right-side confirmation. This is not lookahead, but it can materially delay BOS/CHoCH and swing recognition.
+Static inspection shows the implementation computes pivots using a right-side window and then filters pivots by `i - k` before they can be used. That may be a valid way to enforce confirmation rather than a double delay. I am not classifying it as a confirmed defect without a bar-by-bar replay.
 
-Required correction:
-- Define one canonical pivot availability timestamp/index.
-- Use it consistently in live and historical calculations.
-- Add tests that prove the pivot becomes available exactly after the intended number of closed candles.
+Required verification:
+- Create a fixture with a known swing high/low and a configurable right-side confirmation length.
+- Assert the exact first bar on which the pivot becomes available.
+- Compare live and historical structure events on the same truncated candle prefixes.
+- Confirm no future candle influences an earlier decision.
 
 ### F-05 — 1H zone-touch logic needs stronger boundary semantics
 Severity: Medium (trigger correctness)
