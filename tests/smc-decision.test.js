@@ -40,7 +40,7 @@ test("waits when price is outside zone without a confirmed 1H trigger",()=>{
 });
 
 test("accepts a fresh 1H confirmation only when chase distance and live R:R remain valid",()=>{
- const good=evaluateSmcSetup(input({price:99,rejection4h:false,ltf:{state:"confirmed",trigger:"1H BOS",close:99}}),{minRR:1.5});
+ const good=evaluateSmcSetup(input({price:98,rejection4h:false,ltf:{state:"confirmed",trigger:"1H BOS",close:98},plan:{entry:96,stop:94,tp1:99,tp2:104}}),{minRR:1.5});
  assert.equal(good.status,"BUY_CANDIDATE");
  const far=evaluateSmcSetup(input({price:101,rejection4h:false,ltf:{state:"confirmed",trigger:"1H BOS",close:101}}),{minRR:1.5});
  assert.ok(far.reasons.includes("LTF_TRIGGER_TOO_FAR_FROM_ZONE"));
