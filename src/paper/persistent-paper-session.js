@@ -110,7 +110,7 @@ export async function createPersistentPaperSession({
   });
 
   async function persistRiskState(reason) {
-    const state = riskMonitor.status();
+    const state = { ...riskMonitor.status(), events: [] };
     const timestamp = now();
     const ledgerState = await ledger.snapshot();
     const digest = createHash("sha256").update(canonical({ reason, timestamp, sequence: ledgerState.lastSequence, state })).digest("hex");
@@ -262,6 +262,7 @@ export async function createPersistentPaperSession({
     if (closed) throw new Error("paper session is closed");
     const snapshot = currentRiskSnapshot();
     if (!snapshot) throw new Error("cannot reset kill switch: fresh portfolio marks are unavailable");
+    riskMonitor.evaluate(snapshot);
     const result = riskMonitor.reset(snapshot);
     await persistRiskState("MANUAL_KILL_SWITCH_RESET");
     return result;
