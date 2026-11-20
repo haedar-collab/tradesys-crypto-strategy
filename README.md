@@ -25,6 +25,7 @@ It does **not** own market-data fetching, UI, browser storage, notifications, ex
 - [x] Initial entry/exit plan and partial-profit state machine with same-bar breakeven stop handling.
 - [ ] Portfolio stress controls, trailing/forced exit policy, and application risk-state integration.
 - [x] Initial single-symbol and aligned multi-symbol event-driven Spot backtests with next-bar entry, fees, slippage, conservative OHLC exits, portfolio exposure/correlation gates, and regression fixtures.
+- [x] 1H zone-intersection / invalidation / reclaim state tests and contiguous daily RS history checks.
 - [ ] Walk-forward/out-of-sample validation, parameter sensitivity, spread/market-impact calibration, and exchange-realistic execution.
 - [ ] Application adapter integration.
 
