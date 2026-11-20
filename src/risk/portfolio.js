@@ -13,7 +13,7 @@ export function calculatePositionSize(input) {
   const regimeMultiplier = input.regimeMultiplier ?? 1;
   const drawdownMultiplier = input.drawdownMultiplier ?? 1;
   const eventMultiplier = input.eventMultiplier ?? 1;
-  if (!finitePositive(equity) || !finitePositive(entry) || !finitePositive(riskPct) ||
+  if (!finitePositive(equity) || !finitePositive(entry) || !finitePositive(riskPct) || riskPct > 100 ||
       stop <= 0 || stop >= entry ||
       ![regimeMultiplier,drawdownMultiplier,eventMultiplier].every(x=>Number.isFinite(x)&&x>=0)) {
     return { status:"BLOCKED",size:0,riskUsd:0,reasons:["INVALID_RISK_PARAMETERS"] };
@@ -23,7 +23,7 @@ export function calculatePositionSize(input) {
   const requestedRiskUsd = equity*(riskPct/100)*multiplier;
   const uncappedSize = requestedRiskUsd/stopDistancePct;
   const availableExposure = input.availableExposure == null ? Infinity : input.availableExposure;
-  if (!(availableExposure >= 0)) return {status:"BLOCKED",size:0,riskUsd:0,reasons:["INVALID_AVAILABLE_EXPOSURE"]};
+  if (!(availableExposure >= 0) || (availableExposure !== Infinity && !Number.isFinite(availableExposure))) return {status:"BLOCKED",size:0,riskUsd:0,reasons:["INVALID_AVAILABLE_EXPOSURE"]};
   const size = Math.min(uncappedSize,availableExposure);
   const riskUsd = size*stopDistancePct;
   const reasons=[];
@@ -58,9 +58,11 @@ export function evaluatePortfolioRisk(input) {
     !Number.isInteger(maxPositions)||maxPositions<1||typeof candidateSymbol!=="string"||!candidateSymbol) {
     return {status:"BLOCKED",allowed:false,reasons:["INVALID_PORTFOLIO_PARAMETERS"]};
   }
-  const open=input.openPositions||[], pending=input.pendingSignals||[], newSignals=input.newSignals||[];
+  const open=input.openPositions??[], pending=input.pendingSignals??[], newSignals=input.newSignals??[];
+  if (![open,pending,newSignals].every(Array.isArray)) return {status:"BLOCKED",allowed:false,reasons:["INVALID_ACTIVE_POSITION_LIST"]};
   const active=[...open,...pending,...newSignals];
-  const usedUsd=active.reduce((sum,x)=>sum+(Number.isFinite(x.size)?Math.max(0,x.size):0),0);
+  if (active.some(x=>!x||typeof x.symbol!=="string"||!x.symbol||!Number.isFinite(x.size)||x.size<0)) return {status:"BLOCKED",allowed:false,reasons:["INVALID_ACTIVE_POSITION_RECORD"]};
+  const usedUsd=active.reduce((sum,x)=>sum+x.size,0);
   const capUsd=equity*regimeCapPct/100, freeUsd=Math.max(0,capUsd-usedUsd);
   const slots=Math.max(0,maxPositions-active.length);
   const reasons=[];
@@ -72,11 +74,13 @@ export function evaluatePortfolioRisk(input) {
   if(!Number.isFinite(corrMax)||corrMax< -1||corrMax>1) return {status:"BLOCKED",allowed:false,reasons:["INVALID_CORRELATION_THRESHOLD"]};
   let correlatedWith=null, highestCorrelation=null;
   if(active.some(item=>item.symbol===candidateSymbol)){correlatedWith=candidateSymbol;highestCorrelation=1;}
-  if(Array.isArray(candidateReturns) && !correlatedWith) {
-    for(const item of active) {
+  if(active.length && input.enforceCorrelation !== false && !correlatedWith) {
+    if(!Array.isArray(candidateReturns) || candidateReturns.length < 2) reasons.push("CORRELATION_DATA_UNAVAILABLE");
+    else for(const item of active) {
       const corr=pearsonCorrelation(candidateReturns,item.dailyReturns);
-      if(corr!=null&&(highestCorrelation==null||corr>highestCorrelation)) highestCorrelation=corr;
-      if(corr!=null&&corr>corrMax){correlatedWith=item.symbol;break;}
+      if(corr==null){reasons.push("CORRELATION_DATA_UNAVAILABLE");break;}
+      if(highestCorrelation==null||corr>highestCorrelation) highestCorrelation=corr;
+      if(corr>corrMax){correlatedWith=item.symbol;break;}
     }
   }
   if(correlatedWith) reasons.push("CORRELATED_WITH_ACTIVE_POSITION");
