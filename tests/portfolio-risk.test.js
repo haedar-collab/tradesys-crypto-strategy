@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { calculatePositionSize, evaluatePortfolioRisk, pearsonCorrelation } from "../src/risk/portfolio.js";
+import { calculatePositionSize, evaluatePortfolioRisk, pearsonCorrelation, evaluateDrawdownRisk } from "../src/risk/portfolio.js";
 
 test("sizes spot position from fixed fractional risk and stop distance",()=>{
  const r=calculatePositionSize({equity:10000,riskPct:1,entry:100,stop:95});
@@ -73,4 +73,25 @@ test("fails closed when correlation is enabled but aligned return history is mis
 test("rejects risk budgets above 100 percent of equity",()=>{
  const r=calculatePositionSize({equity:10000,riskPct:150,entry:100,stop:95});
  assert.equal(r.status,"BLOCKED");
+});
+
+test("drawdown guard reduces risk, blocks at limit, and recovers with hysteresis",()=>{
+ const normal=evaluateDrawdownRisk({equity:10000,peakEquity:10000});
+ assert.equal(normal.state,"NORMAL");
+ const reduced=evaluateDrawdownRisk({equity:9400,peakEquity:10000});
+ assert.equal(reduced.state,"REDUCED");
+ assert.equal(reduced.multiplier,.5);
+ const blocked=evaluateDrawdownRisk({equity:8900,peakEquity:10000});
+ assert.equal(blocked.state,"BLOCKED");
+ assert.equal(blocked.allowNewEntries,false);
+ const stillBlocked=evaluateDrawdownRisk({equity:9200,peakEquity:10000,previousState:"BLOCKED"});
+ assert.equal(stillBlocked.state,"BLOCKED");
+ const recovered=evaluateDrawdownRisk({equity:9500,peakEquity:10000,previousState:"BLOCKED"});
+ assert.equal(recovered.state,"NORMAL");
+});
+
+test("fails closed on invalid drawdown thresholds",()=>{
+ const result=evaluateDrawdownRisk({equity:9000,peakEquity:10000,ddLimitPct:5,ddRecoverPct:5});
+ assert.equal(result.allowNewEntries,false);
+ assert.equal(result.state,"UNKNOWN");
 });
