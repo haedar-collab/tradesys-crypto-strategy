@@ -96,7 +96,11 @@ export function runEventBacktest(input) {
         const marked=markPosition({...active,remaining:active.state.remaining},bar.c,feeRate,slipRate);
         const markedEquity=equity+marked.netContribution;
         peak=Math.max(peak,markedEquity);
-        maxDrawdownPct=Math.max(maxDrawdownPct,(peak-markedEquity)/peak*100);
+        const dd=(peak-markedEquity)/peak*100;
+        maxDrawdownPct=Math.max(maxDrawdownPct,dd);
+        drawdownBlocked=dd>=ddLimitPct;
+      } else {
+        drawdownBlocked=((peak-equity)/peak*100)>=ddLimitPct;
       }
       continue;
     }
