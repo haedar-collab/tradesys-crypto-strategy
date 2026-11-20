@@ -6,7 +6,7 @@ const order = (id, side = "BUY", quantity = 1) => ({
   clientOrderId: id, symbol: "BTCUSDT", side, quantity, gross: 100,
   fee: 1, fillPrice: 100, status: "FILLED"
 });
-function fixture({ events = null, orders = [order("client_0001")], cash = 8_999,
+function fixture({ events = null, orders = [order("client_0001")], cash = 9_899,
   positions = [{ symbol: "BTCUSDT", quantity: 1 }] } = {}) {
   const rows = events ?? [
     { eventId: "submit_0001", type: "ORDER_SUBMITTED", payload: { clientOrderId: "client_0001" } },
