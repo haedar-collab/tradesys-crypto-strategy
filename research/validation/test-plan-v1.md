@@ -31,6 +31,14 @@ For EMA, SMA, Wilder smoothing, RSI, true range, ATR, ADX, Bollinger Bands, OBV,
 
 ## 4. Relative strength and universe
 
+- asset and BTC daily close timestamps must be aligned at the latest candle;
+- 7/30/90-day returns are measured over the same common timestamp sequence;
+- score weights are non-negative and the fallback for unavailable 90-day return is documented;
+- insufficient aligned history and as-of mismatch return WAIT_DATA;
+- deterministic rank tie-breaking and top-percentile cutoff are tested.
+
+### Original checks
+
 - calculate 7/30/90-day relative returns against BTC from aligned timestamps;
 - verify missing history does not silently substitute an invalid period;
 - test stablecoin/leveraged-token exclusions and listing-age requirements;
