@@ -6,7 +6,7 @@ Static review of `src/backtest/event-driven.js` and `src/backtest/portfolio.js` 
 
 ## Findings and remediation status
 
-The original findings below were addressed in code on `foundation/v1-contract` with marked-equity accounting, per-bar drawdown checks, and terminal marked equity. The implementation has now passed GitHub Actions CI on the latest branch revision (117 tests, 0 failures). The parity coverage includes terminal marked equity, partial TP1 open-position accounting, gap-through-stop fills, completed-trade PnL and single-/one-symbol shared hysteretic drawdown-reduction sizing. Multi-position simultaneous-loss stress tests now verify that combined realized losses block a subsequent candidate and that combined open-position losses are marked before entry admission. Broader recovery-state parity, all fee/slippage configurations and terminal liquidation remain open.
+The original findings below were addressed in code on `foundation/v1-contract` with marked-equity accounting, per-bar drawdown checks, and terminal marked equity. The implementation has now passed GitHub Actions CI on the latest branch revision (121 tests, 0 failures). The parity coverage includes terminal marked equity, partial TP1 open-position accounting, gap-through-stop fills, completed-trade PnL and single-/one-symbol shared hysteretic drawdown-reduction sizing. Multi-position simultaneous-loss stress tests now verify that combined realized losses block a subsequent candidate and that combined open-position losses are marked before entry admission. Broader recovery-state parity, all fee/slippage configurations and terminal liquidation remain open.
 
 ### BTA-001 — Drawdown is calculated from realized closed-trade equity only
 
@@ -73,3 +73,9 @@ Backtest outputs remain research-only until the current branch passes CI and the
 
 
 - Added a deterministic multi-position hysteresis test with two open positions: a partial equity rebound above the recovery threshold must keep the portfolio blocked, while a later full recovery unlocks the next candidate. CI run #341 passed: 117 tests, 0 failures.
+
+
+## Correlation stress increment — 2026-11-20
+
+- Tested negative correlation against a positive-correlation cap, a highly correlated candidate against multiple active positions, exact threshold boundary behavior, and fail-closed behavior when one active asset has incomplete aligned return history.
+- CI run #351 passed: 121 tests, 0 failures. These are deterministic unit tests, not evidence of real-world diversification or stable correlations during market stress.
