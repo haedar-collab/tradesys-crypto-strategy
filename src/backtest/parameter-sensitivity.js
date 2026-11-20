@@ -20,6 +20,8 @@ export function runParameterSensitivity(runner,input,parameterSets,options={}) {
     throw new TypeError("at least two parameter sets are required");
   }
   const metric=options.metric??"netReturnPct";
+  const direction=options.direction??(metric==="maxDrawdownPct"?"minimize":"maximize");
+  if(!["maximize","minimize"].includes(direction)) throw new RangeError("direction must be maximize or minimize");
   const results=parameterSets.map((parameters,index)=>{
     const result=runner({...input,...parameters});
     const metricValue=validateMetric(result,metric);
@@ -34,10 +36,10 @@ export function runParameterSensitivity(runner,input,parameterSets,options={}) {
   const returns=results.map(r=>r.netReturnPct);
   const drawdowns=results.map(r=>r.maxDrawdownPct);
   const mean=values=>values.reduce((s,v)=>s+v,0)/values.length;
-  const best=[...results].sort((a,b)=>b.metricValue-a.metricValue||a.index-b.index)[0];
-  const worst=[...results].sort((a,b)=>a.metricValue-b.metricValue||a.index-b.index)[0];
+  const best=[...results].sort((a,b)=>(direction==="maximize"?b.metricValue-a.metricValue:a.metricValue-b.metricValue)||a.index-b.index)[0];
+  const worst=[...results].sort((a,b)=>(direction==="maximize"?a.metricValue-b.metricValue:b.metricValue-a.metricValue)||a.index-b.index)[0];
   return {
-    status:"COMPLETE",metric,scenarioCount:results.length,results,
+    status:"COMPLETE",metric,direction,scenarioCount:results.length,results,
     summary:{
       metricMin:Math.min(...metricValues),metricMedian:percentile(metricValues,.5),
       metricMax:Math.max(...metricValues),metricRange:Math.max(...metricValues)-Math.min(...metricValues),
