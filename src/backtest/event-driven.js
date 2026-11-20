@@ -42,7 +42,7 @@ export function runEventBacktest(input) {
   const minRR=input.minRR??1.5;
   const maxEntryDriftPct=input.maxEntryDriftPct??1;
   const ddLimitPct=input.ddLimitPct??10;
-  const ddRecoverPct=input.ddRecoverPct??5;
+  const ddRecoverPct=input.ddRecoverPct??Math.min(5,(input.ddLimitPct??10)/2);
   const ddReducedMultiplier=input.ddReducedMultiplier??0.5;
   if (![initialCapital,riskPct,feeBps,slippageBps,minRR,maxEntryDriftPct,ddLimitPct,ddRecoverPct,ddReducedMultiplier].every(Number.isFinite) ||
       initialCapital<=0 || riskPct<=0 || riskPct>100 || feeBps<0 || slippageBps<0 ||
