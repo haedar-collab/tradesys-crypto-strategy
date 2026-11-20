@@ -19,7 +19,7 @@ test("returns a true OHLC zone intersection without bullish confirmation",()=>{
  assert.equal(result.zoneState,"TOUCHED");
  assert.equal(result.touchedAt,p.t[50]);
  assert.equal(result.trigger,null);
- assert.equal(result.stop1h,96);
+ assert.equal(result.stop1h,97.5);
 });
 
 test("does not count a candle entirely below the demand zone as a touch",()=>{
@@ -39,7 +39,7 @@ test("confirms bullish 1H BOS after the zone is touched",()=>{
 });
 
 test("confirms 1H swing-low sweep and reclaim",()=>{
- const p=fixture();p.piv.lo=[50];p.l[50]=97.5;p.l[51]=97;p.o[51]=97.8;p.c[51]=98;p.c[59]=98;
+ const p=fixture();p.piv.lo=[50];p.l[50]=97.5;p.l[51]=97;p.o[51]=97.8;p.c[51]=98;p.c[59]=98;p.l[59]=98;
  const result=evaluateLtfTrigger(p,zone,4);
  assert.equal(result.state,"confirmed");assert.equal(result.trigger,"1H sweep + reclaim");
  assert.equal(result.level,97.5);assert.equal(result.at,p.t[51]);
@@ -54,14 +54,14 @@ test("records a wick below the zone followed by a close back above as reclaim",(
 });
 
 test("marks the zone broken on any close below the invalidation buffer in lookback",()=>{
- const p=fixture();p.c[55]=94.5;p.l[55]=94;p.c[59]=98;
+ const p=fixture();p.c[55]=94.5;p.l[55]=94;p.c[59]=98;p.l[59]=98;
  const result=evaluateLtfTrigger(p,zone,4);
  assert.equal(result.state,"broken");assert.equal(result.zoneState,"BROKEN");
  assert.equal(result.invalidatedAt,p.t[55]);
 });
 
 test("a stale zone touch outside the 12-bar observation window is ignored",()=>{
- const p=fixture();p.l[40]=98;
+ const p=fixture();p.l[50]=100;p.l[40]=98;
  const result=evaluateLtfTrigger(p,zone,4);
  assert.equal(result.state,"none");assert.equal(result.touchedAt,null);
 });
