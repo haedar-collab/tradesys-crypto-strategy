@@ -45,3 +45,27 @@ test("rejects invalid zones and side values",()=>{
  assert.throws(()=>zoneVisits(p,10,9,1,"demand"),RangeError);
  assert.throws(()=>zoneQuality(p,{lo:8,hi:9,idx:1},1,"buy",2),RangeError);
 });
+
+test("zone quality is frozen to the requested historical as-of bar",()=>{
+ const full=makeSeries(), zone={lo:8,hi:9.5,idx:2};
+ const asOf=8;
+ const prefix={n:asOf,o:full.o.slice(0,asOf),c:full.c.slice(0,asOf),h:full.h.slice(0,asOf),l:full.l.slice(0,asOf),atr:full.atr.slice(0,asOf)};
+ const before=zoneQuality(full,zone,1,"demand",3,asOf);
+ const replay=zoneQuality(prefix,zone,1,"demand",3,asOf);
+ assert.deepEqual(before,replay);
+ full.l[9]=7;full.h[9]=10;full.c[9]=8;full.o[9]=8;
+ const afterFutureMutation=zoneQuality(full,zone,1,"demand",3,asOf);
+ assert.deepEqual(afterFutureMutation,before);
+});
+
+test("zone visits count only true OHLC intersections and ignore future visits",()=>{
+ const p=makeSeries();
+ p.l[4]=7;p.h[4]=7.5; // Entirely below demand zone: not an intersection.
+ const result=zoneVisits(p,8,9.5,3,"demand",8);
+ assert.deepEqual(result,{prior:1,ongoing:false});
+});
+
+test("zone quality rejects an as-of bar at or before the zone origin",()=>{
+ const p=makeSeries();
+ assert.throws(()=>zoneQuality(p,{lo:8,hi:9.5,idx:2},1,"demand",3,2),RangeError);
+});
