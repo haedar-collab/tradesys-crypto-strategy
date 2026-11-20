@@ -108,3 +108,56 @@ test("persists mark-to-market events without altering broker positions", async (
     await session.close();
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
+
+
+test("persistent risk gate blocks a projected entry above maximum exposure", async () => {
+  const f = fixture(), dir = await f.dirPromise, filePath = join(dir, "events.jsonl");
+  try {
+    const session = await createPersistentPaperSession({ filePath, now: f.now });
+    const input = {
+      ...await orderInput(f.now, "session_risk_exp_001"),
+      quantity: 90
+    };
+    await assert.rejects(session.submitMarketOrder(input), /MAX_EXPOSURE_LIMIT_EXCEEDED/);
+    const state = await session.snapshot();
+    assert.equal(state.broker.positions.length, 0);
+    assert.equal(state.risk.halted, true);
+    assert.ok(state.ledger.events.some(e => e.type === "RISK_EVENT"));
+    await session.close();
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});
+
+test("kill switch remains latched after restart and blocks new BUY entries", async () => {
+  const f = fixture(), dir = await f.dirPromise, filePath = join(dir, "events.jsonl");
+  try {
+    let session = await createPersistentPaperSession({ filePath, now: f.now });
+    await session.activateKillSwitch("OPERATOR_STOP");
+    await session.close();
+
+    session = await createPersistentPaperSession({ filePath, now: f.now });
+    const state = await session.snapshot();
+    assert.equal(state.risk.halted, true);
+    assert.deepEqual(state.risk.haltReasons, ["OPERATOR_STOP"]);
+    const input = await orderInput(f.now, "session_risk_halt_01");
+    await assert.rejects(session.submitMarketOrder(input), /KILL_SWITCH_LATCHED/);
+    await session.close();
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});
+
+test("mark-to-market breach persists the kill switch and it survives restart", async () => {
+  const f = fixture(), dir = await f.dirPromise, filePath = join(dir, "events.jsonl");
+  try {
+    let session = await createPersistentPaperSession({ filePath, now: f.now });
+    await session.submitMarketOrder(await orderInput(f.now, "session_risk_mark_1"));
+    const marked = await session.markToMarket({ BTCUSDT: quote(f.now(), 80, 81) });
+    assert.equal(marked.risk.halted, true);
+    assert.ok(marked.risk.reasons.includes("DAILY_LOSS_LIMIT_REACHED") ||
+      marked.risk.reasons.includes("MAX_DRAWDOWN_LIMIT_REACHED"));
+    await session.close();
+
+    session = await createPersistentPaperSession({ filePath, now: f.now });
+    assert.equal((await session.snapshot()).risk.halted, true);
+    await assert.rejects(session.submitMarketOrder(await orderInput(f.now, "session_risk_mark_2")), /KILL_SWITCH_LATCHED/);
+    await session.close();
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});
