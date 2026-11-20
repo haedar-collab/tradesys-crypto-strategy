@@ -20,7 +20,7 @@ test("rejects invalid split ratios and undersized data",()=>{
  assert.throws(()=>splitChronologicalDataset(bars,{trainPct:.6,validationPct:.2,purgeBars:200}),/too small/);
 });
 test("builds three regime buckets and accounts for all ready labels",()=>{
- const result=buildRegimeBuckets(bars,{lookback:10,trendThresholdPct:3});
+ const result=buildRegimeBuckets(bars,{lookback:10,trendThresholdPct:1.5});
  assert.equal(result.status,"COMPLETE");
  assert.equal(result.counts.BULLISH,290);
  assert.equal(result.counts.BEARISH,0);
