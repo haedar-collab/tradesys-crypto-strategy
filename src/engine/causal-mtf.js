@@ -42,11 +42,15 @@ function frameEvidence(frame) {
     confirmedLowPivotCount:p.piv.lo.filter(i=>i<=last-3).length};
 }
 
+export function classifyContextBias(structureTrend,ema50,ema200) {
+  if(!Number.isFinite(structureTrend)||!Number.isFinite(ema50)||!Number.isFinite(ema200))return "Neutral";
+  if(structureTrend>0&&ema50>ema200)return "Bullish";
+  if(structureTrend<0&&ema50<ema200)return "Bearish";
+  if(structureTrend===0)return "Neutral";
+  return "Mixed";
+}
 function contextBias(frame) {
-  const e50=frame.prepared.e50.at(-1),e200=frame.prepared.e200.at(-1);
-  if(frame.structure.trend>0&&Number.isFinite(e50)&&Number.isFinite(e200)&&e50>e200)return "Bullish";
-  if(frame.structure.trend<0&&Number.isFinite(e50)&&Number.isFinite(e200)&&e50<e200)return "Bearish";
-  return "Neutral";
+  return classifyContextBias(frame.structure.trend,frame.prepared.e50.at(-1),frame.prepared.e200.at(-1));
 }
 function makeFrameSeries(frame) {
   return {...frame.prepared,t:frame.series.t,ct:frame.series.ct,o:frame.series.o,
