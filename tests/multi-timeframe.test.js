@@ -59,3 +59,19 @@ test("orchestrates weekly, daily, regime, 4H demand zone and confirmed 1H trigge
   assert.equal(result.plan.tp2,105);
   assert.match(result.disclaimer,/No order execution/);
 });
+
+test("strict as-of mode blocks missing temporal metadata and accepts fresh closed contexts",()=>{
+  const now=Date.UTC(2026,10,20,12);
+  const missing=context();
+  const blocked=evaluateMultiTimeframeSetup(missing,{requireAsOfValidation:true,evaluationTime:now});
+  assert.equal(blocked.status,"WAIT");
+  assert.ok(blocked.reasons.includes("TIMEFRAME_ASOF_VALIDATION_FAILED"));
+  const aligned=context({
+    weekly:{closed:true,asOf:now-2*86_400_000,trend:"Bullish"},
+    daily:{closed:true,asOf:now-86_400_000,bias:"Bullish"},
+    h4:{...context().h4,closed:true,asOf:now-4*3_600_000},
+    h1:{...context().h1,closed:true,asOf:now-3_600_000}
+  });
+  const accepted=evaluateMultiTimeframeSetup(aligned,{requireAsOfValidation:true,evaluationTime:now,blockWeakZones:false,minRR:1.5});
+  assert.equal(accepted.status,"BUY_CANDIDATE");
+});
