@@ -25,3 +25,25 @@ test("rejects unsupported symbols and invalid ranges",async()=>{
  await assert.rejects(()=>runMultiSymbolHistoricalPipeline({symbols:["DOGEUSDT"],intervals:["1h"],startTime:start,endTime:start+1,fetchDataset}),/approved/);
  await assert.rejects(()=>runMultiSymbolHistoricalPipeline({symbols:["BTCUSDT"],intervals:["5m"],startTime:start,endTime:start+1,fetchDataset}),/unsupported/);
 });
+
+import { createFileDatasetStore } from "../src/data/file-dataset-store.js";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
+test("integrates pipeline with persistent checksum-verified file storage",async t=>{
+ const root=await mkdtemp(join(tmpdir(),"tradesys-pipeline-"));
+ t.after(()=>rm(root,{recursive:true,force:true}));
+ const store=createFileDatasetStore({rootDir:root});
+ const result=await runMultiSymbolHistoricalPipeline({
+  symbols:["BTCUSDT","ETHUSDT"],intervals:["1h"],startTime:start,endTime:start+4*3600000,
+  fetchDataset,
+  writeDataset:store.writeDataset
+ });
+ assert.equal(result.status,"COMPLETE");
+ for(const dataset of result.datasets){
+  const restored=await store.readManifest(dataset.id);
+  assert.equal(restored.sha256.length,64);
+  assert.equal(restored.barCount,4);
+ }
+});
