@@ -1,0 +1,41 @@
+name: Live Binance Strategy Replay
+on:
+  push:
+    branches: [feature/app-data-contract-v1]
+    paths:
+      - 'scripts/live-binance-strategy-replay.mjs'
+      - 'src/integration/**'
+      - 'src/engine/**'
+      - 'src/backtest/**'
+      - '.github/workflows/live-binance-strategy-replay.yml'
+  workflow_dispatch:
+    inputs:
+      symbol:
+        description: Binance Spot symbol
+        required: true
+        default: BTCUSDT
+permissions:
+  contents: read
+jobs:
+  live-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/app-data-contract-v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch real Binance candles and run causal replay
+        env:
+          SYMBOL: ${{ inputs.symbol }}
+          OUTPUT_FILE: artifacts/binance-btcusdt-live-replay.json
+        run: node scripts/live-binance-strategy-replay.mjs
+      - name: Upload replay report
+        uses: actions/upload-artifact@v4
+        with:
+          name: binance-live-strategy-replay
+          path: artifacts/binance-btcusdt-live-replay.json
+          if-no-files-found: error
+          retention-days: 7
