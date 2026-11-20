@@ -17,7 +17,7 @@ export function zoneVisits(p, lo, hi, from, side, asOf = p?.n) {
   }
   let visits = 0, inside = false, ongoing = false;
   for (let q = from; q < asOf; q++) {
-    const touch = side === "demand" ? p.l[q] <= hi : p.h[q] >= lo;
+    const touch = side === "demand" ? p.l[q] <= hi && p.h[q] >= lo : p.h[q] >= lo && p.l[q] <= hi;
     if (touch && !inside) visits++;
     inside = touch;
     if (q === asOf - 1) ongoing = touch;
@@ -52,8 +52,9 @@ export function zoneQuality(p, zone, atr, side, from, asOf = p?.n) {
       !Number.isFinite(atr) || atr <= 0 || !["demand", "supply"].includes(side)) {
     throw new RangeError("invalid zone quality arguments");
   }
-  const origin = zoneOrigin(p, zone.idx, atr, side, from, zone.lo, zone.hi);
-  const visits = zoneVisits(p, zone.lo, zone.hi, Math.max(zone.idx + 1, from || 0), side);
+  if (!Number.isInteger(asOf) || asOf <= zone.idx || asOf > p.n) throw new RangeError("asOf must be after zone origin and within available history");
+  const origin = zoneOrigin(p, zone.idx, atr, side, from, zone.lo, zone.hi, asOf);
+  const visits = zoneVisits(p, zone.lo, zone.hi, Math.max(zone.idx + 1, from || 0), side, asOf);
   const strength = origin.departAtr >= 3 ? "Strong" : origin.departAtr >= 1.5 ? "Moderate" : "Weak";
   const quality = visits.prior >= 2 || strength === "Weak" ? "Weak"
     : visits.prior === 1 || strength === "Moderate" ? "Moderate" : "Strong";
