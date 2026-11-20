@@ -229,3 +229,19 @@ test("recovery rejects a submission interrupted after its durable risk check", a
     });
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
+
+
+test("immutable session configuration mismatch blocks activation and releases the ledger lock", async () => {
+  const f = fixture(), dir = await f.dirPromise, filePath = join(dir, "events.jsonl");
+  try {
+    const first = await createPersistentPaperSession({ filePath, now: f.now });
+    await first.close();
+    await assert.rejects(
+      createPersistentPaperSession({ filePath, now: f.now, initialCash: 20_000 }),
+      /configuration differs from immutable ledger header/
+    );
+    const reopened = await createPersistentPaperSession({ filePath, now: f.now });
+    assert.equal((await reopened.snapshot()).broker.initialCash, 10_000);
+    await reopened.close();
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});
