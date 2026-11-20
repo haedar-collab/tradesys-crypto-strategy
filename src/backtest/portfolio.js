@@ -81,9 +81,19 @@ export function runPortfolioBacktest(input){
    maxDrawdownPct=Math.max(maxDrawdownPct,(peak-equity)/peak*100);
   }
  };
+ let markedEquity=initialCapital;
  for(let i=1;i<first.length;i++){
   const activeAtStart=new Set(active.keys());
   for(const symbol of activeAtStart) closeOrAdvance(symbol,i,input.assets[symbol].bars[i]);
+  const markedPositions=[...active.entries()].map(([symbol,p])=>({
+   symbol,entryFill:p.entryFill,quantity:p.quantity,remaining:p.state.remaining,
+   entryFee:p.entryFee,grossPnl:p.grossPnl,exitFees:p.exitFees
+  }));
+  const marks=Object.fromEntries(symbols.map(symbol=>[symbol,input.assets[symbol].bars[i].c]));
+  markedEquity=calculateMarkedEquity(equity,markedPositions,marks,feeRate,slipRate).equity;
+  peak=Math.max(peak,markedEquity);
+  const barDrawdownPct=(peak-markedEquity)/peak*100;
+  maxDrawdownPct=Math.max(maxDrawdownPct,barDrawdownPct);
   const candidates=(signalMap.get(i-1)||[]).sort((a,b)=>(b.signal.priority??0)-(a.signal.priority??0)||a.symbol.localeCompare(b.symbol));
   for(const {symbol,signal} of candidates){
    if(activeAtStart.has(symbol)||active.has(symbol)){
@@ -141,8 +151,8 @@ export function runPortfolioBacktest(input){
  const wins=trades.filter(t=>t.netPnl>0),losses=trades.filter(t=>t.netPnl<0);
  const netWins=wins.reduce((s,t)=>s+t.netPnl,0),netLosses=Math.abs(losses.reduce((s,t)=>s+t.netPnl,0));
  return {
-  status:"COMPLETE",initialCapital,endingEquity:equity,netPnl:equity-initialCapital,
-  netReturnPct:(equity/initialCapital-1)*100,tradeCount:trades.length,
+  status:"COMPLETE",initialCapital,realizedEndingEquity:equity,endingEquity:finalMarked.equity,markedEndingEquity:finalMarked.equity,netPnl:finalMarked.equity-initialCapital,
+  netReturnPct:(finalMarked.equity/initialCapital-1)*100,tradeCount:trades.length,
   winRatePct:trades.length?wins.length/trades.length*100:0,
   profitFactor:netLosses?netWins/netLosses:null,maxDrawdownPct,
   maxDrawdownBasis:"marked equity at each aligned closed-bar close, including estimated liquidation costs",
