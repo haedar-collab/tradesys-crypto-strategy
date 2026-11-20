@@ -122,7 +122,8 @@ export function runEventBacktest(input) {
       skipped.push({index:signal.index,reason:"ENTRY_RR_BELOW_MINIMUM"});
       continue;
     }
-    if(drawdownBlocked) { skipped.push({index:signal.index,reason:"MARKED_DRAWDOWN_LIMIT_REACHED"}); continue; }\n    const riskBudget=markedEquity*riskPct/100;
+    if(drawdownBlocked) { skipped.push({index:signal.index,reason:"MARKED_DRAWDOWN_LIMIT_REACHED"}); continue; }
+    const riskBudget=equity*riskPct/100;
     const stopPct=(entryFill-plan.stop)/entryFill;
     const notional=Math.min(equity/(1+feeRate),riskBudget/stopPct);
     if(notional<=0) {
@@ -138,6 +139,14 @@ export function runEventBacktest(input) {
     // The signal candle is never used for entry; the next bar is processed from
     // its open onward so a stop/target on the entry bar is not silently ignored.
     processActiveBar(i,bar);
+    if(active) {
+      const marked=markPosition({...active,remaining:active.state.remaining},bar.c,feeRate,slipRate);
+      const markedEquity=equity+marked.netContribution;
+      peak=Math.max(peak,markedEquity);
+      const dd=(peak-markedEquity)/peak*100;
+      maxDrawdownPct=Math.max(maxDrawdownPct,dd);
+      drawdownBlocked=dd>=ddLimitPct;
+    }
   }
 
   const openPosition=active?{
@@ -147,15 +156,16 @@ export function runEventBacktest(input) {
     unrealizedPnl:(bars[bars.length-1].c-active.entryFill)*active.quantity*active.state.remaining,
     status:"OPEN"
   }:null;
+  const terminalMarked=equity+(active?markPosition({...active,remaining:active.state.remaining},bars.at(-1).c,feeRate,slipRate).netContribution:0);
+  if(active) { peak=Math.max(peak,terminalMarked); maxDrawdownPct=Math.max(maxDrawdownPct,(peak-terminalMarked)/peak*100); }
   const netWins=trades.filter(t=>t.netPnl>0).reduce((s,t)=>s+t.netPnl,0);
   const netLosses=Math.abs(trades.filter(t=>t.netPnl<0).reduce((s,t)=>s+t.netPnl,0));
   const wins=trades.filter(t=>t.netPnl>0).length;
   return {
     status:"COMPLETE",
-    initialCapital,realizedEndingEquity:equity,
-    endingEquity:equity+(active?markPosition({...active,remaining:active.state.remaining},bars.at(-1).c,feeRate,slipRate).netContribution:0),
-    netPnl:(equity+(active?markPosition({...active,remaining:active.state.remaining},bars.at(-1).c,feeRate,slipRate).netContribution:0))-initialCapital,
-    netReturnPct:((equity+(active?markPosition({...active,remaining:active.state.remaining},bars.at(-1).c,feeRate,slipRate).netContribution:0))/initialCapital-1)*100,
+    initialCapital,realizedEndingEquity:equity,markedEndingEquity:terminalMarked,endingEquity:terminalMarked,
+    netPnl:terminalMarked-initialCapital,
+    netReturnPct:(terminalMarked/initialCapital-1)*100,
     tradeCount:trades.length,winRatePct:trades.length?wins/trades.length*100:0,
     profitFactor:netLosses?netWins/netLosses:null,
     maxDrawdownPct,maxDrawdownBasis:"marked equity at each closed-bar close, including estimated liquidation costs",trades,skipped,openPosition,
