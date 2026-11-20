@@ -25,7 +25,8 @@ function verifyLines(text) {
     let row;
     try { row = JSON.parse(rows[i]); } catch { throw new Error("ledger contains invalid JSON at line " + (i + 1)); }
     const { hash: storedHash, ...body } = row;
-    if (body.sequence !== i + 1 || body.previousHash !== previousHash) throw new Error("ledger sequence or hash-chain link is invalid at line " + (i + 1));
+    if (body.sequence !== i + 1) throw new Error("ledger sequence is invalid at line " + (i + 1) + ": expected " + (i + 1) + ", received " + body.sequence);
+    if (body.previousHash !== previousHash) throw new Error("ledger hash-chain link is invalid at line " + (i + 1) + ": expected " + previousHash + ", received " + body.previousHash);
     if (typeof body.eventId !== "string" || ids.has(body.eventId)) throw new Error("ledger contains duplicate or invalid eventId at line " + (i + 1));
     if (storedHash !== hash(canonical(body))) throw new Error("ledger checksum mismatch at line " + (i + 1));
     ids.add(body.eventId);
