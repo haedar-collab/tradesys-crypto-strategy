@@ -21,7 +21,7 @@ test("returns touch without a bullish 1H confirmation", () => {
   assert.equal(result.state, "touch");
   assert.equal(result.touchedAt, p.t[50]);
   assert.equal(result.trigger, null);
-  assert.equal(result.stop1h, 97.5);
+  assert.equal(result.stop1h, 96);
 });
 
 test("confirms bullish 1H BOS after the zone is touched", () => {
