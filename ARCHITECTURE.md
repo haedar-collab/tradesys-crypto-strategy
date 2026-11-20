@@ -50,3 +50,5 @@ The extracted regime module deliberately preserves the current application's reg
 - `src/relative-strength/index.js`: aligned daily asset-versus-BTC relative-return scoring (7/30/90-day weighted score), five-day score snapshot, ratio trend check, and deterministic top-percentile ranking. The application still owns the Binance symbol universe, exchange eligibility filters, quote-volume thresholds, stablecoin/tokenized-stock exclusions, and external float enrichment.
 
 - `src/structure/events.js`: confirmed-pivot BOS/CHoCH event stream with legacy event ordering and trend-state semantics. Order blocks, FVG, liquidity sweeps, zone lifecycle, and 1H trigger logic remain separate extraction tasks.
+
+- `src/structure/zones.js`: bullish order-block discovery/invalidation, unfilled bullish FVG discovery with partial-fill handling, equal-high buy-side liquidity, sell-side liquidity, and sweep/reclaim detection. Zone selection, zone quality, and final SMC signal policy remain higher-level responsibilities.
