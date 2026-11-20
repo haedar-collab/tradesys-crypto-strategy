@@ -16,7 +16,8 @@ It does **not** own market-data fetching, UI, browser storage, notifications, ex
 - [x] Initial BTC market-regime classifier and confirmation timeline.
 - [x] Initial relative-strength scoring and universe ranking module.
 - [x] Initial confirmed-pivot BOS/CHoCH event engine.
-- [ ] Order blocks, FVG, liquidity, zone lifecycle, and 1H trigger state machine.
+- [x] Initial bullish order-block, FVG, and liquidity-level primitives.
+- [ ] Zone lifecycle/quality, 1H trigger state machine, and integrated SMC decision engine.
 - [ ] Entry/exit and portfolio risk modules.
 - [ ] Event-driven backtest and out-of-sample validation.
 - [ ] Application adapter integration.
@@ -31,7 +32,7 @@ The extracted indicator and regime modules are initial implementations. They mus
 - `src/indicators/` — deterministic technical indicators.
 - `src/regime/` — benchmark market-regime classification.
 - `src/relative-strength/` — aligned asset-versus-BTC performance scoring and deterministic ranking.
-- `src/structure/` — confirmed-pivot market-structure events.
+- `src/structure/` — confirmed-pivot market-structure events and initial SMC zone/liquidity primitives.
 - `src/` — additional pure strategy modules.
 - `fixtures/` and `tests/` — deterministic scenarios, regression, and anti-lookahead tests.
 - `research/` — audit findings and validation reports.
