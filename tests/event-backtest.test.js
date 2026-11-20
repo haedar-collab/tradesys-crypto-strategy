@@ -47,7 +47,9 @@ test("keeps a position open at the end and reports mark-to-market separately",()
  assert.equal(result.tradeCount,0);
  assert.equal(result.openPosition.status,"OPEN");
  assert.equal(result.openPosition.markPrice,102);
- assert.equal(result.endingEquity,result.initialCapital);
+ assert.equal(result.realizedEndingEquity,result.initialCapital);
+ assert.ok(result.markedEndingEquity>result.realizedEndingEquity);
+ assert.equal(result.endingEquity,result.markedEndingEquity);
 });
 
 test("rejects unordered bars and invalid signal plans",()=>{
