@@ -6,7 +6,7 @@ Static review of `src/backtest/event-driven.js` and `src/backtest/portfolio.js` 
 
 ## Findings and remediation status
 
-The original findings below were addressed in code on `foundation/v1-contract` with marked-equity accounting, per-bar drawdown checks, and terminal marked equity. The implementation has now passed GitHub Actions CI on the latest branch revision (113 tests, 0 failures). The parity coverage includes terminal marked equity, partial TP1 open-position accounting, gap-through-stop fills and completed-trade PnL. Full parity of drawdown transitions, all fee/slippage configurations and terminal liquidation remains open.
+The original findings below were addressed in code on `foundation/v1-contract` with marked-equity accounting, per-bar drawdown checks, and terminal marked equity. The implementation has now passed GitHub Actions CI on the latest branch revision (114 tests, 0 failures). The parity coverage includes terminal marked equity, partial TP1 open-position accounting, gap-through-stop fills, completed-trade PnL and single-/one-symbol shared hysteretic drawdown-reduction sizing. Full parity across multiple simultaneous positions, all fee/slippage configurations and terminal liquidation remains open.
 
 ### BTA-001 — Drawdown is calculated from realized closed-trade equity only
 
