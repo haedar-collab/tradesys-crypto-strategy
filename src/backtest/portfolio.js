@@ -42,7 +42,7 @@ export function runPortfolioBacktest(input){
  const regimeCapPct=input.regimeCapPct??80, maxPositions=input.maxPositions??5;
  const corrMax=input.corrMax??0.8, feeRate=(input.feeBps??10)/10000, slipRate=(input.slippageBps??5)/10000;
  const minRR=input.minRR??1.5, maxEntryDriftPct=input.maxEntryDriftPct??1;
- const ddLimitPct=input.ddLimitPct??10, ddRecoverPct=input.ddRecoverPct??5, ddReducedMultiplier=input.ddReducedMultiplier??0.5;
+ const ddLimitPct=input.ddLimitPct??10, ddRecoverPct=input.ddRecoverPct??Math.min(5,(input.ddLimitPct??10)/2), ddReducedMultiplier=input.ddReducedMultiplier??0.5;
  if(![initialCapital,riskPct,regimeCapPct,maxPositions,corrMax,feeRate,slipRate,minRR,maxEntryDriftPct].every(Number.isFinite)||
    initialCapital<=0||riskPct<=0||riskPct>100||regimeCapPct<0||regimeCapPct>100||
    !Number.isInteger(maxPositions)||maxPositions<1||corrMax< -1||corrMax>1||feeRate<0||slipRate<0||minRR<=0||maxEntryDriftPct<0||
