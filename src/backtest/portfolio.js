@@ -94,7 +94,7 @@ export function runPortfolioBacktest(input){
   peak=Math.max(peak,markedEquity);
   const barDrawdownPct=(peak-markedEquity)/peak*100;
   maxDrawdownPct=Math.max(maxDrawdownPct,barDrawdownPct);
-  const barRiskState=evaluateDrawdownRisk({equity:markedEquity,peakEquity:peak,ddLimitPct,ddRecoverPct,reducedMultiplier:ddReducedMultiplier,previousState:drawdownState});
+  let barRiskState=evaluateDrawdownRisk({equity:markedEquity,peakEquity:peak,ddLimitPct,ddRecoverPct,reducedMultiplier:ddReducedMultiplier,previousState:drawdownState});
   drawdownState=barRiskState.state;
   const candidates=(signalMap.get(i-1)||[]).sort((a,b)=>(b.signal.priority??0)-(a.signal.priority??0)||a.symbol.localeCompare(b.symbol));
   for(const {symbol,signal} of candidates){
@@ -136,6 +136,16 @@ export function runPortfolioBacktest(input){
     state:{entry:entryFill,stop:plan.stop,tp1:plan.tp1,tp2:plan.tp2,tp3:plan.tp3,stage:0,remaining:1,status:"OPEN"}
    });
    closeOrAdvance(symbol,i,bar);
+   const postPositions=[...active.entries()].map(([sym,p])=>({
+    symbol:sym,entryFill:p.entryFill,quantity:p.quantity,remaining:p.state.remaining,
+    entryFee:p.entryFee,grossPnl:p.grossPnl,exitFees:p.exitFees
+   }));
+   markedEquity=calculateMarkedEquity(equity,postPositions,marks,feeRate,slipRate).equity;
+   peak=Math.max(peak,markedEquity);
+   const postEntryDrawdownPct=(peak-markedEquity)/peak*100;
+   maxDrawdownPct=Math.max(maxDrawdownPct,postEntryDrawdownPct);
+   barRiskState=evaluateDrawdownRisk({equity:markedEquity,peakEquity:peak,ddLimitPct,ddRecoverPct,reducedMultiplier:ddReducedMultiplier,previousState:drawdownState});
+   drawdownState=barRiskState.state;
   }
  }
  const openPositions=[...active.entries()].map(([symbol,p])=>({
