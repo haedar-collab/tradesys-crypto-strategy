@@ -42,3 +42,7 @@ Latest CI run: 35 tests passed, 0 failed. These are extraction increments, not a
 - Fixed single-symbol drawdown admission when a stop closes on the entry bar.
 - Added single-symbol/one-symbol portfolio parity coverage for open positions, partial TP1, gap-through-stop fills and completed trades.
 - Latest GitHub Actions CI: 113 tests passed, 0 failed. Research-only status remains; broader risk-state parity and out-of-sample validation are not complete.
+
+- Unified single-symbol and portfolio backtests on the same hysteretic drawdown state machine, including reduced-risk sizing and a recovery threshold derived safely from lower custom drawdown limits.
+- Added single-/one-symbol portfolio parity test for drawdown-reduction sizing after a realized loss.
+- Latest GitHub Actions CI: 114 tests passed, 0 failed.
