@@ -5,6 +5,7 @@
  * checks are applied before every entry. No exchange or account I/O.
  */
 import { advanceLongPosition } from "../risk/trade-plan.js";
+import { calculateMarkedEquity } from "./mark-to-market.js";
 import { calculatePositionSize, evaluatePortfolioRisk, evaluateDrawdownRisk } from "../risk/portfolio.js";
 
 function validateBars(bars,symbol) {
@@ -98,7 +99,7 @@ export function runPortfolioBacktest(input){
    const openPositions=[...active.entries()].map(([sym,p])=>({
     symbol:sym,size:p.notional*p.state.remaining,dailyReturns:input.assets[sym].dailyReturns
    }));
-   const ddGate=evaluateDrawdownRisk({equity,peakEquity:peak,ddLimitPct,ddRecoverPct,reducedMultiplier:ddReducedMultiplier,previousState:drawdownState});
+   const ddGate=evaluateDrawdownRisk({equity:markedEquity,peakEquity:peak,ddLimitPct,ddRecoverPct,reducedMultiplier:ddReducedMultiplier,previousState:drawdownState});
    drawdownState=ddGate.state;
    if(!ddGate.allowNewEntries){skipped.push({symbol,index:signal.index,reason:"DRAWDOWN_LIMIT_REACHED"});continue;}
    const riskGate=evaluatePortfolioRisk({
@@ -109,7 +110,7 @@ export function runPortfolioBacktest(input){
     skipped.push({symbol,index:signal.index,reason:riskGate.reasons.join("|")});continue;
    }
    const sizing=calculatePositionSize({
-    equity,riskPct,entry:entryFill,stop:plan.stop,availableExposure:riskGate.freeUsd,
+    equity:markedEquity,riskPct,entry:entryFill,stop:plan.stop,availableExposure:riskGate.freeUsd,
     regimeMultiplier:signal.regimeMultiplier??1,
     drawdownMultiplier:(signal.drawdownMultiplier??1)*ddGate.multiplier,
     eventMultiplier:signal.eventMultiplier??1
@@ -131,6 +132,12 @@ export function runPortfolioBacktest(input){
   markPrice:input.assets[symbol].bars.at(-1).c,
   unrealizedPnl:(input.assets[symbol].bars.at(-1).c-p.entryFill)*p.quantity*p.state.remaining
  }));
+ const finalPositions=[...active.entries()].map(([symbol,p])=>({
+  symbol,entryFill:p.entryFill,quantity:p.quantity,remaining:p.state.remaining,
+  entryFee:p.entryFee,grossPnl:p.grossPnl,exitFees:p.exitFees
+ }));
+ const finalMarks=Object.fromEntries(symbols.map(symbol=>[symbol,input.assets[symbol].bars.at(-1).c]));
+ const finalMarked=calculateMarkedEquity(equity,finalPositions,finalMarks,feeRate,slipRate);
  const wins=trades.filter(t=>t.netPnl>0),losses=trades.filter(t=>t.netPnl<0);
  const netWins=wins.reduce((s,t)=>s+t.netPnl,0),netLosses=Math.abs(losses.reduce((s,t)=>s+t.netPnl,0));
  return {
@@ -138,7 +145,7 @@ export function runPortfolioBacktest(input){
   netReturnPct:(equity/initialCapital-1)*100,tradeCount:trades.length,
   winRatePct:trades.length?wins.length/trades.length*100:0,
   profitFactor:netLosses?netWins/netLosses:null,maxDrawdownPct,
-  maxDrawdownBasis:"realized closed-trade equity; excludes open-position mark-to-market",
+  maxDrawdownBasis:"marked equity at each aligned closed-bar close, including estimated liquidation costs",
   trades,skipped,openPositions,
   assumptions:{signal:"bar close",entry:"next bar open; entry bar is processed",
    feesAndSlippage:"applied on entry and each exit tranche",sameBarAmbiguity:"conservative stop-first",
