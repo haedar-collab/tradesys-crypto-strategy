@@ -10,6 +10,8 @@
 - Restart restores the latest persisted risk-monitor state, including the latched kill switch.
 - New sessions persist an initial-equity baseline before the first order.
 - Order submissions are serialized within a session to avoid concurrent in-process risk-check races.
+- The persistent ledger uses an exclusive lock file held for the lifetime of the session; lock ownership is checked before release.
+- Initialization failures release the lock. Stale lock recovery is intentionally manual to avoid stealing a lock from a slow but active writer.
 
 ## Fail-closed conditions
 - If an open position has no durable, fresh mark, or a mark predates the most recent fill, new BUY entries are rejected.
@@ -24,7 +26,7 @@
 - Maximum age of a durable mark for new-entry risk checks: 60 seconds by default (configurable).
 
 ## Remaining limitations
-- This is an in-process paper-session guard. It does not provide a cross-process file lock; two independent processes must not open the same ledger concurrently.
+- The ledger acquires an exclusive lifetime lock (`.lock`) so a second process cannot open the same ledger concurrently. A pre-existing lock is treated as stale/owned by another process and is never auto-deleted; operator review is required.
 - It does not liquidate existing positions or manage protective exits.
 - Mark freshness is only as reliable as the timestamp supplied by the caller; production integration must source marks from the trusted market-data adapter.
 - This stage is not live-trading authorization and does not connect to Binance order endpoints.
