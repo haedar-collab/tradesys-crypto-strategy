@@ -50,10 +50,21 @@ test("rejects assets whose OHLC timestamps are not aligned",()=>{
  }}),RangeError);
 });
 
-test("reports open positions separately from realized ending equity",()=>{
+test("reports marked ending equity separately from realized equity for open positions",()=>{
  const rows=[[100,101,99,100],[100,104,99,102],[102,104,101,103]];
  const result=runPortfolioBacktest({assets:{AAAUSDT:asset(rows,[signal()],[1,2,3])},feeBps:0,slippageBps:0});
  assert.equal(result.tradeCount,0);
  assert.equal(result.openPositions.length,1);
  assert.equal(result.endingEquity,result.initialCapital);
+});
+
+test("marked drawdown is reflected in portfolio equity while positions remain open",()=>{
+ const rows=[[100,101,99,100],[100,101,97,98],[98,99,97,98],[98,99,97,98]];
+ const result=runPortfolioBacktest({
+  assets:{AAAUSDT:asset(rows,[signal(0),signal(1)],[.01,.02,.03])},
+  riskPct:50,ddLimitPct:1,ddRecoverPct:.5,regimeCapPct:100,maxPositions:3,
+  feeBps:0,slippageBps:0
+ });
+ assert.ok(result.maxDrawdownPct>=1);
+ assert.ok(result.skipped.some(x=>x.reason==="DRAWDOWN_LIMIT_REACHED"));
 });
