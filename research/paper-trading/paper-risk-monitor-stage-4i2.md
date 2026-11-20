@@ -30,3 +30,18 @@
 - It does not liquidate existing positions or manage protective exits.
 - Mark freshness is only as reliable as the timestamp supplied by the caller; production integration must source marks from the trusted market-data adapter.
 - This stage is not live-trading authorization and does not connect to Binance order endpoints.
+
+
+## Stage 4I.3 — Reliability and concurrency hardening
+- An exclusive `.lock` file is created with atomic `open(..., "wx")` and retained for the ledger lifetime.
+- A second independent Node.js process is tested and must fail to open the same ledger while the first process owns the lock.
+- Graceful close releases the lock. Abrupt process termination intentionally leaves a stale lock; automatic lock stealing is disabled and manual operator review is required.
+- Initialization/recovery failures release a lock acquired by the current process.
+- Recovery rejects a JSONL file whose final record is not newline-terminated; it never appends to an ambiguous partial tail.
+- Crash-window recovery is tested for a durable order intent alone and for an order intent followed by a durable risk-check snapshot but no durable fill. Both are rejected for manual review and are never auto-executed.
+- A durable `ORDER_FILLED` event is replayed to reconstruct paper broker balances and positions; the existing restart test verifies this path.
+
+### Scope and operational caveats
+- The lock is intended for processes sharing a local filesystem with reliable exclusive-create semantics. It is not a distributed lock service and does not establish safe coordination across arbitrary network filesystems or hosts.
+- Stale lock cleanup must only be performed after the operator verifies that no process still owns the ledger.
+- Abrupt termination between an in-memory broker fill and durable `ORDER_FILLED` is fundamentally ambiguous with the current paper broker. Recovery fails closed from the durable write-ahead intent; it cannot prove whether an external broker filled an order. This remains a paper-only simulation and is not an exchange execution protocol.
