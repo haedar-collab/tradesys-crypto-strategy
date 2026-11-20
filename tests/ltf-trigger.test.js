@@ -24,7 +24,7 @@ test("returns a true OHLC zone intersection without bullish confirmation",()=>{
 
 test("does not count a candle entirely below the demand zone as a touch",()=>{
  const p=fixture();
- p.l[50]=92;p.h[50]=94;p.c[50]=93;p.o[50]=93;
+ p.l[50]=94.7;p.h[50]=94.9;p.c[50]=94.8;p.o[50]=94.8;
  const result=evaluateLtfTrigger(p,zone,4);
  assert.equal(result.state,"none");
  assert.equal(result.zoneState,"UNTOUCHED");
