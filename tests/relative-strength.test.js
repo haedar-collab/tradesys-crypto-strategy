@@ -54,8 +54,7 @@ test("preserves incoming volume order when relative-strength scores tie", () => 
 
 test("returns WAIT_DATA when aligned daily history contains a missing interval",()=>{
  const asset=makeSeries(120,0.01), benchmark=makeSeries(120,0.005);
- asset.t[70]+=86_400_000;
- for(let i=71;i<asset.t.length;i++) asset.t[i]+=86_400_000;
+ asset.t.splice(70,1);asset.c.splice(70,1);
  const result=computeRelativeStrength(asset,benchmark);
  assert.equal(result.status,"WAIT_DATA");
  assert.equal(result.reason,"HISTORY_GAP");
