@@ -59,11 +59,10 @@ test("integrated order submission is idempotent across calls and restarts", asyn
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
 
-test("recovery completes a write-ahead submission interrupted before fill event", async () => {
+test("recovery rejects an interrupted write-ahead submission instead of auto-executing it", async () => {
   const f = fixture(), dir = await f.dirPromise, filePath = join(dir, "events.jsonl");
   try {
     const input = await orderInput(f.now, "session_buy_0003");
-    // Simulate a process that durably wrote intent and crashed before broker execution.
     const ledger = await (await import("../src/paper/persistent-paper-ledger.js")).createPersistentPaperLedger({ filePath });
     const { createHash } = await import("node:crypto");
     const eventId = "paper_" + createHash("sha256").update(input.clientOrderId).digest("hex").slice(0, 32) + "_submitted";
@@ -72,8 +71,10 @@ test("recovery completes a write-ahead submission interrupted before fill event"
 
     const recovered = await createPersistentPaperSession({ filePath, now: f.now });
     const state = await recovered.snapshot();
-    assert.equal(state.broker.positions[0].quantity, 0.25);
-    assert.ok(state.ledger.events.some(e => e.type === "ORDER_FILLED"));
+    assert.equal(state.broker.positions.length, 0);
+    assert.ok(state.ledger.events.some(e => e.type === "ORDER_REJECTED" &&
+      /manual review required/.test(e.payload.message)));
+    await assert.rejects(recovered.submitMarketOrder(input), /manual review required/);
     await recovered.close();
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
