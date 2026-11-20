@@ -29,7 +29,7 @@ test("calculates realized trade statistics and UTC period PnL", () => {
   assert.equal(report.profitFactor, 2.5);
   assert.equal(report.netRealizedPnl, 60);
   assert.equal(report.totalFees, 3);
-  assert.equal(report.maxDrawdownPct, 0.39604);
+  assert.equal(report.maxDrawdownPct, 0.3960396);
   assert.equal(report.daily.length, 2);
 });
 
