@@ -95,3 +95,58 @@ test("fails closed on invalid drawdown thresholds",()=>{
  assert.equal(result.allowNewEntries,false);
  assert.equal(result.state,"UNKNOWN");
 });
+
+test("allows negatively correlated assets under a positive-correlation cap",()=>{
+ const r=evaluatePortfolioRisk({
+  equity:10000,regimeCapPct:80,maxPositions:5,candidateSymbol:"HEDGEUSDT",corrMax:.8,
+  candidateReturns:[1,2,3,4,5],
+  openPositions:[{symbol:"BTCUSDT",size:1000,dailyReturns:[5,4,3,2,1]}]
+ });
+ assert.equal(r.allowed,true);
+ assert.equal(r.highestCorrelation,-1);
+});
+
+test("blocks a candidate highly correlated with any one of several active positions",()=>{
+ const r=evaluatePortfolioRisk({
+  equity:10000,regimeCapPct:80,maxPositions:5,candidateSymbol:"ALTUSDT",corrMax:.8,
+  candidateReturns:[1,-1,2,-2,3,-3],
+  openPositions:[
+   {symbol:"HEDGEUSDT",size:1000,dailyReturns:[-1,1,-2,2,-3,3]},
+   {symbol:"BTCUSDT",size:1000,dailyReturns:[2,-2,4,-4,6,-6]}
+  ]
+ });
+ assert.equal(r.allowed,false);
+ assert.equal(r.correlatedWith,"BTCUSDT");
+ assert.ok(r.reasons.includes("CORRELATED_WITH_ACTIVE_POSITION"));
+});
+
+test("allows correlation exactly at the configured threshold and blocks above it",()=>{
+ const candidate=[-2,-1,0,1,2];
+ const boundary=[-2,-1,0,1,2];
+ const above=[-2,-1,0,1,2.1];
+ const at=evaluatePortfolioRisk({
+  equity:10000,regimeCapPct:80,maxPositions:5,candidateSymbol:"AT",corrMax:1,
+  candidateReturns:candidate,openPositions:[{symbol:"REF",size:1000,dailyReturns:boundary}]
+ });
+ const over=evaluatePortfolioRisk({
+  equity:10000,regimeCapPct:80,maxPositions:5,candidateSymbol:"OVER",corrMax:.999,
+  candidateReturns:candidate,openPositions:[{symbol:"REF",size:1000,dailyReturns:above}]
+ });
+ assert.equal(at.allowed,false);
+ assert.equal(at.highestCorrelation,1);
+ assert.equal(over.allowed,false);
+ assert.ok(over.reasons.includes("CORRELATED_WITH_ACTIVE_POSITION"));
+});
+
+test("fails closed when one of several active positions has incomplete correlation history",()=>{
+ const r=evaluatePortfolioRisk({
+  equity:10000,regimeCapPct:80,maxPositions:5,candidateSymbol:"ALTUSDT",corrMax:.8,
+  candidateReturns:[1,2,3,4],
+  openPositions:[
+   {symbol:"BTCUSDT",size:1000,dailyReturns:[1,2,3,4]},
+   {symbol:"ETHUSDT",size:1000,dailyReturns:[1,2]}
+  ]
+ });
+ assert.equal(r.allowed,false);
+ assert.ok(r.reasons.includes("CORRELATION_DATA_UNAVAILABLE"));
+});
