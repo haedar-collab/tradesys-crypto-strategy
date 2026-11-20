@@ -9,6 +9,7 @@ import { evaluateLtfTrigger } from "../structure/ltf-trigger.js";
 import { selectDemandZone } from "../structure/select-zone.js";
 import { evaluateSmcSetup } from "../structure/decision.js";
 import { buildLongPlan } from "../risk/trade-plan.js";
+import { validateMultiTimeframeAsOf } from "../validation/timeframes.js";
 
 export const STRATEGY_ENGINE_VERSION = "0.2.0";
 
@@ -23,6 +24,10 @@ const wait = (reason, details = {}) => ({
 export function evaluateMultiTimeframeSetup(input, options = {}) {
   if (!input || !input.weekly || !input.daily || !input.regime || !input.h4) {
     return wait("MISSING_TIMEFRAME_CONTEXT");
+  }
+  if (options.requireAsOfValidation === true) {
+    const temporal = validateMultiTimeframeAsOf(input, { evaluationTime: options.evaluationTime, maxAgeMs: options.maxAgeMs });
+    if (temporal.status !== "PASS") return wait("TIMEFRAME_ASOF_VALIDATION_FAILED", { temporal });
   }
   const { weekly, daily, regime, h4 } = input;
   if (weekly.closed !== true) return wait("WEEKLY_CONTEXT_PROVISIONAL");
