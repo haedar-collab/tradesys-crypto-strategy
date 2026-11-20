@@ -43,3 +43,11 @@ test("ranks the universe deterministically and applies top percentile", () => {
   assert.deepEqual(ranked.map(item => item.top), [true, true, false]);
   assert.deepEqual(ranked.map(item => item.rank), [1, 2, 3]);
 });
+
+test("preserves incoming volume order when relative-strength scores tie", () => {
+  const ranked = rankRelativeStrength([
+    { symbol: "HIGHVOL", status: "PASS", score: 5 },
+    { symbol: "LOWVOL", status: "PASS", score: 5 }
+  ], 50);
+  assert.deepEqual(ranked.map(item => item.symbol), ["HIGHVOL", "LOWVOL"]);
+});
