@@ -30,7 +30,7 @@ test("calculates Pearson correlation and handles constant series",()=>{
 
 test("enforces regime exposure and position-count caps",()=>{
  const r=evaluatePortfolioRisk({equity:10000,regimeCapPct:50,maxPositions:3,candidateSymbol:"AAAUSDT",
-  openPositions:[{symbol:"BBBUSDT",size:2000}],pendingSignals:[{symbol:"CCCUSDT",size:1500}]});
+  openPositions:[{symbol:"BBBUSDT",size:2000}],pendingSignals:[{symbol:"CCCUSDT",size:1500}],enforceCorrelation:false});
  assert.equal(r.status,"ALLOWED");
  assert.equal(r.freeUsd,1500);
  assert.equal(r.slots,1);
@@ -38,10 +38,10 @@ test("enforces regime exposure and position-count caps",()=>{
 
 test("blocks when exposure or position slots are exhausted",()=>{
  const exposure=evaluatePortfolioRisk({equity:10000,regimeCapPct:50,maxPositions:5,candidateSymbol:"AAAUSDT",
-  openPositions:[{symbol:"BBBUSDT",size:5000}]});
+  openPositions:[{symbol:"BBBUSDT",size:5000}],enforceCorrelation:false});
  assert.ok(exposure.reasons.includes("REGIME_EXPOSURE_CAP_REACHED"));
  const slots=evaluatePortfolioRisk({equity:10000,regimeCapPct:80,maxPositions:1,candidateSymbol:"AAAUSDT",
-  openPositions:[{symbol:"BBBUSDT",size:1000}]});
+  openPositions:[{symbol:"BBBUSDT",size:1000}],enforceCorrelation:false});
  assert.ok(slots.reasons.includes("MAX_POSITIONS_REACHED"));
 });
 
@@ -61,4 +61,16 @@ test("blocks highly correlated assets against active positions",()=>{
 
 test("fails closed for missing portfolio context",()=>{
  assert.equal(evaluatePortfolioRisk({}).status,"WAIT_DATA");
+});
+
+test("fails closed when correlation is enabled but aligned return history is missing",()=>{
+ const r=evaluatePortfolioRisk({equity:10000,regimeCapPct:80,maxPositions:5,candidateSymbol:"AAAUSDT",
+  openPositions:[{symbol:"BBBUSDT",size:1000}]});
+ assert.ok(r.reasons.includes("CORRELATION_DATA_UNAVAILABLE"));
+ assert.equal(r.allowed,false);
+});
+
+test("rejects risk budgets above 100 percent of equity",()=>{
+ const r=calculatePositionSize({equity:10000,riskPct:150,entry:100,stop:95});
+ assert.equal(r.status,"BLOCKED");
 });
