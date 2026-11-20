@@ -46,3 +46,6 @@ Latest CI run: 35 tests passed, 0 failed. These are extraction increments, not a
 - Unified single-symbol and portfolio backtests on the same hysteretic drawdown state machine, including reduced-risk sizing and a recovery threshold derived safely from lower custom drawdown limits.
 - Added single-/one-symbol portfolio parity test for drawdown-reduction sizing after a realized loss.
 - Latest GitHub Actions CI: 114 tests passed, 0 failed.
+
+- Added multi-position simultaneous-loss stress tests proving that combined realized losses trigger the portfolio drawdown block before a subsequent candidate can enter, and that combined open-position losses are marked before entry admission.
+- Latest GitHub Actions CI: 116 tests passed, 0 failed (run #324).
