@@ -35,7 +35,7 @@ test("prioritizes stop when stop and target are both touched in the same OHLC ba
 
 test("takes 40 percent at TP1 and moves stop to breakeven",()=>{
  const p={entry:100,stop:95,tp1:105,tp2:110,tp3:115,stage:0,remaining:1,status:"OPEN"};
- const r=advanceLongPosition(p,{low:99,high:106});
+ const r=advanceLongPosition(p,{low:100.1,high:106});
  assert.equal(r.stage,1);
  assert.equal(r.stop,100);
  assert.equal(r.remaining,.6);
@@ -44,7 +44,7 @@ test("takes 40 percent at TP1 and moves stop to breakeven",()=>{
 
 test("scales out TP1 TP2 and TP3 according to the fixed plan",()=>{
  let p={entry:100,stop:95,tp1:105,tp2:110,tp3:115,stage:0,remaining:1,status:"OPEN"};
- p=advanceLongPosition(p,{low:99,high:106});
+ p=advanceLongPosition(p,{low:100.1,high:106});
  p=advanceLongPosition(p,{low:100.1,high:111});
  p=advanceLongPosition(p,{low:110,high:116});
  assert.equal(p.status,"CLOSED");
