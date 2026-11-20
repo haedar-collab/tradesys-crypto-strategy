@@ -49,12 +49,12 @@ export async function createPersistentPaperSession({
     finally { clock = now(); }
   }
 
-  async function persistFill(input, order) {
+  async function persistFill(input, order, executionInput = input) {
     await ledger.append({
       eventId: eventId(input.clientOrderId, "filled"),
       type: "ORDER_FILLED",
       timestamp: order.filledAt,
-      payload: { clientOrderId: input.clientOrderId, order, orderInput: input }
+      payload: { clientOrderId: input.clientOrderId, order, orderInput: input, executionInput }
     });
     filled.set(input.clientOrderId, { input: clone(input), order: clone(order) });
   }
@@ -105,7 +105,7 @@ export async function createPersistentPaperSession({
   // Rebuild broker balances and inventory by replaying durable fills in ledger order.
   for (const entry of recovered.events) {
     if (entry.type !== "ORDER_FILLED") continue;
-    const input = entry.payload.orderInput;
+    const input = entry.payload.executionInput ?? entry.payload.orderInput;
     const replayed = executeAtQuoteTime(input);
     if (replayed.status !== "FILLED" || replayed.clientOrderId !== entry.payload.clientOrderId) {
       throw new Error("paper broker replay did not reproduce a recorded fill");
@@ -243,7 +243,7 @@ export async function createPersistentPaperSession({
       if (!risk.allowed) throw new Error("paper risk gate blocked entry: " + risk.reason);
       const safeInput = { ...clone(input), riskGate: { allowed: true, source: "PERSISTENT_SESSION_RISK_MONITOR" } };
       const order = executeAtQuoteTime(safeInput);
-      await persistFill(input, order);
+      await persistFill(input, order, safeInput);
       lastFillTimestamp = Math.max(lastFillTimestamp, order.filledAt);
       return clone(order);
     } catch (error) {
