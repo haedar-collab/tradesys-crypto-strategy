@@ -14,7 +14,7 @@ It does **not** own market-data fetching, UI, browser storage, notifications, ex
 - [x] Binance Spot candle normalization and quality checks.
 - [x] Technical indicator primitives: EMA, SMA, Wilder, RSI, ATR, ADX, Bollinger Bands, OBV, pivots, percentile rank.
 - [x] Initial BTC market-regime classifier and confirmation timeline.
-- [ ] Relative-strength engine.
+- [x] Initial relative-strength scoring and universe ranking module.
 - [ ] Structure/SMC and 1H trigger state machine.
 - [ ] Entry/exit and portfolio risk modules.
 - [ ] Event-driven backtest and out-of-sample validation.
@@ -29,6 +29,7 @@ The extracted indicator and regime modules are initial implementations. They mus
 - `src/validation/` — candle normalization and data-quality checks.
 - `src/indicators/` — deterministic technical indicators.
 - `src/regime/` — benchmark market-regime classification.
+- `src/relative-strength/` — aligned asset-versus-BTC performance scoring and deterministic ranking.
 - `src/` — additional pure strategy modules.
 - `fixtures/` and `tests/` — deterministic scenarios, regression, and anti-lookahead tests.
 - `research/` — audit findings and validation reports.
