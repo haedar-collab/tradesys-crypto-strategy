@@ -79,12 +79,13 @@ test("resets the daily loss baseline at UTC midnight without resetting peak draw
   const day1 = Date.UTC(2026, 10, 20, 23, 59, 0);
   const day2 = Date.UTC(2026, 10, 21, 0, 1, 0);
   const monitor = createPaperRiskMonitor();
-  const first = monitor.evaluate({ equity: 10_000, positions: [], timestamp: day1 });
-  assert.equal(first.dayStartEquity, 10_000);
+  monitor.evaluate({ equity: 10_000, positions: [], timestamp: day1 });
+  assert.equal(monitor.status().dayStartEquity, 10_000);
   const nextDay = monitor.evaluate({ equity: 9_900, positions: [], timestamp: day2 });
-  assert.equal(nextDay.dayKey, "2026-11-21");
-  assert.equal(nextDay.dayStartEquity, 9_900);
-  assert.equal(nextDay.peakEquity, 10_000);
+  const state = monitor.status();
+  assert.equal(state.dayKey, "2026-11-21");
+  assert.equal(state.dayStartEquity, 9_900);
+  assert.equal(state.peakEquity, 10_000);
   assert.equal(nextDay.dailyLossPct, 0);
   assert.equal(nextDay.drawdownPct, 1);
 });
