@@ -157,3 +157,22 @@ test("single-asset and one-symbol portfolio agree on gap-through-stop fills",()=
  assert.ok(Math.abs(single.trades[0].netPnl-portfolio.trades[0].netPnl)<1e-8);
  assert.ok(Math.abs(single.endingEquity-portfolio.endingEquity)<1e-8);
 });
+
+test("single-asset and one-symbol portfolio share drawdown reduction before the next entry",()=>{
+ const rows=[[100,101,99,100],[100,101,93,94],[100,101,99,100],[100,103,99,102],[102,103,99,101]];
+ const candles=bars(rows);
+ const widerPlan={entry:100,stop:94,tp1:106,tp2:112,tp3:118};
+ const signals=[{index:0,plan:{...widerPlan}},{index:1,plan:{...widerPlan}}];
+ const config={initialCapital:10000,riskPct:10,ddLimitPct:10,ddRecoverPct:5,ddReducedMultiplier:.5,feeBps:0,slippageBps:0};
+ const single=runEventBacktest({...config,bars:candles,signals});
+ const portfolio=runPortfolioBacktest({
+  ...config,assets:{AAAUSDT:{bars:candles,signals,dailyReturns:[.01,.02,.03,.04,.05]}},
+  regimeCapPct:100,maxPositions:1
+ });
+ assert.equal(single.tradeCount,1);
+ assert.equal(portfolio.tradeCount,1);
+ assert.equal(single.drawdownGuard.state,"REDUCED");
+ assert.equal(portfolio.assumptions.drawdownGuard.state,"REDUCED");
+ assert.ok(Math.abs(single.openPosition.notional-portfolio.openPositions[0].notional)<1e-8);
+ assert.ok(Math.abs(single.openPosition.notional-10000*10*.5/100/0.06)<1e-8);
+});
