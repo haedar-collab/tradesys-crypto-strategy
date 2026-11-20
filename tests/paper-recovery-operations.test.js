@@ -4,7 +4,7 @@ import { mkdtemp, readFile, rm, writeFile, access } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createPersistentPaperLedger } from "../src/paper/persistent-paper-ledger.js";
-import { dryRunLegacyPaperLedgerMigration, exportPaperRecoveryReport, formatPaperRecoveryReport, inspectPaperLedgerFile } from "../src/paper/paper-recovery-operations.js";
+import { dryRunLegacyPaperLedgerMigration, exportPaperRecoveryReport, formatPaperRecoveryReport, inspectPaperLedgerFile, verifyPaperLedgerBackup } from "../src/paper/paper-recovery-operations.js";
 
 const config = { mode: "PAPER_ONLY", initialCash: 10_000, feeBps: 10, slippageBps: 5,
   maxQuoteAgeMs: 5_000, riskMarkMaxAgeMs: 60_000, dailyLossLimitPct: 3, maxDrawdownPct: 10, maxExposurePct: 80 };
@@ -92,4 +92,47 @@ test("report formatting is deterministic and export refuses overwrite", async ()
 
 test("report formatter rejects unsupported formats", () => {
   assert.throws(() => formatPaperRecoveryReport({ status: "PASS" }, { format: "yaml" }), /format must be text or json/);
+});
+
+
+test("backup verification passes only for byte-identical valid ledger copies", async () => {
+  const f = await fixture();
+  const backupPath = join(f.dir, "backup.jsonl");
+  try {
+    await createLegacy(f.sourcePath);
+    await writeFile(backupPath, await readFile(f.sourcePath));
+    const result = await verifyPaperLedgerBackup({ sourcePath: f.sourcePath, backupPath });
+    assert.equal(result.status, "PASS");
+    assert.equal(result.byteIdentical, true);
+    assert.equal(result.sourceLedgerValid, true);
+    assert.equal(result.backupLedgerValid, true);
+    assert.equal(result.sourceSha256, result.backupSha256);
+    assert.equal(result.sourceEventCount, 1);
+  } finally { await rm(f.dir, { recursive: true, force: true }); }
+});
+
+test("backup verification detects changed bytes and invalid backup without mutation", async () => {
+  const f = await fixture();
+  const backupPath = join(f.dir, "backup.jsonl");
+  try {
+    await createLegacy(f.sourcePath);
+    await writeFile(backupPath, (await readFile(f.sourcePath, "utf8")).replace("legacy_event_01", "legacy_event_02"));
+    const mismatch = await verifyPaperLedgerBackup({ sourcePath: f.sourcePath, backupPath });
+    assert.equal(mismatch.status, "INVALID");
+    assert.equal(mismatch.byteIdentical, false);
+    await writeFile(backupPath, await readFile(f.sourcePath));
+    await writeFile(f.sourcePath + ".lock", JSON.stringify({ pid: 999, createdAt: 1 }));
+    const locked = await verifyPaperLedgerBackup({ sourcePath: f.sourcePath, backupPath });
+    assert.equal(locked.status, "REVIEW");
+    assert.equal(locked.sourceLocked, true);
+    await access(f.sourcePath + ".lock");
+  } finally { await rm(f.dir, { recursive: true, force: true }); }
+});
+
+test("backup verification rejects same path and missing files", async () => {
+  const f = await fixture();
+  try {
+    await assert.rejects(verifyPaperLedgerBackup({ sourcePath: f.sourcePath, backupPath: f.sourcePath }), /paths must differ/);
+    await assert.rejects(verifyPaperLedgerBackup({ sourcePath: f.sourcePath, backupPath: f.destinationPath }), { code: "ENOENT" });
+  } finally { await rm(f.dir, { recursive: true, force: true }); }
 });
