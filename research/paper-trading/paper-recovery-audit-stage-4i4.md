@@ -1,6 +1,9 @@
 # Stage 4I.4 — Operational Recovery and Audit
 
 ## Delivered scope
+- Integrated the audit as a fail-closed activation gate in `createPersistentPaperSession`: only `PASS` returns an active session; `REVIEW` and `FAIL` throw an error carrying the structured `recoveryAudit` report.
+- New sessions persist an immutable `SESSION_STARTED` header with mode, initial cash, fee/slippage, quote-age, and risk-limit configuration. Reopening with changed configuration is rejected.
+- A recovered interrupted write-ahead intent is not executed; it is durably marked rejected for recovery bookkeeping, then the audit returns `REVIEW` and prevents activation until operator review.
 - Added a read-only recovery audit in `src/paper/paper-recovery-audit.js`.
 - The audit requires a complete ledger snapshot (the snapshot is produced by the persistent ledger, which verifies JSONL framing, sequence, unique event IDs, previous-hash links, and SHA-256 checksums when opening and snapshotting).
 - Checks write-ahead order intents for missing terminal outcomes, conflicting/duplicate lifecycle events, fill records without intents, and invalid identifiers.
@@ -24,7 +27,8 @@
 7. Rebuild the paper broker from durable fills, run the recovery audit, and require a `PASS` before normal paper-session use. A `REVIEW` requires explicit human resolution; a `FAIL` blocks activation.
 
 ## Important limitations
-- The audit is a diagnostic function, not an activation interlock. The caller must enforce that only `PASS` permits routine paper-session activation. This stage does not yet integrate automatic audit gating into session creation.
+- Legacy ledgers created before the immutable `SESSION_STARTED` header are rejected by the activation gate. There is no automatic migration; preserve a backup and perform a separately reviewed migration process before using those ledgers again.
+- The audit gate verifies the reconstructed paper broker and local ledger, not external execution truth.
 - Broker reconciliation is against the deterministic in-memory paper broker reconstructed from durable ledger fills, not Binance account balances or exchange execution reports.
 - The current paper broker replay validates reproducibility, not external execution truth. An intent without a durable fill remains ambiguous and is never auto-replayed.
 - Cash reconciliation assumes the same configured `initialCash` used to create the original session and the broker's current fee/fill model. Configuration provenance is not yet persisted as an immutable session header.
