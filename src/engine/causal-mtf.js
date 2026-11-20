@@ -30,6 +30,18 @@ function prepareClosedTimeframe(rows,key,evaluationTime,options) {
   return {status:"PASS",timeframe:key,candles,series,prepared,structure,asOf:candles[latest].closeTime,
     price:series.c[latest],atr:prepared.atr[latest],warnings:normalized.warnings};
 }
+
+function frameEvidence(frame) {
+  const last=frame.candles.length-1,p=frame.prepared,s=frame.structure;
+  const finite=x=>Number.isFinite(x)?x:null;
+  const e50=finite(p.e50.at(-1)),e200=finite(p.e200.at(-1));
+  return {asOf:frame.asOf,price:finite(frame.price),ema20:finite(p.e20.at(-1)),ema50:e50,ema200:e200,
+    closeVsEma50:e50==null?null:frame.price-e50,closeVsEma200:e200==null?null:frame.price-e200,
+    ema50VsEma200:e50==null||e200==null?null:e50-e200,eventTrend:s.trend,eventCount:s.events.length,
+    lastEvent:s.events.at(-1)??null,confirmedHighPivotCount:p.piv.hi.filter(i=>i<=last-3).length,
+    confirmedLowPivotCount:p.piv.lo.filter(i=>i<=last-3).length};
+}
+
 function contextBias(frame) {
   const e50=frame.prepared.e50.at(-1),e200=frame.prepared.e200.at(-1);
   if(frame.structure.trend>0&&Number.isFinite(e50)&&Number.isFinite(e200)&&e50>e200)return "Bullish";
@@ -74,7 +86,8 @@ export function buildCausalMultiTimeframeContext(input,options={}) {
   };
   const temporal=validateMultiTimeframeAsOf(context,{evaluationTime,maxAgeMs:options.maxAgeMs});
   if(temporal.status!=="PASS")return {status:"WAIT",reason:"TIMEFRAME_ASOF_VALIDATION_FAILED",temporal};
-  return {status:"READY",evaluationTime,context,temporal,metadata:{
+  return {status:"READY",evaluationTime,context,temporal,diagnostics:{weekly:frameEvidence(weekly),daily:frameEvidence(daily),dailyRegimeRaw:raw?.reg??null,dailyRegimeWhy:raw?.why??null,dailyRegimeFacts:raw?.facts??null},
+  metadata:{
     intervals:{...CAUSAL_MTF_INTERVALS,...options.intervals},
     closedCandleCounts:Object.fromEntries(keys.map(key=>[key,frames[key].candles.length])),
     warnings:Object.fromEntries(keys.map(key=>[key,frames[key].warnings]))}};
