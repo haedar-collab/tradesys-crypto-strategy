@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { createPaperBroker } from "./paper-broker.js";
 import { createPersistentPaperLedger } from "./persistent-paper-ledger.js";
 import { createPaperRiskMonitor } from "../risk/paper-risk-monitor.js";
+import { auditPaperRecovery } from "./paper-recovery-audit.js";
 
 const clone = (value) => structuredClone(value);
 const canonical = (value) => JSON.stringify(value);
@@ -69,7 +70,21 @@ export async function createPersistentPaperSession({
     rejected.set(input.clientOrderId, { input: clone(input), message });
   }
 
-  const recovered = await ledger.snapshot();
+  let recovered = await ledger.snapshot();
+  const sessionConfig = { mode: "PAPER_ONLY", initialCash, feeBps, slippageBps,
+    maxQuoteAgeMs, riskMarkMaxAgeMs, dailyLossLimitPct, maxDrawdownPct, maxExposurePct };
+  const sessionHeaders = recovered.events.filter(entry => entry.type === "SESSION_STARTED");
+  if (recovered.events.length === 0) {
+    await ledger.append({
+      eventId: "session_start_" + createHash("sha256").update(canonical({ filePath: ledger.filePath, timestamp: now(), sessionConfig })).digest("hex").slice(0, 32),
+      type: "SESSION_STARTED", timestamp: now(), payload: { config: sessionConfig }
+    });
+    recovered = await ledger.snapshot();
+  } else if (sessionHeaders.length !== 1 || recovered.events[0]?.type !== "SESSION_STARTED") {
+    throw new Error("paper recovery audit blocked activation: immutable session configuration header is missing or invalid");
+  } else if (canonical(sessionHeaders[0].payload?.config) !== canonical(sessionConfig)) {
+    throw new Error("paper recovery audit blocked activation: session configuration differs from immutable ledger header");
+  }
   let latestMark = null;
   let lastFillTimestamp = -1;
   let latestRiskState = null;
@@ -104,6 +119,18 @@ export async function createPersistentPaperSession({
     await persistRejection(input, new Error("submission interrupted before durable fill; manual review required"));
   }
   clock = now();
+
+  const recoveryAudit = auditPaperRecovery({
+    ledgerSnapshot: await ledger.snapshot(),
+    brokerSnapshot: broker.snapshot(),
+    initialCash,
+    expectedConfig: sessionConfig
+  });
+  if (recoveryAudit.status !== "PASS") {
+    const error = new Error("paper recovery audit blocked activation: " + recoveryAudit.status);
+    error.recoveryAudit = recoveryAudit;
+    throw error;
+  }
 
   const riskMonitor = createPaperRiskMonitor({
     dailyLossLimitPct, maxDrawdownPct, maxExposurePct, now,
@@ -295,7 +322,8 @@ export async function createPersistentPaperSession({
     submitMarketOrder, markToMarket, snapshot, close,
     activateKillSwitch, resetKillSwitch,
     riskStatus: () => riskMonitor.status(),
-    filePath: ledger.filePath
+    filePath: ledger.filePath,
+    recoveryAudit: () => clone(recoveryAudit)
   });
   } catch (error) {
     // If recovery or baseline initialization fails, do not strand the ledger lock.
