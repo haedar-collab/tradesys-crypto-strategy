@@ -49,3 +49,6 @@ Latest CI run: 35 tests passed, 0 failed. These are extraction increments, not a
 
 - Added multi-position simultaneous-loss stress tests proving that combined realized losses trigger the portfolio drawdown block before a subsequent candidate can enter, and that combined open-position losses are marked before entry admission.
 - Latest GitHub Actions CI: 116 tests passed, 0 failed (run #324).
+
+- Added a multi-position recovery test: the drawdown block persists through a partial rebound and allows a new entry only after the configured recovery threshold is reached.
+- Latest GitHub Actions CI: 117 tests passed, 0 failed (run #341).
