@@ -58,3 +58,14 @@
 - Cash reconciliation assumes the same configured `initialCash` used to create the original session and the broker's current fee/fill model. Configuration provenance is not yet persisted as an immutable session header.
 - No automatic stale-lock deletion, ledger repair, order replay, or balance adjustment is provided.
 - Paper-only; no Binance order endpoint or live-trading authorization.
+
+
+## Stage 4I.7 — Recovery operations tooling
+
+- Added `src/paper/paper-recovery-operations.js` for read-only ledger preflight, migration dry-run, deterministic text/JSON report formatting, and no-overwrite audit report export.
+- Refactored legacy migration to expose a pure `prepareLegacyPaperLedgerMigration` planner. Dry-run and actual migration share the same validation and hash-chain transformation; actual migration still acquires the exclusive source lock and rechecks the source before writing.
+- Preflight verifies JSONL framing, sequence, event IDs, previous-hash links, and checksums through the persistent ledger verifier. It reports file metadata, event count, header/legacy classification, and adjacent lock presence. It never removes locks.
+- Dry-run reports the source digest, source/migrated event counts, planned final hash, and output size. It does not create a destination, acquire a lock, or write temporary files. Because it is intentionally read-only, filesystem state can change after preview; actual migration rechecks lock and destination collision conditions.
+- Audit report export supports deterministic JSON or human-readable text and uses exclusive-create semantics; existing report files are never overwritten.
+- The tooling does not inspect process liveness, clear stale locks, repair malformed records, infer missing session configuration, reconcile against Binance, or replay orders.
+- A dry-run is a structural preview, not approval to activate a session. A migrated ledger must still pass the normal recovery activation audit.
