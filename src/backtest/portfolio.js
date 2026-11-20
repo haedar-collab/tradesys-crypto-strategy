@@ -46,7 +46,7 @@ export function runPortfolioBacktest(input){
  if(![initialCapital,riskPct,regimeCapPct,maxPositions,corrMax,feeRate,slipRate,minRR,maxEntryDriftPct].every(Number.isFinite)||
    initialCapital<=0||riskPct<=0||riskPct>100||regimeCapPct<0||regimeCapPct>100||
    !Number.isInteger(maxPositions)||maxPositions<1||corrMax< -1||corrMax>1||feeRate<0||slipRate<0||minRR<=0||maxEntryDriftPct<0||
-   !Number.isFinite(ddLimitPct)||!Number.isFinite(ddRecoverPct)||!Number.isFinite(ddReducedMultiplier))
+   !Number.isFinite(ddLimitPct)||ddLimitPct<=0||ddLimitPct>=100||!Number.isFinite(ddRecoverPct)||ddRecoverPct<0||ddRecoverPct>=ddLimitPct||!Number.isFinite(ddReducedMultiplier)||ddReducedMultiplier<0||ddReducedMultiplier>1)
    throw new RangeError("invalid portfolio backtest parameters");
 
  const signalMap=new Map();
@@ -94,6 +94,8 @@ export function runPortfolioBacktest(input){
   peak=Math.max(peak,markedEquity);
   const barDrawdownPct=(peak-markedEquity)/peak*100;
   maxDrawdownPct=Math.max(maxDrawdownPct,barDrawdownPct);
+  const barRiskState=evaluateDrawdownRisk({equity:markedEquity,peakEquity:peak,ddLimitPct,ddRecoverPct,reducedMultiplier:ddReducedMultiplier,previousState:drawdownState});
+  drawdownState=barRiskState.state;
   const candidates=(signalMap.get(i-1)||[]).sort((a,b)=>(b.signal.priority??0)-(a.signal.priority??0)||a.symbol.localeCompare(b.symbol));
   for(const {symbol,signal} of candidates){
    if(activeAtStart.has(symbol)||active.has(symbol)){
@@ -109,8 +111,7 @@ export function runPortfolioBacktest(input){
    const openPositions=[...active.entries()].map(([sym,p])=>({
     symbol:sym,size:p.notional*p.state.remaining,dailyReturns:input.assets[sym].dailyReturns
    }));
-   const ddGate=evaluateDrawdownRisk({equity:markedEquity,peakEquity:peak,ddLimitPct,ddRecoverPct,reducedMultiplier:ddReducedMultiplier,previousState:drawdownState});
-   drawdownState=ddGate.state;
+   const ddGate=barRiskState;
    if(!ddGate.allowNewEntries){skipped.push({symbol,index:signal.index,reason:"DRAWDOWN_LIMIT_REACHED"});continue;}
    const riskGate=evaluatePortfolioRisk({
     equity:markedEquity,regimeCapPct,maxPositions,candidateSymbol:symbol,openPositions,
