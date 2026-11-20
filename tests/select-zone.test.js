@@ -12,7 +12,7 @@ const ob=(lo,hi,idx,from=idx+1)=>({lo,hi,idx,from,t:idx});
 test("prefers discount zone with OB/FVG overlap over a nearer premium zone",()=>{
  const p=series();
  const low=ob(95,97,10), high=ob(99,100,20);
- const result=selectDemandZone({price:102,atr:1,rangeEquilibrium:98,fvgs:[{lo:96,hi:96.5,idx:12}],orderBlocks:[high,low],series:p});
+ const result=selectDemandZone({price:103.5,atr:1,rangeEquilibrium:98,fvgs:[{lo:96,hi:96.5,idx:12}],orderBlocks:[high,low],series:p});
  assert.equal(result.selected.idx,10);
  assert.equal(result.selected.kind,"Order block + FVG");
  assert.equal(result.candidates.length,2);
