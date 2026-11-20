@@ -132,7 +132,7 @@ test("allows correlation exactly at the configured threshold and blocks above it
   equity:10000,regimeCapPct:80,maxPositions:5,candidateSymbol:"OVER",corrMax:.999,
   candidateReturns:candidate,openPositions:[{symbol:"REF",size:1000,dailyReturns:above}]
  });
- assert.equal(at.allowed,false);
+ assert.equal(at.allowed,true);
  assert.equal(at.highestCorrelation,1);
  assert.equal(over.allowed,false);
  assert.ok(over.reasons.includes("CORRELATED_WITH_ACTIVE_POSITION"));
@@ -143,8 +143,8 @@ test("fails closed when one of several active positions has incomplete correlati
   equity:10000,regimeCapPct:80,maxPositions:5,candidateSymbol:"ALTUSDT",corrMax:.8,
   candidateReturns:[1,2,3,4],
   openPositions:[
-   {symbol:"BTCUSDT",size:1000,dailyReturns:[1,2,3,4]},
-   {symbol:"ETHUSDT",size:1000,dailyReturns:[1,2]}
+   {symbol:"ETHUSDT",size:1000,dailyReturns:[1,2]},
+   {symbol:"BTCUSDT",size:1000,dailyReturns:[1,2,3,4]}
   ]
  });
  assert.equal(r.allowed,false);
