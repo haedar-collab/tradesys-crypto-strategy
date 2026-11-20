@@ -131,7 +131,7 @@ test("fails closed on a crash-truncated JSONL tail and releases the acquired loc
     await writeFile(f.filePath, (await readFile(f.filePath, "utf8")) + '{"sequence":2,"eventId":');
     await assert.rejects(
       createPersistentPaperLedger({ filePath: f.filePath }),
-      /invalid JSON at line 2/
+      /not newline-terminated/
     );
     await assert.rejects(
       readFile(f.filePath + ".lock", "utf8"),
