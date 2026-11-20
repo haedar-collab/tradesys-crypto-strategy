@@ -33,3 +33,6 @@ Latest CI run: 35 tests passed, 0 failed. These are extraction increments, not a
 - CI regression suite expanded to 93 passing tests.
 - Added historical-prefix anti-lookahead tests for confirmed structure events and daily regime decisions.
 - CI regression suite expanded to 95 passing tests.
+- Added explicit historical `asOf` boundaries to zone quality, departure strength and retest counting; zone visits now require actual OHLC intersection.
+- Added regression tests for historical zone-quality stability, future-candle mutation, and OB/FVG snapshots before later invalidation/fill.
+- CI regression suite expanded to 98 passing tests.
