@@ -1,0 +1,40 @@
+name: Live Binance Signal Diagnostics
+on:
+  push:
+    branches: [feature/app-data-contract-v1]
+    paths:
+      - 'scripts/live-binance-signal-diagnostics.mjs'
+      - 'src/integration/**'
+      - 'src/engine/**'
+      - '.github/workflows/live-binance-signal-diagnostics.yml'
+  workflow_dispatch:
+    inputs:
+      symbol:
+        description: Binance Spot symbol
+        required: true
+        default: BTCUSDT
+permissions:
+  contents: read
+jobs:
+  diagnostics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/app-data-contract-v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch Binance candles and diagnose MTF strategy gates
+        env:
+          SYMBOL: ${{ inputs.symbol }}
+          OUTPUT_FILE: artifacts/binance-btcusdt-signal-diagnostics.json
+        run: node scripts/live-binance-signal-diagnostics.mjs
+      - name: Upload diagnostics report
+        uses: actions/upload-artifact@v4
+        with:
+          name: binance-live-signal-diagnostics
+          path: artifacts/binance-btcusdt-signal-diagnostics.json
+          if-no-files-found: error
+          retention-days: 7
