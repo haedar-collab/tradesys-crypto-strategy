@@ -11,7 +11,7 @@ function finding(code, severity, message, reference = null, action = null) {
  * Read-only operational audit. It does not mutate the ledger or broker,
  * repair balances, replay orders, or clear filesystem locks.
  */
-export function auditPaperRecovery({ ledgerSnapshot, brokerSnapshot, initialCash } = {}) {
+export function auditPaperRecovery({ ledgerSnapshot, brokerSnapshot, initialCash, expectedConfig } = {}) {
   const findings = [];
   if (!ledgerSnapshot || ledgerSnapshot.status !== "COMPLETE" ||
       !Array.isArray(ledgerSnapshot.events) ||
@@ -43,6 +43,17 @@ export function auditPaperRecovery({ ledgerSnapshot, brokerSnapshot, initialCash
   }
 
   const events = ledgerSnapshot.events;
+  const headers = events.filter(entry => entry.type === "SESSION_STARTED");
+  if (headers.length !== 1 || events[0]?.type !== "SESSION_STARTED") {
+    findings.push(finding("SESSION_CONFIG_HEADER_INVALID", "CRITICAL",
+      "Ledger must begin with exactly one immutable SESSION_STARTED configuration header.",
+      null, "Do not activate this ledger; migrate only through a reviewed, backed-up procedure."));
+  } else if (!headers[0].payload?.config ||
+      (expectedConfig && JSON.stringify(headers[0].payload.config) !== JSON.stringify(expectedConfig))) {
+    findings.push(finding("SESSION_CONFIG_MISMATCH", "CRITICAL",
+      "Persisted session configuration does not match the requested configuration.",
+      headers[0].eventId, "Reopen using the original immutable configuration; do not overwrite it."));
+  }
   const ids = new Set();
   const intents = new Map();
   const fills = new Map();
@@ -76,7 +87,7 @@ export function auditPaperRecovery({ ledgerSnapshot, brokerSnapshot, initialCash
     if (entry.type === "RISK_EVENT") riskEvents.push(entry);
   }
 
-  for (const [id] of intents) {
+  for (const [id, entry] of rejections) {\n    if (/manual review required/i.test(entry.payload?.message ?? "")) {\n      findings.push(finding("INTERRUPTED_ORDER_REQUIRES_MANUAL_REVIEW", "ERROR",\n        "A prior interrupted submission was safely rejected during recovery but still requires operator review.", id,\n        "Verify external execution evidence before treating the intent as resolved."));\n    }\n  }\n  for (const [id] of intents) {
     if (!fills.has(id) && !rejections.has(id)) {
       findings.push(finding("AMBIGUOUS_ORDER_INTENT", "ERROR",
         "Order intent has no durable fill or rejection terminal event.", id,
