@@ -4,6 +4,8 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createPersistentPaperSession } from "../src/paper/persistent-paper-session.js";
+import { createPersistentPaperLedger } from "../src/paper/persistent-paper-ledger.js";
+import { createPaperRiskMonitor } from "../src/risk/paper-risk-monitor.js";
 
 const ACCEPT = { decision: "ACCEPT", eligibleForPaperTrading: true };
 const ALLOW = { allowed: true };
@@ -193,5 +195,42 @@ test("serializes concurrent duplicate submissions to one durable fill", async ()
     const state = await paper.snapshot();
     assert.equal(state.ledger.events.filter(e => e.type === "ORDER_FILLED").length, 1);
     await paper.close();
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});
+
+
+test("recovery rejects a submission interrupted after its durable risk check", async () => {
+  const f = fixture(), dir = await f.dirPromise, filePath = join(dir, "events.jsonl");
+  try {
+    const input = await orderInput(f.now, "session_crash_risk_01");
+    const ledger = await createPersistentPaperLedger({ filePath });
+    const riskMonitor = createPaperRiskMonitor({ now: f.now });
+    riskMonitor.evaluate({ equity: 10_000, positions: [], timestamp: f.now() });
+    const state = { ...riskMonitor.status(), events: [] };
+    const { createHash } = await import("node:crypto");
+    const digest = createHash("sha256").update(JSON.stringify({
+      reason: "ORDER_ENTRY_CHECK", timestamp: f.now(), sequence: 1, state
+    })).digest("hex");
+    const submittedId = "paper_" + createHash("sha256").update(input.clientOrderId).digest("hex").slice(0, 32) + "_submitted";
+    await ledger.append({
+      eventId: submittedId, type: "ORDER_SUBMITTED", timestamp: f.now(),
+      payload: { clientOrderId: input.clientOrderId, orderInput: input }
+    });
+    await ledger.append({
+      eventId: "risk_" + digest.slice(0, 48), type: "RISK_EVENT", timestamp: f.now(),
+      payload: { reason: "ORDER_ENTRY_CHECK", state }
+    });
+    await ledger.close();
+
+    const recovered = await createPersistentPaperSession({ filePath, now: f.now });
+    const snapshot = await recovered.snapshot();
+    assert.equal(snapshot.broker.positions.length, 0);
+    assert.equal(snapshot.risk.peakEquity, 10_000);
+    assert.ok(snapshot.ledger.events.some(e =>
+      e.type === "ORDER_REJECTED" &&
+      e.payload.clientOrderId === input.clientOrderId &&
+      /manual review required/.test(e.payload.message)
+    ));
+    await recovered.close();
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
