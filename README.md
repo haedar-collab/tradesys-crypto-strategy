@@ -24,7 +24,7 @@ It does **not** own market-data fetching, UI, browser storage, notifications, ex
 - [x] Initial position sizing, regime exposure, position-count, duplicate-symbol, and correlation risk gates.
 - [x] Initial entry/exit plan and partial-profit state machine with same-bar breakeven stop handling.
 - [ ] Broader portfolio stress controls, trailing/forced exit policy, and application risk-state integration. Initial simultaneous-loss drawdown admission stress tests are passing.
-- [x] Initial single-symbol and aligned multi-symbol event-driven Spot backtests with next-bar entry, fees, slippage, conservative OHLC exits, portfolio exposure/correlation gates, marked-equity drawdown checks, and terminal marked-equity reporting. Latest accounting changes pass CI: 117 tests passed, 0 failed, including single-asset parity, shared hysteretic drawdown sizing, and multi-position simultaneous-loss stress tests and blocked-state recovery hysteresis.
+- [x] Initial single-symbol and aligned multi-symbol event-driven Spot backtests with next-bar entry, fees, slippage, conservative OHLC exits, portfolio exposure/correlation gates, marked-equity drawdown checks, and terminal marked-equity reporting. Latest accounting changes pass CI: 121 tests passed, 0 failed, including single-asset parity, shared hysteretic drawdown sizing, and multi-position simultaneous-loss stress tests and blocked-state recovery hysteresis and multi-asset correlation stress coverage.
 - [x] 1H zone-intersection / invalidation / reclaim state tests and contiguous daily RS history checks.
 - [x] Prefix-based anti-lookahead regression checks for confirmed structure events and daily regime decisions.
 - [x] Historical as-of zone-quality/retest scoring and OB/FVG snapshot regression checks.
