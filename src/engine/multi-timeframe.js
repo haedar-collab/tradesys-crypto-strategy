@@ -26,12 +26,15 @@ export function evaluateMultiTimeframeSetup(input, options = {}) {
   }
   const { weekly, daily, regime, h4 } = input;
   if (weekly.closed !== true) return wait("WEEKLY_CONTEXT_PROVISIONAL");
+  if (!["Bullish","Neutral","Sideways","Mixed","Bearish"].includes(weekly.trend)) return wait("INVALID_WEEKLY_BIAS");
   if (weekly.trend === "Bearish") return wait("WEEKLY_BIAS_BEARISH");
   if (daily.bias !== "Bullish") return wait("DAILY_BIAS_NOT_BULLISH");
   if (regime.confirmed !== true) return wait("MARKET_REGIME_UNCONFIRMED", { regime });
+  if (!["Uptrend","Sideways","Kompresi","Kapitulasi","Downtrend"].includes(regime.effective)) return wait("INVALID_MARKET_REGIME", { regime });
   if (regime.effective === "Downtrend") return wait("MARKET_REGIME_DOWNTREND", { regime });
-  if (!h4.series || !Number.isFinite(h4.price) || !Number.isFinite(h4.close) ||
-      !Number.isFinite(h4.atr) || h4.atr <= 0 || !h4.trend) {
+  if (!h4.series || !Number.isFinite(h4.price) || h4.price <= 0 || !Number.isFinite(h4.close) || h4.close <= 0 ||
+      !Number.isFinite(h4.atr) || h4.atr <= 0 || !["Bullish","Neutral","Sideways","Mixed","Bearish"].includes(h4.trend) ||
+      !Number.isFinite(h4.rangeEquilibrium) || h4.rangeEquilibrium <= 0) {
     return wait("INVALID_4H_CONTEXT");
   }
 
@@ -61,6 +64,7 @@ export function evaluateMultiTimeframeSetup(input, options = {}) {
     ? evaluateLtfTrigger(input.h1.series, zone, h4.atr)
     : null;
   if (!ltf) return wait("1H_TRIGGER_DATA_UNAVAILABLE", { zone, plan });
+  if (ltf.state === "broken") return wait("1H_DEMAND_ZONE_BROKEN", { zone, plan, ltf });
   const decision = evaluateSmcSetup({
     dailyBias: daily.bias,
     trend4h: h4.trend,
