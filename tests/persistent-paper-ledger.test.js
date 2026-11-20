@@ -192,3 +192,38 @@ test("exclusive ledger lock is enforced across separate Node.js processes", asyn
     await rm(f.dir, { recursive: true, force: true });
   }
 });
+
+
+test("an abruptly terminated lock owner leaves a stale lock that blocks recovery", async () => {
+  const f = await fixture();
+  const moduleUrl = new URL("../src/paper/persistent-paper-ledger.js", import.meta.url).href;
+  const script = [
+    'const { createPersistentPaperLedger } = await import(' + JSON.stringify(moduleUrl) + ');',
+    'await createPersistentPaperLedger({ filePath: process.argv[1] });',
+    'process.stdout.write("READY\\n");',
+    'process.stdin.once("data", () => process.exit(77));'
+  ].join("\\n");
+  let child;
+  try {
+    child = spawn(process.execPath, ["--input-type=module", "-e", script, f.filePath], {
+      cwd: process.cwd(), stdio: ["pipe", "pipe", "pipe"]
+    });
+    const [ready] = await Promise.race([
+      once(child.stdout, "data"),
+      once(child, "exit").then(([code]) => { throw new Error("crash-simulation child exited early: " + code); })
+    ]);
+    assert.match(String(ready), /READY/);
+    child.stdin.write("crash");
+    const [code] = await once(child, "exit");
+    assert.equal(code, 77);
+    const lock = JSON.parse(await readFile(f.filePath + ".lock", "utf8"));
+    assert.ok(Number.isInteger(lock.pid));
+    await assert.rejects(
+      createPersistentPaperLedger({ filePath: f.filePath }),
+      /stale lock; manual review required/
+    );
+  } finally {
+    if (child && child.exitCode === null) child.kill("SIGKILL");
+    await rm(f.dir, { recursive: true, force: true });
+  }
+});
