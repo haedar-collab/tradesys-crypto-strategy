@@ -1,7 +1,23 @@
 import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
+import { timingSafeEqual } from "node:crypto";
 const MAX_RESPONSE_BYTES = 1_048_576;
 const LOOPBACKS = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
+
+function isAuthorized(header, auth) {
+  if (typeof header !== "string" || !header.startsWith("Basic ")) return false;
+  let decoded;
+  try { decoded = Buffer.from(header.slice(6), "base64").toString("utf8"); } catch { return false; }
+  const separator = decoded.indexOf(":");
+  if (separator < 1) return false;
+  const username = Buffer.from(decoded.slice(0, separator));
+  const password = Buffer.from(decoded.slice(separator + 1));
+  const expectedUsername = Buffer.from(auth.username);
+  const expectedPassword = Buffer.from(auth.password);
+  const usernameMatches = username.length === expectedUsername.length && timingSafeEqual(username, expectedUsername);
+  const passwordMatches = password.length === expectedPassword.length && timingSafeEqual(password, expectedPassword);
+  return usernameMatches && passwordMatches;
+}
 
 function sendJson(response, status, body) {
   const payload = Buffer.from(JSON.stringify(body));
@@ -27,12 +43,17 @@ export async function startPaperDashboardHttpServer({
   getSnapshot,
   host = "127.0.0.1",
   port = 0,
-  maxResponseBytes = MAX_RESPONSE_BYTES
+  maxResponseBytes = MAX_RESPONSE_BYTES,
+  auth = null
 } = {}) {
   if (typeof getSnapshot !== "function") throw new TypeError("getSnapshot must be a function");
-  if (host !== "127.0.0.1" && host !== "::1") {
-    throw new Error("paper dashboard HTTP server may bind only to loopback");
+  const loopbackHost = host === "127.0.0.1" || host === "::1";
+  const validAuth = auth && typeof auth.username === "string" && auth.username.length > 0 &&
+    typeof auth.password === "string" && auth.password.length >= 24;
+  if (!loopbackHost && !(host === "0.0.0.0" && validAuth)) {
+    throw new Error("non-loopback binding requires 0.0.0.0 and valid dashboard authentication");
   }
+  if (auth !== null && !validAuth) throw new Error("dashboard auth requires a username and a password of at least 24 characters");
   if (!Number.isInteger(port) || port < 0 || port > 65_535) {
     throw new RangeError("port must be an integer from 0 to 65535");
   }
@@ -41,8 +62,17 @@ export async function startPaperDashboardHttpServer({
   }
 
   const server = createServer(async (request, response) => {
-    if (!LOOPBACKS.has(request.socket.remoteAddress) || !LOOPBACKS.has(request.socket.localAddress)) {
+    if (loopbackHost && (!LOOPBACKS.has(request.socket.remoteAddress) || !LOOPBACKS.has(request.socket.localAddress))) {
       sendJson(response, 403, { error: "LOOPBACK_ONLY" });
+      return;
+    }
+    if (auth && !isAuthorized(request.headers.authorization, auth)) {
+      response.writeHead(401, {
+        "www-authenticate": 'Basic realm="Tradesys Crypto", charset="UTF-8"',
+        "cache-control": "no-store",
+        "x-content-type-options": "nosniff"
+      });
+      response.end("Authentication required");
       return;
     }
     if (request.method !== "GET") {
