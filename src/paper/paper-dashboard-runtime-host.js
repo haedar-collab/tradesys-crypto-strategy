@@ -24,14 +24,20 @@ export async function startPaperDashboardRuntimeHost({
     throw new Error("runtime host supports PAPER_ONLY mode exclusively");
   }
 
+  if (typeof feedProvider !== "function") throw new TypeError("feedProvider must be a function");
   const session = await createPersistentPaperSession({
     ...sessionOptions,
     filePath,
     now
   });
   let server;
+  let feedStarted = false;
   let closed = false;
   try {
+    if (typeof feedProvider.start === "function") {
+      await feedProvider.start();
+      feedStarted = true;
+    }
     server = await startPaperDashboardHttpServer({
       host,
       port,
@@ -44,6 +50,9 @@ export async function startPaperDashboardRuntimeHost({
       })
     });
   } catch (error) {
+    if (feedStarted && typeof feedProvider.stop === "function") {
+      await Promise.resolve().then(() => feedProvider.stop()).catch(() => {});
+    }
     await session.close().catch(() => {});
     throw error;
   }
@@ -53,10 +62,16 @@ export async function startPaperDashboardRuntimeHost({
     close: async () => {
       if (closed) return;
       closed = true;
+      let closeError = null;
+      if (feedStarted && typeof feedProvider.stop === "function") {
+        try { await feedProvider.stop(); } catch (error) { closeError = error; }
+        feedStarted = false;
+      }
       await new Promise((resolve, reject) => {
         server.close(error => error ? reject(error) : resolve());
       });
-      await session.close();
+      try { await session.close(); } catch (error) { closeError ??= error; }
+      if (closeError) throw closeError;
     }
   });
 }
