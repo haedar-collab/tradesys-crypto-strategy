@@ -7,6 +7,7 @@ import { validateBinanceSpotQuote } from "../data/binance-spot-quote-contract.js
 
 const clone = (value) => structuredClone(value);
 const canonical = (value) => JSON.stringify(value);
+const canonicalConfig = (value) => JSON.stringify(Object.fromEntries(Object.entries(value ?? {}).sort(([a], [b]) => a.localeCompare(b))));
 const eventId = (clientOrderId, suffix) =>
   "paper_" + createHash("sha256").update(clientOrderId).digest("hex").slice(0, 32) + "_" + suffix;
 
