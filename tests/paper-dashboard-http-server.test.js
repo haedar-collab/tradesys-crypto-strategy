@@ -16,11 +16,7 @@ const validSnapshot = () => ({
 });
 
 async function withServer(options, run) {
-  const server = createPaperDashboardHttpServer(options);
-  await new Promise((resolve, reject) => {
-    server.once("error", reject);
-    server.listen(0, "127.0.0.1", resolve);
-  });
+  const server = await startPaperDashboardHttpServer({ ...options, port: 0, host: "127.0.0.1" });
   try { await run("http://127.0.0.1:" + server.address().port); }
   finally { await new Promise(resolve => server.close(resolve)); }
 }
@@ -57,7 +53,7 @@ test("transport fails closed for invalid or unavailable snapshots", async () => 
 });
 
 test("transport enforces loopback binding and response size", async () => {
-  assert.throws(() => createPaperDashboardHttpServer({ getSnapshot: async () => validSnapshot(), host: "0.0.0.0" }), /loopback/);
+  await assert.rejects(startPaperDashboardHttpServer({ getSnapshot: async () => validSnapshot(), host: "0.0.0.0" }), /loopback/);
   await withServer({ getSnapshot: async () => validSnapshot(), maxResponseBytes: 10 }, async base => {
     assert.equal((await fetch(base + "/api/paper-dashboard")).status, 503);
   });
