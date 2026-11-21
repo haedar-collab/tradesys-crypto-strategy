@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: tradesys-crypto
+    runtime: node
+    plan: starter
+    region: singapore
+    buildCommand: npm install
+    startCommand: npm run start:dashboard -- --ledger /var/data/paper-ledger.jsonl --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    autoDeployTrigger: off
+    disk:
+      name: tradesys-paper-ledger
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRADESYS_ALLOW_REMOTE
+        value: "true"
+      - key: TRADESYS_DASHBOARD_USER
+        sync: false
+      - key: TRADESYS_DASHBOARD_PASSWORD
+        sync: false
