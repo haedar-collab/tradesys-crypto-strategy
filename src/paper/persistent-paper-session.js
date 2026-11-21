@@ -85,8 +85,14 @@ export async function createPersistentPaperSession({
     recovered = await ledger.snapshot();
   } else if (sessionHeaders.length !== 1 || recovered.events[0]?.type !== "SESSION_STARTED") {
     throw new Error("paper recovery audit blocked activation: immutable session configuration header is missing or invalid");
-  } else if (canonical(sessionHeaders[0].payload?.config) !== canonical(sessionConfig)) {
-    throw new Error("paper recovery audit blocked activation: session configuration differs from immutable ledger header");
+  } else {
+    const storedConfig = {
+      ...sessionHeaders[0].payload.config,
+      requireMarketDataProvenance: sessionHeaders[0].payload.config.requireMarketDataProvenance ?? false
+    };
+    if (canonicalConfig(storedConfig) !== canonicalConfig(sessionConfig)) {
+      throw new Error("paper recovery audit blocked activation: session configuration differs from immutable ledger header");
+    }
   }
   let latestMark = null;
   let lastFillTimestamp = -1;
