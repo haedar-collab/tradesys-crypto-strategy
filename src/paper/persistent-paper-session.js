@@ -3,6 +3,7 @@ import { createPaperBroker } from "./paper-broker.js";
 import { createPersistentPaperLedger } from "./persistent-paper-ledger.js";
 import { createPaperRiskMonitor } from "../risk/paper-risk-monitor.js";
 import { auditPaperRecovery } from "./paper-recovery-audit.js";
+import { validateBinanceSpotQuote } from "../data/binance-spot-quote-contract.js";
 
 const clone = (value) => structuredClone(value);
 const canonical = (value) => JSON.stringify(value);
@@ -20,6 +21,7 @@ export async function createPersistentPaperSession({
   feeBps = 10,
   slippageBps = 5,
   maxQuoteAgeMs = 5_000,
+  requireMarketDataProvenance = false,
   riskMarkMaxAgeMs = 60_000,
   dailyLossLimitPct = 3,
   maxDrawdownPct = 10,
@@ -72,7 +74,7 @@ export async function createPersistentPaperSession({
 
   let recovered = await ledger.snapshot();
   const sessionConfig = { mode: "PAPER_ONLY", initialCash, feeBps, slippageBps,
-    maxQuoteAgeMs, riskMarkMaxAgeMs, dailyLossLimitPct, maxDrawdownPct, maxExposurePct };
+    maxQuoteAgeMs, requireMarketDataProvenance, riskMarkMaxAgeMs, dailyLossLimitPct, maxDrawdownPct, maxExposurePct };
   const sessionHeaders = recovered.events.filter(entry => entry.type === "SESSION_STARTED");
   if (recovered.events.length === 0) {
     await ledger.append({
@@ -156,6 +158,13 @@ export async function createPersistentPaperSession({
     await persistRiskState("SESSION_START_BASELINE");
   }
 
+  function prepareMarketQuote(symbol, quote) {
+    if (!requireMarketDataProvenance) return { quote, provenance: null };
+    const result = validateBinanceSpotQuote({ quote, symbol, now: now(), maxAgeMs: maxQuoteAgeMs });
+    if (!result.valid) throw new Error("market data provenance rejected: " + result.reason);
+    return result;
+  }
+
   function currentRiskSnapshot() {
     const state = broker.snapshot();
     if (state.positions.length === 0) {
@@ -230,6 +239,9 @@ export async function createPersistentPaperSession({
       throw new Error("order submission is already being recovered");
     }
 
+    const validatedQuote = prepareMarketQuote(input.symbol, input.quote);
+    const preparedInput = { ...clone(input), quote: validatedQuote.quote };
+
     await ledger.append({
       eventId: eventId(id, "submitted"),
       type: "ORDER_SUBMITTED",
@@ -239,9 +251,9 @@ export async function createPersistentPaperSession({
     submitted.set(id, clone(input));
 
     try {
-      const risk = await evaluateEntryRisk(input);
+      const risk = await evaluateEntryRisk(preparedInput);
       if (!risk.allowed) throw new Error("paper risk gate blocked entry: " + risk.reason);
-      const safeInput = { ...clone(input), riskGate: { allowed: true, source: "PERSISTENT_SESSION_RISK_MONITOR" } };
+      const safeInput = { ...clone(preparedInput), riskGate: { allowed: true, source: "PERSISTENT_SESSION_RISK_MONITOR" } };
       const order = executeAtQuoteTime(safeInput);
       await persistFill(input, order, safeInput);
       lastFillTimestamp = Math.max(lastFillTimestamp, order.filledAt);
@@ -262,12 +274,20 @@ export async function createPersistentPaperSession({
     if (closed) throw new Error("paper session is closed");
     await submissionQueue;
     clock = now();
-    const mark = broker.markToMarket(quotes);
+    const normalizedQuotes = {};
+    const provenance = [];
+    for (const [symbol, quote] of Object.entries(quotes ?? {})) {
+      const validated = prepareMarketQuote(symbol, quote);
+      normalizedQuotes[symbol] = validated.quote;
+      if (validated.provenance) provenance.push(validated.provenance);
+    }
+    const mark = broker.markToMarket(normalizedQuotes);
+    const markPayload = { ...mark, marketDataProvenance: provenance };
     const entry = await ledger.append({
-      eventId: "mark_" + createHash("sha256").update(canonical({ timestamp: clock, mark })).digest("hex").slice(0, 40),
+      eventId: "mark_" + createHash("sha256").update(canonical({ timestamp: clock, markPayload })).digest("hex").slice(0, 40),
       type: "POSITION_MARKED",
       timestamp: clock,
-      payload: mark
+      payload: markPayload
     });
     latestMark = entry;
     const risk = riskMonitor.evaluate({
