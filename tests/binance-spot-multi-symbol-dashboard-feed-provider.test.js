@@ -82,9 +82,52 @@ test("isolates one symbol startup failure and validates configuration", async ()
   const snapshot = await provider();
   assert.equal(snapshot.status.state, "WAIT_DATA");
   assert.equal(snapshot.status.feeds.ETHUSDT.state, "ERROR");
+  assert.equal(snapshot.status.feeds.ETHUSDT.reason, "mock start failure");
   assert.throws(() => createBinanceSpotMultiSymbolDashboardFeedProvider({ symbols: [] }), /non-empty/);
   assert.throws(() => createBinanceSpotMultiSymbolDashboardFeedProvider({
     symbols: ["BTCUSDT"], selectedSymbol: "ETHUSDT", feedFactory
   }), /selectedSymbol/);
+  provider.stop();
+});
+
+
+test("recovers an individual feed after stale status and reaches CONNECTED only when all feeds are healthy", async () => {
+  const { feedFactory, feeds } = harness();
+  const provider = createBinanceSpotMultiSymbolDashboardFeedProvider({
+    symbols: ["BTCUSDT", "ETHUSDT"], selectedSymbol: "BTCUSDT", feedFactory
+  });
+  provider.start();
+  feeds.get("BTCUSDT").emitQuote();
+  feeds.get("ETHUSDT").emitQuote();
+  let snapshot = await provider();
+  assert.equal(snapshot.status.state, "CONNECTED");
+  assert.equal(snapshot.status.healthyCount, 2);
+
+  feeds.get("BTCUSDT").state = "STALE";
+  snapshot = await provider();
+  assert.equal(snapshot.status.state, "DEGRADED");
+  assert.equal(snapshot.quote, null);
+  assert.equal(snapshot.status.feeds.BTCUSDT.quote, null);
+
+  feeds.get("BTCUSDT").state = "CONNECTED";
+  feeds.get("BTCUSDT").emitQuote();
+  snapshot = await provider();
+  assert.equal(snapshot.status.state, "CONNECTED");
+  assert.equal(snapshot.status.healthyCount, 2);
+  assert.equal(snapshot.quote.symbol, "BTCUSDT");
+  provider.stop();
+});
+
+test("failed symbol startup exposes its concrete diagnostic without fabricating a quote", async () => {
+  const { feedFactory } = harness({ failSymbol: "ETHUSDT" });
+  const provider = createBinanceSpotMultiSymbolDashboardFeedProvider({
+    symbols: ["BTCUSDT", "ETHUSDT"], selectedSymbol: "ETHUSDT", feedFactory
+  });
+  provider.start();
+  const snapshot = await provider();
+  assert.equal(snapshot.status.feeds.ETHUSDT.state, "ERROR");
+  assert.equal(snapshot.status.feeds.ETHUSDT.reason, "mock start failure");
+  assert.equal(snapshot.status.feeds.ETHUSDT.quote, null);
+  assert.equal(snapshot.quote, null);
   provider.stop();
 });
