@@ -1,5 +1,6 @@
 import { createBinanceSpotMultiSymbolDashboardFeedProvider } from "../data/binance-spot-multi-symbol-dashboard-feed-provider.js";
 import { startPaperDashboardRuntimeHost } from "./paper-dashboard-runtime-host.js";
+import { createBinanceSpotMtfScreenerProvider } from "../data/binance-spot-mtf-screener-provider.js";
 
 export const DEFAULT_BINANCE_SPOT_DASHBOARD_SYMBOLS = Object.freeze([
   "BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT"
@@ -23,7 +24,9 @@ export async function startBinanceSpotPaperDashboardRuntime({
   port = 8787,
   maxQuoteAgeMs = 5_000,
   now = () => Date.now(),
-  strategyProvider
+  strategyProvider,
+  screenerRefreshIntervalMs = 60_000,
+  screenerFetchKlines
 } = {}) {
   if (typeof filePath !== "string" || filePath.trim() === "") {
     throw new TypeError("a persistent paper ledger filePath is required");
@@ -31,11 +34,17 @@ export async function startBinanceSpotPaperDashboardRuntime({
   const feedProvider = createBinanceSpotMultiSymbolDashboardFeedProvider({
     symbols, selectedSymbol, maxSymbols, feedFactory, feedOptions
   });
+  const effectiveStrategyProvider = strategyProvider ?? createBinanceSpotMtfScreenerProvider({
+    symbols,
+    refreshIntervalMs: screenerRefreshIntervalMs,
+    ...(screenerFetchKlines ? { fetchKlines: screenerFetchKlines } : {}),
+    now
+  });
   const runtime = await startPaperDashboardRuntimeHost({
     filePath,
     sessionOptions,
     feedProvider,
-    ...(strategyProvider ? { strategyProvider } : {}),
+    strategyProvider: effectiveStrategyProvider,
     host,
     port,
     maxQuoteAgeMs,
