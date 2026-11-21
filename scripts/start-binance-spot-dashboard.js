@@ -36,6 +36,9 @@ try {
       maxQuoteAgeMs: config.maxQuoteAgeMs
     });
     const address = runtime.address();
+    // Install handlers before the readiness marker so an immediate SIGTERM is handled.
+    process.once("SIGINT", () => { void shutdown("SIGINT"); });
+    process.once("SIGTERM", () => { void shutdown("SIGTERM"); });
     const baseUrl = "http://" + (config.host.includes(":") ? "[" + config.host + "]" : config.host) + ":" + address.port;
     process.stdout.write("Tradesys Crypto paper dashboard is running.\n");
     process.stdout.write("Dashboard: " + baseUrl + "/dashboard/\n");
@@ -43,8 +46,6 @@ try {
     process.stdout.write("API:       " + baseUrl + "/api/paper-dashboard\n");
     process.stdout.write("Mode:      PAPER_ONLY (read-only; no live orders)\n");
     process.stdout.write("Ledger:    " + config.filePath + "\n");
-    process.once("SIGINT", () => { void shutdown("SIGINT"); });
-    process.once("SIGTERM", () => { void shutdown("SIGTERM"); });
   }
 } catch (error) {
   process.stderr.write((error?.message ?? String(error)) + "\n\n" + BINANCE_SPOT_DASHBOARD_CLI_USAGE);
