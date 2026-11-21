@@ -50,7 +50,13 @@ export function auditPaperRecovery({ ledgerSnapshot, brokerSnapshot, initialCash
       "Ledger must begin with exactly one immutable SESSION_STARTED configuration header.",
       null, "Do not activate this ledger; migrate only through a reviewed, backed-up procedure."));
   } else if (!headers[0].payload?.config ||
-      (expectedConfig && JSON.stringify(headers[0].payload.config) !== JSON.stringify(expectedConfig))) {
+      (expectedConfig && canonicalConfig({
+        ...headers[0].payload.config,
+        requireMarketDataProvenance: headers[0].payload.config.requireMarketDataProvenance ?? false
+      }) !== canonicalConfig({
+        ...expectedConfig,
+        requireMarketDataProvenance: expectedConfig.requireMarketDataProvenance ?? false
+      }))) {
     findings.push(finding("SESSION_CONFIG_MISMATCH", "CRITICAL",
       "Persisted session configuration does not match the requested configuration.",
       headers[0].eventId, "Reopen using the original immutable configuration; do not overwrite it."));
