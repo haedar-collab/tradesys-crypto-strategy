@@ -41,7 +41,7 @@ test("CLI rejects public bind, malformed port, duplicate and excessive symbols",
   assert.throws(() => parseBinanceSpotDashboardCliArgs([...base, "--port", "8.5"]), /integer/);
   assert.throws(() => parseBinanceSpotDashboardCliArgs([...base, "--symbols", "BTCUSDT,BTCUSDT"]), /unique/);
   assert.throws(() => parseBinanceSpotDashboardCliArgs([...base, "--symbols", "BTCUSDT,"]), /unique/);
-  assert.throws(() => parseBinanceSpotDashboardCliArgs([...base, "--symbols", Array(21).fill("BTCUSDT" + "X").join(",")]), /unique/);
+  assert.throws(() => parseBinanceSpotDashboardCliArgs([...base, "--symbols", Array.from({ length: 21 }, (_, index) => "S" + String(index).padStart(2, "0")).join(",")]), /1–20/);
   assert.throws(() => parseBinanceSpotDashboardCliArgs([...base, "--symbols", "BTCUSDT,ETHUSDT", "--selected-symbol", "SOLUSDT"]), /included/);
 });
 
