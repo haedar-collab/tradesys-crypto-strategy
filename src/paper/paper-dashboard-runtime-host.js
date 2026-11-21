@@ -23,8 +23,8 @@ export async function startPaperDashboardRuntimeHost({
   if (sessionOptions.mode !== undefined && sessionOptions.mode !== "PAPER_ONLY") {
     throw new Error("runtime host supports PAPER_ONLY mode exclusively");
   }
-
   if (typeof feedProvider !== "function") throw new TypeError("feedProvider must be a function");
+
   const session = await createPersistentPaperSession({
     ...sessionOptions,
     filePath,
@@ -32,7 +32,6 @@ export async function startPaperDashboardRuntimeHost({
   });
   let server;
   let feedStarted = false;
-  let closed = false;
   try {
     if (typeof feedProvider.start === "function") {
       await feedProvider.start();
@@ -57,21 +56,32 @@ export async function startPaperDashboardRuntimeHost({
     throw error;
   }
 
+  let closePromise;
   return Object.freeze({
     address: () => server.address(),
-    close: async () => {
-      if (closed) return;
-      closed = true;
-      let closeError = null;
-      if (feedStarted && typeof feedProvider.stop === "function") {
-        try { await feedProvider.stop(); } catch (error) { closeError = error; }
-        feedStarted = false;
-      }
-      await new Promise((resolve, reject) => {
-        server.close(error => error ? reject(error) : resolve());
-      });
-      try { await session.close(); } catch (error) { closeError ??= error; }
-      if (closeError) throw closeError;
+    close: () => {
+      // Share one shutdown operation: concurrent callers must wait for the
+      // same feed/server/session teardown rather than returning prematurely.
+      closePromise ??= (async () => {
+        let closeError = null;
+        try {
+          if (feedStarted && typeof feedProvider.stop === "function") {
+            try { await feedProvider.stop(); } catch (error) { closeError = error; }
+            feedStarted = false;
+          }
+          try {
+            await new Promise((resolve, reject) => {
+              server.close(error => error ? reject(error) : resolve());
+            });
+          } catch (error) {
+            closeError ??= error;
+          }
+        } finally {
+          try { await session.close(); } catch (error) { closeError ??= error; }
+        }
+        if (closeError) throw closeError;
+      })();
+      return closePromise;
     }
   });
 }
