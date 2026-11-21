@@ -1,6 +1,4 @@
 import { createServer } from "node:http";
-import { isIP } from "node:net";
-
 const MAX_RESPONSE_BYTES = 1_048_576;
 const LOOPBACKS = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
 
@@ -24,20 +22,24 @@ function sendJson(response, status, body) {
  * Only its view model and non-sensitive provenance metadata leave this process;
  * raw ledger events and broker internals are never sent over HTTP.
  */
-export function createPaperDashboardHttpServer({
+export async function startPaperDashboardHttpServer({
   getSnapshot,
   host = "127.0.0.1",
+  port = 0,
   maxResponseBytes = MAX_RESPONSE_BYTES
 } = {}) {
   if (typeof getSnapshot !== "function") throw new TypeError("getSnapshot must be a function");
   if (host !== "127.0.0.1" && host !== "::1") {
     throw new Error("paper dashboard HTTP server may bind only to loopback");
   }
+  if (!Number.isInteger(port) || port < 0 || port > 65_535) {
+    throw new RangeError("port must be an integer from 0 to 65535");
+  }
   if (!Number.isSafeInteger(maxResponseBytes) || maxResponseBytes < 1 || maxResponseBytes > MAX_RESPONSE_BYTES) {
     throw new RangeError("maxResponseBytes must be between 1 byte and 1 MiB");
   }
 
-  return createServer(async (request, response) => {
+  const server = createServer(async (request, response) => {
     if (!LOOPBACKS.has(request.socket.remoteAddress) || !LOOPBACKS.has(request.socket.localAddress)) {
       sendJson(response, 403, { error: "LOOPBACK_ONLY" });
       return;
@@ -94,4 +96,9 @@ export function createPaperDashboardHttpServer({
       sendJson(response, 503, { error: "SNAPSHOT_UNAVAILABLE" });
     }
   });
+  await new Promise((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(port, host, resolve);
+  });
+  return server;
 }
