@@ -50,8 +50,17 @@ export function parseBinanceSpotDashboardCliArgs(argv = []) {
   }
 
   const host = values.get("--host") ?? "127.0.0.1";
-  if (!LOOPBACK_HOSTS.has(host)) {
-    throw new Error("--host must be 127.0.0.1 or ::1; public interfaces are forbidden");
+  const dashboardUsername = process.env.TRADESYS_DASHBOARD_USER;
+  const dashboardPassword = process.env.TRADESYS_DASHBOARD_PASSWORD;
+  const auth = dashboardUsername && dashboardPassword
+    ? Object.freeze({ username: dashboardUsername, password: dashboardPassword })
+    : null;
+  const remoteEnabled = process.env.TRADESYS_ALLOW_REMOTE === "true";
+  if (!LOOPBACK_HOSTS.has(host) && !(host === "0.0.0.0" && remoteEnabled && auth && auth.password.length >= 24)) {
+    throw new Error("public binding requires TRADESYS_ALLOW_REMOTE=true, TRADESYS_DASHBOARD_USER, and TRADESYS_DASHBOARD_PASSWORD (minimum 24 characters)");
+  }
+  if (auth && auth.password.length < 24) {
+    throw new Error("TRADESYS_DASHBOARD_PASSWORD must contain at least 24 characters");
   }
   const port = parseInteger(values.get("--port") ?? "8787", "--port", 0, 65_535);
   const maxQuoteAgeMs = parseInteger(
@@ -78,6 +87,7 @@ export function parseBinanceSpotDashboardCliArgs(argv = []) {
     help: false,
     filePath: resolve(ledger),
     host,
+    auth,
     port,
     maxQuoteAgeMs,
     symbols: Object.freeze(symbols),
@@ -90,12 +100,12 @@ export const BINANCE_SPOT_DASHBOARD_CLI_USAGE = `Usage:
 
 Options:
   --ledger PATH             Required persistent paper ledger path
-  --host HOST               127.0.0.1 (default) or ::1 only
+  --host HOST               127.0.0.1 (default), ::1, or protected 0.0.0.0
   --port PORT               0–65535 (default 8787; 0 selects an ephemeral port)
   --symbols CSV             Comma-separated symbols (default BTCUSDT,ETHUSDT,SOLUSDT,BNBUSDT,XRPUSDT)
   --selected-symbol SYMBOL  Selected dashboard symbol (default first symbol)
   --max-quote-age-ms N      Quote freshness limit 100–300000 (default 5000)
-  --help                    Show this help
+  TRADESYS_ALLOW_REMOTE=true enables protected remote binding only when both dashboard credentials are set.\n  TRADESYS_DASHBOARD_USER and TRADESYS_DASHBOARD_PASSWORD are required remotely; password minimum 24 characters.\n  --help                    Show this help
 
 This launcher is PAPER_ONLY and read-only. It never submits exchange orders.
 `;
