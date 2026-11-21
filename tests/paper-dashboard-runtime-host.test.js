@@ -42,3 +42,46 @@ test("runtime host rejects missing ledger path and non-paper mode", async () => 
     await rm(dir, { recursive: true, force: true });
   }
 });
+
+test("runtime host starts and stops a lifecycle-aware market data provider", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "tradesys-dashboard-host-feed-"));
+  const filePath = join(dir, "paper-ledger.jsonl");
+  let starts = 0;
+  let stops = 0;
+  const feedProvider = async () => ({
+    status: { state: "DISCONNECTED" },
+    quote: null
+  });
+  feedProvider.start = async () => { starts += 1; };
+  feedProvider.stop = async () => { stops += 1; };
+  const host = await startPaperDashboardRuntimeHost({ filePath, port: 0, feedProvider });
+  try {
+    assert.equal(starts, 1);
+    const response = await fetch("http://127.0.0.1:" + host.address().port + "/api/paper-dashboard");
+    assert.equal(response.status, 200);
+  } finally {
+    await host.close();
+    assert.equal(stops, 1);
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test("runtime host stops market data provider if HTTP startup fails", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "tradesys-dashboard-host-feed-fail-"));
+  let starts = 0;
+  let stops = 0;
+  const feedProvider = async () => ({ status: { state: "DISCONNECTED" }, quote: null });
+  feedProvider.start = () => { starts += 1; };
+  feedProvider.stop = () => { stops += 1; };
+  try {
+    await assert.rejects(startPaperDashboardRuntimeHost({
+      filePath: join(dir, "ledger.jsonl"),
+      host: "0.0.0.0",
+      feedProvider
+    }), /loopback/);
+    assert.equal(starts, 1);
+    assert.equal(stops, 1);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
