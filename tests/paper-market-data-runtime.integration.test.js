@@ -128,6 +128,21 @@ test("real feed adapter -> supervisor -> runtime -> bridge -> persistent ledger;
     marks = snapshot.ledger.events.filter(event => event.type === "POSITION_MARKED");
     assert.equal(marks.length, 1, "disconnect must not append a partial or synthetic mark");
 
+    // Reconnect after bounded backoff; only a fresh quote from the new socket
+    // restores health and permits the next durable portfolio mark.
+    await timers.runDelay(100);
+    const recoveredSocket = MockSocket.instances[1];
+    assert.ok(recoveredSocket, "feed should create a replacement socket after backoff");
+    recoveredSocket.open();
+    recoveredSocket.message(payload(102, "101.00", "101.10"));
+    assert.equal(supervisor.checkHealth().BTCUSDT.healthy, true);
+
+    await timers.runDelay(250);
+    snapshot = await session.snapshot();
+    marks = snapshot.ledger.events.filter(event => event.type === "POSITION_MARKED");
+    assert.equal(marks.length, 2, "fresh quote after reconnect should resume durable marking");
+    assert.equal(marks[1].payload.marketDataProvenance[0].source, "BINANCE_SPOT_WS_BOOK_TICKER");
+
     await runtime.stop();
     assert.equal(runtime.getStatus().state, "STOPPED");
     assert.equal(timers.tasks.size, 0, "runtime and feed timers must all be cleared");
