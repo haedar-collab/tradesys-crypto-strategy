@@ -29,7 +29,10 @@ function render(vm) {
   renderDetails("market-details", [
     ["Symbol", vm.market.symbol], ["Bid", vm.market.bid], ["Ask", vm.market.ask],
     ["Spread", vm.market.spread], ["Quote age (ms)", vm.market.quoteAgeMs],
-    ["Max age (ms)", vm.market.maxQuoteAgeMs], ["Source", vm.market.source]
+    ["Max age (ms)", vm.market.maxQuoteAgeMs], ["Source", vm.market.source],
+    ["Selected symbol", vm.market.selectedSymbol],
+    ["Healthy symbols", vm.market.healthySymbolCount === null ? null : vm.market.healthySymbolCount + " / " + vm.market.symbolCount],
+    ["Per-symbol health", vm.market.feeds.map(feed => feed.symbol + ": " + (feed.healthy ? "HEALTHY" : feed.state + (feed.reason ? " (" + feed.reason + ")" : "")))]
   ]);
   setText("strategy-state", vm.strategy.status);
   renderDetails("strategy-details", [
