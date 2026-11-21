@@ -90,3 +90,39 @@ test("supervisor can be stopped before any quote and started idempotently", () =
   supervisor.stop();
   assert.equal(supervisor.getSnapshot().state, "STOPPED");
 });
+
+
+test("clears a prior startup diagnostic after the symbol reconnects successfully", () => {
+  const feeds = new Map();
+  let shouldFail = true;
+  const supervisor = createBinanceSpotBookTickerSupervisor({
+    symbols: ["BTCUSDT"],
+    feedFactory: options => {
+      const feed = {
+        started: false,
+        start() {
+          if (shouldFail) throw new Error("temporary startup failure");
+          this.started = true;
+          options.onState({ symbol: "BTCUSDT", state: "CONNECTED" });
+        },
+        stop() {
+          this.started = false;
+          options.onState({ symbol: "BTCUSDT", state: "STOPPED" });
+        },
+        checkHealth() { return { healthy: this.started, reason: this.started ? null : "FEED_NOT_CONNECTED" }; },
+        getLastQuote() { return null; }
+      };
+      feeds.set("BTCUSDT", feed);
+      return feed;
+    }
+  });
+
+  supervisor.start();
+  assert.equal(supervisor.getSnapshot().errors.BTCUSDT, "temporary startup failure");
+  supervisor.stop();
+  shouldFail = false;
+  supervisor.start();
+  assert.equal(supervisor.getSnapshot().feeds.BTCUSDT.state, "CONNECTED");
+  assert.equal(supervisor.getSnapshot().errors.BTCUSDT, undefined);
+  supervisor.stop();
+});
