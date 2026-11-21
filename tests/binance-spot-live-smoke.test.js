@@ -7,7 +7,7 @@ test("live smoke script checks the five configured Spot symbols without credenti
   for (const symbol of ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT"]) assert.ok(source.includes(symbol));
   assert.match(source, /globalThis\.WebSocket/);
   assert.match(source, /validateBinanceSpotQuote/);
-  assert.match(source, /feed\.stop\(\)/);
+  assert.ok(source.includes("feed?.stop()"));
   assert.doesNotMatch(source, /apiKey|apiSecret|createOrder|order\(/i);
 });
 
