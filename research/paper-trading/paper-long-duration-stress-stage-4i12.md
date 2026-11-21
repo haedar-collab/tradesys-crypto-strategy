@@ -16,8 +16,8 @@ This stage adds deterministic stress coverage for long-running PAPER_ONLY sessio
 ## Risk-stop scenario
 
 - Open one small paper position.
-- Latch the kill switch manually.
-- Verify a subsequent BUY entry is rejected.
+- Persist a fresh position mark while the position is open, then latch the kill switch manually. The mark is required by the entry risk gate to evaluate portfolio risk; without it, the test would only exercise the fail-closed RISK_DATA_UNAVAILABLE path.
+- Verify a subsequent BUY entry is rejected specifically by the latched kill switch.
 - Verify SELL remains permitted to exit the already-open position.
 - Verify the position is flat while the kill switch remains latched and the recovery audit passes.
 
