@@ -96,6 +96,7 @@ export function createBinanceSpotBookTickerFeed({
     if (stopped) return;
     clearTimers();
     const token = ++generation;
+    lastQuote = null;
     publish("CONNECTING", { attempt: attempts + 1 });
     let ws;
     try {
@@ -109,7 +110,6 @@ export function createBinanceSpotBookTickerFeed({
     }
     attach(ws, "open", () => {
       if (stopped || token !== generation || socket !== ws) return;
-      attempts = 0;
       publish("CONNECTED");
       scheduleStaleCheck(token);
     });
@@ -126,7 +126,8 @@ export function createBinanceSpotBookTickerFeed({
         }
         const receivedAt = now();
         if (!Number.isSafeInteger(receivedAt) || receivedAt < 0) throw new TypeError("receive clock must return a non-negative integer");
-        const eventTime = Number.isSafeInteger(parsed.E) && parsed.E >= 0 ? parsed.E : receivedAt;
+        const hasExchangeEventTime = Number.isSafeInteger(parsed.E) && parsed.E >= 0;
+        const eventTime = hasExchangeEventTime ? parsed.E : receivedAt;
         const quote = {
           exchange: "BINANCE",
           source: "BINANCE_SPOT_WS_BOOK_TICKER",
@@ -139,8 +140,9 @@ export function createBinanceSpotBookTickerFeed({
           bid: Number(parsed.b),
           ask: Number(parsed.a),
           updateId: parsed.u,
-          eventTimeBasis: Number.isSafeInteger(parsed.E) ? "EXCHANGE_EVENT_TIME" : "LOCAL_RECEIVE_TIME"
+          eventTimeBasis: hasExchangeEventTime ? "EXCHANGE_EVENT_TIME" : "LOCAL_RECEIVE_TIME"
         };
+        attempts = 0;
         lastQuote = quote;
         onQuote(quote);
         scheduleStaleCheck(token);
