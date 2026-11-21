@@ -72,9 +72,9 @@ export function buildPaperDashboardViewModel({
       quoteAgeMs,
       maxQuoteAgeMs,
       symbol: quote?.symbol ?? null,
-      bid: quoteValid ? quote.bid : null,
-      ask: quoteValid ? quote.ask : null,
-      spread: quoteValid ? quote.ask - quote.bid : null,
+      bid: feedState === "HEALTHY" ? quote.bid : null,
+      ask: feedState === "HEALTHY" ? quote.ask : null,
+      spread: feedState === "HEALTHY" ? quote.ask - quote.bid : null,
       source: quote?.source ?? null
     }),
     strategy: Object.freeze({
