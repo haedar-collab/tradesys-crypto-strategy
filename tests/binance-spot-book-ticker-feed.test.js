@@ -126,7 +126,6 @@ test("stale watchdog marks feed stale and reconnects", () => {
   const socket = MockSocket.instances[0];
   socket.open();
   timers.runNext();
-  assert.equal(feed.getState(), "STALE");
   assert.equal(socket.closed, true);
   assert.ok(states.some(item => item.state === "STALE"));
   assert.equal(feed.getState(), "RECONNECT_WAIT");
