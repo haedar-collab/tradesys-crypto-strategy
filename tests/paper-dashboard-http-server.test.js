@@ -71,3 +71,32 @@ test("transport serves dashboard assets from the same loopback origin", async ()
     assert.equal((await fetch(base + "/dashboard/..%2F..%2Fpackage.json")).status, 404);
   });
 });
+
+
+test("remote transport requires strong Basic authentication and keeps health probe public", async () => {
+  await assert.rejects(
+    startPaperDashboardHttpServer({ getSnapshot: async () => validSnapshot(), host: "0.0.0.0", port: 0 }),
+    /remote binding requires/
+  );
+  const auth = { username: "tradesys-owner", password: "a".repeat(32) };
+  const server = await startPaperDashboardHttpServer({
+    getSnapshot: async () => validSnapshot(), host: "0.0.0.0", port: 0, auth
+  });
+  try {
+    const base = "http://127.0.0.1:" + server.address().port;
+    const denied = await fetch(base + "/api/paper-dashboard");
+    assert.equal(denied.status, 401);
+    assert.match(denied.headers.get("www-authenticate"), /Basic/);
+    assert.equal((await fetch(base + "/healthz")).status, 200);
+    const credentials = Buffer.from(auth.username + ":" + auth.password).toString("base64");
+    const allowed = await fetch(base + "/api/paper-dashboard", {
+      headers: { authorization: "Basic " + credentials }
+    });
+    assert.equal(allowed.status, 200);
+    assert.equal((await fetch(base + "/dashboard/", {
+      headers: { authorization: "Basic " + credentials }
+    })).status, 200);
+  } finally {
+    await new Promise(resolve => server.close(resolve));
+  }
+});
