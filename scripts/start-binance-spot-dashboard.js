@@ -33,7 +33,8 @@ try {
       selectedSymbol: config.selectedSymbol,
       host: config.host,
       port: config.port,
-      maxQuoteAgeMs: config.maxQuoteAgeMs
+      maxQuoteAgeMs: config.maxQuoteAgeMs,
+      auth: config.auth
     });
     const address = runtime.address();
     // Install handlers before the readiness marker so an immediate SIGTERM is handled.
