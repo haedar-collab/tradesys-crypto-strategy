@@ -1,6 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { createBinanceSpotBookTickerFeed } from "../src/data/binance-spot-book-ticker-feed.js";
 import { validateBinanceSpotQuote } from "../src/data/binance-spot-quote-contract.js";
+import { validateBinanceSpotLiveEvidence } from "../src/data/binance-spot-live-evidence.js";
 
 const SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT"];
 const TIMEOUT_MS = 20_000;
@@ -76,6 +77,8 @@ const report = {
   failed,
   success: failed.length === 0 && passed.length === SYMBOLS.length
 };
+report.acceptance = validateBinanceSpotLiveEvidence(report);
+report.success = report.acceptance.accepted;
 const serialized = JSON.stringify(report, null, 2);
 console.log(serialized);
 if (process.env.BINANCE_SMOKE_REPORT_PATH) {
