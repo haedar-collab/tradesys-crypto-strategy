@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 const MAX_RESPONSE_BYTES = 1_048_576;
 const LOOPBACKS = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
@@ -52,6 +53,36 @@ export async function startPaperDashboardHttpServer({
     const path = new URL(request.url ?? "/", "http://127.0.0.1").pathname;
     if (path === "/healthz") {
       sendJson(response, 200, { status: "OK", mode: "PAPER_ONLY", readOnly: true });
+      return;
+    }
+    const staticFiles = {
+      "/dashboard/": ["../../dashboard/index.html", "text/html; charset=utf-8"],
+      "/dashboard/index.html": ["../../dashboard/index.html", "text/html; charset=utf-8"],
+      "/dashboard/dashboard.js": ["../../dashboard/dashboard.js", "text/javascript; charset=utf-8"],
+      "/dashboard/dashboard.css": ["../../dashboard/dashboard.css", "text/css; charset=utf-8"],
+      "/src/paper/paper-dashboard-view-model.js": ["./paper-dashboard-view-model.js", "text/javascript; charset=utf-8"]
+    };
+    if (path === "/dashboard") {
+      response.writeHead(302, { location: "/dashboard/", "cache-control": "no-store" });
+      response.end();
+      return;
+    }
+    if (staticFiles[path]) {
+      try {
+        const [relativePath, contentType] = staticFiles[path];
+        const file = await readFile(new URL(relativePath, import.meta.url));
+        response.writeHead(200, {
+          "content-type": contentType,
+          "content-length": file.length,
+          "cache-control": "no-store",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "no-referrer",
+          "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
+        });
+        response.end(file);
+      } catch {
+        sendJson(response, 500, { error: "STATIC_ASSET_UNAVAILABLE" });
+      }
       return;
     }
     if (path !== "/api/paper-dashboard") {
