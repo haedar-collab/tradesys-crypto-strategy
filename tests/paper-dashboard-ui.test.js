@@ -19,5 +19,5 @@ test("dashboard snapshot rendering uses the established read-only projection", a
   assert.match(js, /maySubmitOrders/);
   assert.match(js, /mayMutateLedger/);
   assert.match(js, /mayResetRisk/);
-  assert.match(js, /quote age/);
+  assert.match(js, /Quote age/);
 });
