@@ -66,7 +66,7 @@ export async function startPaperDashboardHttpServer({
       sendJson(response, 403, { error: "LOOPBACK_ONLY" });
       return;
     }
-    if (auth && !isAuthorized(request.headers.authorization, auth)) {
+    if (auth && new URL(request.url ?? "/", "http://localhost").pathname !== "/healthz" && !isAuthorized(request.headers.authorization, auth)) {
       response.writeHead(401, {
         "www-authenticate": 'Basic realm="Tradesys Crypto", charset="UTF-8"',
         "cache-control": "no-store",
