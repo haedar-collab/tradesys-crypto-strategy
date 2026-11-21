@@ -76,7 +76,7 @@ test("transport serves dashboard assets from the same loopback origin", async ()
 test("remote transport requires strong Basic authentication and keeps health probe public", async () => {
   await assert.rejects(
     startPaperDashboardHttpServer({ getSnapshot: async () => validSnapshot(), host: "0.0.0.0", port: 0 }),
-    /remote binding requires/
+    /non-loopback binding requires/
   );
   const auth = { username: "tradesys-owner", password: "a".repeat(32) };
   const server = await startPaperDashboardHttpServer({
