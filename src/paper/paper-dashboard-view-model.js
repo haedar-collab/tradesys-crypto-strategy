@@ -28,11 +28,22 @@ export function buildPaperDashboardViewModel({
   const quoteValid = quoteAgeMs !== null && quoteTimestamp <= now &&
     finite(quote?.bid) && quote.bid > 0 && finite(quote?.ask) &&
     quote.ask >= quote.bid && quote.ask > 0;
-  const feedConnected = feedStatus?.state === "CONNECTED" ||
-    feedStatus?.status === "CONNECTED" || feedStatus?.connected === true;
-  const feedState = !feedConnected ? "DISCONNECTED" :
+  const aggregateFeedState = feedStatus?.state ?? feedStatus?.status;
+  const feedConnected = aggregateFeedState === "CONNECTED" ||
+    feedStatus?.connected === true;
+  const feedState = aggregateFeedState === "DEGRADED" ? "DEGRADED" :
+    aggregateFeedState === "WAIT_DATA" ? "WAIT_DATA" :
+    aggregateFeedState === "STOPPED" || aggregateFeedState === "DISCONNECTED" ? "DISCONNECTED" :
+    !feedConnected ? "DISCONNECTED" :
     !quoteValid ? "WAIT_QUOTE" :
     quoteAgeMs > maxQuoteAgeMs ? "STALE" : "HEALTHY";
+  const feedSymbols = Object.entries(feedStatus?.feeds ?? {}).map(([symbol, feed]) => ({
+    symbol,
+    state: feed?.state ?? "UNKNOWN",
+    healthy: feed?.healthy === true,
+    reason: feed?.reason ?? null,
+    ageMs: finite(feed?.ageMs) ? feed.ageMs : null
+  }));
 
   const ledgerComplete = ledgerSnapshot?.status === "COMPLETE" &&
     Array.isArray(ledgerSnapshot.events) &&
@@ -75,7 +86,11 @@ export function buildPaperDashboardViewModel({
       bid: feedState === "HEALTHY" ? quote.bid : null,
       ask: feedState === "HEALTHY" ? quote.ask : null,
       spread: feedState === "HEALTHY" ? quote.ask - quote.bid : null,
-      source: quote?.source ?? null
+      source: quote?.source ?? null,
+      selectedSymbol: feedStatus?.selectedSymbol ?? quote?.symbol ?? null,
+      healthySymbolCount: Number.isSafeInteger(feedStatus?.healthyCount) ? feedStatus.healthyCount : null,
+      symbolCount: Number.isSafeInteger(feedStatus?.symbolCount) ? feedStatus.symbolCount : null,
+      feeds: Object.freeze(feedSymbols.map(feed => Object.freeze(feed)))
     }),
     strategy: Object.freeze({
       symbol: signal?.symbol ?? null,
