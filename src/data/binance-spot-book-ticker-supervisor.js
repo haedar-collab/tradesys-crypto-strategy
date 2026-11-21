@@ -49,6 +49,14 @@ export function createBinanceSpotBookTickerSupervisor({
     feeds.set(symbol, feed);
   }
 
+  function checkHealth() {
+    return Object.fromEntries([...feeds].map(([symbol, feed]) => [symbol, {
+      ...feed.checkHealth(),
+      state: states.get(symbol),
+      lastQuote: feed.getLastQuote()
+    }]));
+  }
+
   return {
     start() {
       if (started) return;
@@ -76,19 +84,13 @@ export function createBinanceSpotBookTickerSupervisor({
       }
       onState({ state: "STOPPED", symbols: [...symbols] });
     },
-    checkHealth() {
-      return Object.fromEntries([...feeds].map(([symbol, feed]) => [symbol, {
-        ...feed.checkHealth(),
-        state: states.get(symbol),
-        lastQuote: feed.getLastQuote()
-      }]));
-    },
+    checkHealth,
     getQuote(symbol) {
       const feed = feeds.get(symbol);
       return feed ? feed.getLastQuote() : null;
     },
     getSnapshot() {
-      const perSymbol = this.checkHealth();
+      const perSymbol = checkHealth();
       const healthyCount = Object.values(perSymbol).filter(item => item.healthy).length;
       return {
         state: started ? "RUNNING" : "STOPPED",
