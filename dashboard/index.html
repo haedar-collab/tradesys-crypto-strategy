@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Tradesys Crypto — Paper Dashboard</title>
+<link rel="stylesheet" href="./dashboard.css">
+</head>
+<body>
+<header class="topbar">
+  <div><p class="eyebrow">TRADESYS CRYPTO</p><h1>Paper Trading Dashboard</h1><p class="muted">Read-only monitoring · No order execution</p></div>
+  <div class="mode"><span class="dot"></span>PAPER ONLY</div>
+</header>
+<main>
+  <section class="notice"><strong>Snapshot viewer</strong><p>Dashboard ini menampilkan snapshot JSON yang Anda impor. Ini bukan koneksi live Binance atau runtime otomatis. Data yang tidak tersedia akan ditampilkan sebagai UNKNOWN / UNAVAILABLE.</p></section>
+  <section class="toolbar">
+    <label for="snapshot-file">Pilih snapshot JSON</label>
+    <input id="snapshot-file" type="file" accept=".json,application/json">
+    <button id="load-demo" type="button">Muat contoh kosong</button>
+    <span id="load-status" role="status" aria-live="polite">Belum ada snapshot.</span>
+  </section>
+  <section class="grid">
+    <article class="panel"><h2>Market Feed</h2><p class="state" id="market-state">UNKNOWN</p><dl id="market-details"></dl></article>
+    <article class="panel"><h2>Strategy Signal</h2><p class="state" id="strategy-state">NOT EVALUATED</p><dl id="strategy-details"></dl></article>
+    <article class="panel"><h2>Risk Monitor</h2><p class="state" id="risk-state">UNKNOWN</p><dl id="risk-details"></dl></article>
+    <article class="panel"><h2>Performance</h2><p class="state" id="performance-state">UNAVAILABLE</p><dl id="performance-details"></dl></article>
+  </section>
+  <section class="panel"><h2>Portfolio Positions</h2><p id="position-summary" class="muted">Belum ada snapshot.</p><div class="table-wrap"><table><thead><tr><th>Symbol</th><th>Quantity</th><th>Mark</th><th>Market Value</th><th>Mark Status</th></tr></thead><tbody id="positions"></tbody></table></div></section>
+  <section class="panel"><h2>Data Quality & Permissions</h2><dl id="quality-details"></dl><dl id="permission-details"></dl></section>
+  <p class="footnote">Snapshot dapat kedaluwarsa setelah diimpor. Umur quote dihitung ulang saat file dimuat. Jangan gunakan tampilan ini sebagai bukti konektivitas real-time atau dasar eksekusi order.</p>
+</main>
+<script type="module" src="./dashboard.js"></script>
+</body></html>
