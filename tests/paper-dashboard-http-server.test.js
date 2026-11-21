@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createPaperDashboardHttpServer } from "../src/paper/paper-dashboard-http-server.js";
+import { startPaperDashboardHttpServer } from "../src/paper/paper-dashboard-http-server.js";
 
 const viewModel = {
   mode: "PAPER_ONLY",
