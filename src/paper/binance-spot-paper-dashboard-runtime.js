@@ -23,6 +23,7 @@ export async function startBinanceSpotPaperDashboardRuntime({
   host = "127.0.0.1",
   port = 8787,
   maxQuoteAgeMs = 5_000,
+  auth = null,
   now = () => Date.now(),
   strategyProvider,
   screenerRefreshIntervalMs = 60_000,
@@ -48,6 +49,7 @@ export async function startBinanceSpotPaperDashboardRuntime({
     host,
     port,
     maxQuoteAgeMs,
+    auth,
     now
   });
   return Object.freeze({
