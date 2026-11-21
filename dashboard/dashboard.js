@@ -39,6 +39,21 @@ function render(vm) {
     ["Symbol", vm.strategy.symbol], ["Side", vm.strategy.side],
     ["Decision", vm.strategy.decision], ["Signal ID", vm.strategy.signalId]
   ]);
+  setText("screener-state", vm.screener.status);
+  setText("screener-summary", vm.screener.candidateCount + " kandidat · " +
+    vm.screener.waitCount + " WAIT · " + vm.screener.dataErrorCount + " data error · " +
+    vm.screener.symbolCount + " aset");
+  const screenerBody = $("screener-results");
+  screenerBody.replaceChildren();
+  for (const item of vm.screener.results) {
+    const tr = document.createElement("tr");
+    for (const value of [item.symbol, item.state, item.reasons.join(", ") || "—"]) {
+      const td = document.createElement("td");
+      td.textContent = format(value);
+      tr.append(td);
+    }
+    screenerBody.append(tr);
+  }
   setText("risk-state", vm.risk.state);
   renderDetails("risk-details", [
     ["Halted", vm.risk.halted], ["Reasons", vm.risk.reasons],
