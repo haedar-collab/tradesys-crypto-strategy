@@ -26,13 +26,19 @@ test("multi-symbol portfolio marks, aggregate exposure gate and recovery remain 
       { symbol: "ETHUSDT", quantity: 4, bid: 500, ask: 501 },
       { symbol: "SOLUSDT", quantity: 10, bid: 100, ask: 101 }
     ];
-    for (const item of entries) {
+    for (let index = 0; index < entries.length; index++) {
+      const item = entries[index];
       const order = await session.submitMarketOrder({
         clientOrderId: "multi_buy_" + item.symbol.slice(0, 3),
         symbol: item.symbol, side: "BUY", quantity: item.quantity,
         quote: quote(clock.now(), item.bid, item.ask), strategyAcceptance: ACCEPT
       });
       assert.equal(order.status, "FILLED");
+      // Every subsequent BUY requires a durable fresh mark for every held symbol.
+      const held = entries.slice(0, index + 1);
+      await session.markToMarket(Object.fromEntries(held.map(position => [
+        position.symbol, quote(clock.now(), position.bid, position.ask)
+      ])));
     }
 
     const markQuotes = Object.fromEntries(entries.map(item => [
