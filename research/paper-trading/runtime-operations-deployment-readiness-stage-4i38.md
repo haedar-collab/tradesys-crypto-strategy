@@ -27,30 +27,33 @@ npm --version
 
 ## Start the runtime
 
-The runtime is exported as a library entry point. Start it from a small local launcher or an application entry point; always pass an explicit ledger path and keep the default loopback bind:
+Use the repository launcher; it requires an explicit ledger path and only permits loopback binding:
 
-```js
-import { startBinanceSpotPaperDashboardRuntime } from "./src/paper/binance-spot-paper-dashboard-runtime.js";
-
-const runtime = await startBinanceSpotPaperDashboardRuntime({
-  filePath: "./var/paper-ledger.jsonl",
-  host: "127.0.0.1",
-  port: 8787
-});
-
-console.log("Dashboard:", `http://127.0.0.1:${runtime.address().port}/dashboard/`);
-console.log("Health:", `http://127.0.0.1:${runtime.address().port}/healthz`);
-
-let closing;
-async function shutdown() {
-  closing ??= runtime.close();
-  await closing;
-}
-process.once("SIGINT", () => { shutdown().then(() => process.exit(0), () => process.exit(1)); });
-process.once("SIGTERM", () => { shutdown().then(() => process.exit(0), () => process.exit(1)); });
+```sh
+npm run start:dashboard -- --ledger ./var/paper-ledger.jsonl
 ```
 
-Run the entry point with Node.js 22. Do not expose the service through a reverse proxy, public interface, tunnel, or port-forwarding rule.
+Optional configuration:
+
+```sh
+npm run start:dashboard -- \
+  --ledger ./var/paper-ledger.jsonl \
+  --host 127.0.0.1 \
+  --port 8787 \
+  --symbols BTCUSDT,ETHUSDT,SOLUSDT,BNBUSDT,XRPUSDT \
+  --selected-symbol BTCUSDT \
+  --max-quote-age-ms 5000
+```
+
+Show supported options without starting the runtime:
+
+```sh
+npm run start:dashboard -- --help
+```
+
+The launcher resolves the ledger path, validates symbol count/uniqueness and selected-symbol membership, and rejects non-loopback hosts. The default bind is 127.0.0.1; ::1 is also allowed. Do not expose the service through a reverse proxy, public interface, tunnel, or port-forwarding rule.
+
+Press Ctrl+C or send SIGTERM for graceful shutdown. Wait for the process to report that the paper dashboard stopped cleanly before restarting.
 
 ## Health checks
 
