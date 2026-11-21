@@ -101,16 +101,13 @@ test("real feed adapter -> supervisor -> runtime -> bridge -> persistent ledger;
 
     const quote = supervisor.getQuote("BTCUSDT");
     assert.equal(quote.source, "BINANCE_SPOT_WS_BOOK_TICKER");
+    assert.equal(quote.eventTimeBasis, "LOCAL_RECEIVE_TIME");
     await session.submitMarketOrder({
       clientOrderId: "e2e_runtime_buy_001",
       symbol: "BTCUSDT",
       side: "BUY",
       quantity: 1,
-      quote: {
-        timestamp: quote.eventTime,
-        bid: quote.bid,
-        ask: quote.ask
-      },
+      quote,
       strategyAcceptance: { decision: "ACCEPT", eligibleForPaperTrading: true }
     });
 
