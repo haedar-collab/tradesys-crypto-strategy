@@ -30,7 +30,7 @@ export function createBinanceSpotMultiSymbolDashboardFeedProvider({
       return [symbol, {
         state: !started ? "STOPPED" : feed.state,
         healthy: started && feed.healthy === true,
-        reason: !started ? "STOPPED" : feed.reason ?? (feed.healthy ? null : "NO_HEALTHY_QUOTE"),
+        reason: !started ? "STOPPED" : aggregate.errors?.[symbol] ?? feed.reason ?? (feed.healthy ? null : "NO_HEALTHY_QUOTE"),
         ageMs: feed.ageMs ?? null,
         quote: quote ? {
           symbol: quote.symbol,
