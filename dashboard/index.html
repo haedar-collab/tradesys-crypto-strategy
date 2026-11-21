@@ -13,10 +13,11 @@
   <div class="mode"><span class="dot"></span>PAPER ONLY</div>
 </header>
 <main>
-  <section class="notice"><strong>Snapshot viewer</strong><p>Dashboard ini menampilkan snapshot JSON yang Anda impor. Ini bukan koneksi live Binance atau runtime otomatis. Data yang tidak tersedia akan ditampilkan sebagai UNKNOWN / UNAVAILABLE.</p></section>
+  <section class="notice"><strong>Read-only runtime monitor</strong><p>Hubungkan ke runtime lokal melalui HTTP read-only, atau impor snapshot JSON. Koneksi ini bukan bukti Binance WebSocket aktif; status data ditentukan oleh feed provider runtime.</p></section>
   <section class="toolbar">
     <label for="snapshot-file">Pilih snapshot JSON</label>
     <input id="snapshot-file" type="file" accept=".json,application/json">
+    <button id="connect-runtime" type="button">Hubungkan runtime</button>
     <button id="load-demo" type="button">Muat contoh kosong</button>
     <span id="load-status" role="status" aria-live="polite">Belum ada snapshot.</span>
   </section>
@@ -28,7 +29,7 @@
   </section>
   <section class="panel"><h2>Portfolio Positions</h2><p id="position-summary" class="muted">Belum ada snapshot.</p><div class="table-wrap"><table><thead><tr><th>Symbol</th><th>Quantity</th><th>Mark</th><th>Market Value</th><th>Mark Status</th></tr></thead><tbody id="positions"></tbody></table></div></section>
   <section class="panel"><h2>Data Quality & Permissions</h2><dl id="quality-details"></dl><dl id="permission-details"></dl></section>
-  <p class="footnote">Snapshot dapat kedaluwarsa setelah diimpor. Umur quote dihitung ulang saat file dimuat. Jangan gunakan tampilan ini sebagai bukti konektivitas real-time atau dasar eksekusi order.</p>
+  <p class="footnote">Runtime diperbarui setiap 3 detik saat terhubung. Jika runtime gagal diakses, tampilan kembali ke kondisi UNKNOWN / UNAVAILABLE. Dashboard tidak memiliki fungsi order, mutasi ledger, atau reset risiko.</p>
 </main>
 <script type="module" src="./dashboard.js"></script>
 </body></html>
