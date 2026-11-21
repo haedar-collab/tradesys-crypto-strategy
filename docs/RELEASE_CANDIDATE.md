@@ -13,7 +13,9 @@
 - Multi-timeframe screener (1W, 1D, 4H, 1H) using closed candles; default refresh cache is 60 seconds.
 - Screener candle cutoff is enforced at the adapter boundary using the conservative evaluation/server-time cutoff.
 - Persistent paper ledger, recovery/risk gates, and read-only performance/dashboard views.
-- HTTP server binds only to loopback, accepts GET only, and does not expose raw ledger events or broker internals.
+- Local mode binds only to loopback. Optional hosted mode binds to `0.0.0.0` only with explicit opt-in and strong HTTP Basic credentials; hosted deployment relies on Render HTTPS termination.
+- HTTP transport accepts GET only and does not expose raw ledger events or broker internals.
+- Render deployment blueprint and setup guide are provided in `render.yaml` and `docs/ONLINE_DEPLOYMENT.md`; deployment is not yet provisioned.
 - No exchange order submission, auto-trading, or live execution capability is included.
 
 ## Requirements
@@ -43,7 +45,11 @@ Optional arguments:
 - `--selected-symbol BTCUSDT`
 - `--max-quote-age-ms 5000`
 
-The launcher rejects non-loopback hosts. Do not put this dashboard directly on the public internet or behind an unreviewed proxy.
+The launcher rejects non-loopback hosts by default. Remote binding requires `TRADESYS_ALLOW_REMOTE=true`, a username, and a password of at least 24 characters. Use only behind a hosting provider that enforces HTTPS; never expose the Node service directly over plaintext internet.
+
+## Online deployment status
+
+The Render Blueprint uses a paid Starter web service and a 1 GB persistent disk. The service is configured for one instance because the file-backed paper ledger uses local filesystem locking. Review the plan and disk charges before creating the service. No hosted URL exists until the owner connects the repository and provisions the Render Blueprint. See `docs/ONLINE_DEPLOYMENT.md`.
 
 ## Acceptance still required
 
