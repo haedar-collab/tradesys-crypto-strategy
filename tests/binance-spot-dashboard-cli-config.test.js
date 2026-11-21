@@ -36,7 +36,7 @@ test("CLI permits explicit loopback and a validated custom symbol set", () => {
 
 test("CLI rejects public bind, malformed port, duplicate and excessive symbols", () => {
   const base = ["--ledger", "./var/paper.jsonl"];
-  assert.throws(() => parseBinanceSpotDashboardCliArgs([...base, "--host", "0.0.0.0"]), /public interfaces|loopback/);
+  assert.throws(() => parseBinanceSpotDashboardCliArgs([...base, "--host", "0.0.0.0"]), /public binding|loopback/);
   assert.throws(() => parseBinanceSpotDashboardCliArgs([...base, "--port", "65536"]), /port/);
   assert.throws(() => parseBinanceSpotDashboardCliArgs([...base, "--port", "8.5"]), /integer/);
   assert.throws(() => parseBinanceSpotDashboardCliArgs([...base, "--symbols", "BTCUSDT,BTCUSDT"]), /unique/);
@@ -56,4 +56,30 @@ test("CLI help is explicit and includes the no-live-orders boundary", () => {
   assert.equal(config.help, true);
   assert.match(BINANCE_SPOT_DASHBOARD_CLI_USAGE, /PAPER_ONLY/);
   assert.match(BINANCE_SPOT_DASHBOARD_CLI_USAGE, /never submits exchange orders/);
+});
+
+
+test("CLI allows remote bind only with explicit opt-in and strong credentials", () => {
+  const keys = ["TRADESYS_ALLOW_REMOTE", "TRADESYS_DASHBOARD_USER", "TRADESYS_DASHBOARD_PASSWORD"];
+  const previous = Object.fromEntries(keys.map(key => [key, process.env[key]]));
+  try {
+    process.env.TRADESYS_ALLOW_REMOTE = "true";
+    process.env.TRADESYS_DASHBOARD_USER = "owner";
+    process.env.TRADESYS_DASHBOARD_PASSWORD = "p".repeat(32);
+    const config = parseBinanceSpotDashboardCliArgs([
+      "--ledger", "./var/paper.jsonl", "--host", "0.0.0.0", "--port", "10000"
+    ]);
+    assert.equal(config.host, "0.0.0.0");
+    assert.equal(config.auth.username, "owner");
+    assert.equal(config.auth.password.length, 32);
+    process.env.TRADESYS_DASHBOARD_PASSWORD = "short";
+    assert.throws(() => parseBinanceSpotDashboardCliArgs([
+      "--ledger", "./var/paper.jsonl", "--host", "0.0.0.0"
+    ]), /minimum 24 characters/);
+  } finally {
+    for (const key of keys) {
+      if (previous[key] === undefined) delete process.env[key];
+      else process.env[key] = previous[key];
+    }
+  }
 });
