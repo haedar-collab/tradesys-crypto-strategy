@@ -32,6 +32,27 @@ test("screener requests all four causal intervals per symbol and reports WAIT fo
   assert.equal(report.controls.noExchangeOrders, true);
 });
 
+test("screener excludes candles that are still open at the exchange-time cutoff", async () => {
+  const evaluationTime = 2_000_000_000_000;
+  const closed = bars(2, evaluationTime);
+  const open = {
+    t: evaluationTime, closeTime: evaluationTime + 3_599_999,
+    o: 102, h: 104, l: 101, c: 103, v: 10
+  };
+  const report = await runBinanceSpotMtfScreener({
+    symbols: ["BTCUSDT"], evaluationTime,
+    fetchKlines: async () => ({
+      serverTime: evaluationTime,
+      bars: [...closed, open]
+    })
+  });
+  assert.equal(report.results[0].data.candleCounts.weekly, 2);
+  assert.equal(report.results[0].data.candleCounts.daily, 2);
+  assert.equal(report.results[0].data.candleCounts.h4, 2);
+  assert.equal(report.results[0].data.candleCounts.h1, 2);
+  assert.equal(report.results[0].data.closedCandlesOnly, true);
+});
+
 test("one symbol data failure is isolated and never converted into a candidate", async () => {
   const report = await runBinanceSpotMtfScreener({
     symbols, evaluationTime: 2_000_000_000_000,
