@@ -42,14 +42,15 @@ test("CLI SIGTERM performs graceful paper-session shutdown and releases the ledg
       check();
     });
 
-    child.kill("SIGTERM");
-    const exit = await new Promise((resolveExit, rejectExit) => {
+    const exitPromise = new Promise((resolveExit, rejectExit) => {
       const timeout = setTimeout(() => rejectExit(new Error("CLI did not exit after SIGTERM")), 10_000);
       child.once("exit", (code, signal) => {
         clearTimeout(timeout);
         resolveExit({ code, signal });
       });
     });
+    child.kill("SIGTERM");
+    const exit = await exitPromise;
     assert.equal(exit.code, 0, stderr);
     assert.match(stdout, /Paper dashboard stopped cleanly/);
     const contents = await readFile(ledger, "utf8");
