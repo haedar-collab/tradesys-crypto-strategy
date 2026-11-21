@@ -85,3 +85,32 @@ test("runtime host stops market data provider if HTTP startup fails", async () =
     await rm(dir, { recursive: true, force: true });
   }
 });
+
+
+test("concurrent runtime shutdown callers await one complete teardown", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "tradesys-dashboard-host-close-"));
+  const filePath = join(dir, "paper-ledger.jsonl");
+  let stops = 0;
+  let finishStop;
+  const feedProvider = async () => ({ status: { state: "DISCONNECTED" }, quote: null });
+  feedProvider.start = async () => {};
+  feedProvider.stop = () => new Promise((resolve) => {
+    stops += 1;
+    finishStop = resolve;
+  });
+  const host = await startPaperDashboardRuntimeHost({ filePath, port: 0, feedProvider });
+  try {
+    const first = host.close();
+    const second = host.close();
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(stops, 1);
+    finishStop();
+    await Promise.all([first, second]);
+    const ledger = await readFile(filePath, "utf8");
+    assert.match(ledger, /SESSION_STOPPED/);
+    assert.equal((ledger.match(/SESSION_STOPPED/g) ?? []).length, 1);
+  } finally {
+    await host.close().catch(() => {});
+    await rm(dir, { recursive: true, force: true });
+  }
+});
