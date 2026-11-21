@@ -93,7 +93,7 @@ export async function runBinanceSpotMtfScreener({
         });
         const rows = Array.isArray(response) ? response : response?.bars;
         const cutoffTime = Array.isArray(response) ? evaluationTime :
-          (response?.serverTime ?? evaluationTime);
+          Math.min(evaluationTime, response?.serverTime ?? evaluationTime);
         return [key, normalizeFetchedBars(rows, key, cutoffTime)];
       }));
       const candles = Object.fromEntries(entries);
