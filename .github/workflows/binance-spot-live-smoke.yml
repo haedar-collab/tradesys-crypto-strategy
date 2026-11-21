@@ -18,4 +18,14 @@ jobs:
         with:
           node-version: 22
       - name: Verify public Binance Spot WebSocket quotes
+        env:
+          BINANCE_SMOKE_REPORT_PATH: ${{ runner.temp }}/binance-spot-live-smoke-report.json
         run: node scripts/binance-spot-live-smoke.js
+      - name: Retain live-feed evidence report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binance-spot-live-smoke-evidence
+          path: ${{ runner.temp }}/binance-spot-live-smoke-report.json
+          if-no-files-found: warn
+          retention-days: 14
