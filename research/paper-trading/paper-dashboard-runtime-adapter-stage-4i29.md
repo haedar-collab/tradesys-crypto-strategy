@@ -2,7 +2,7 @@
 
 ## Delivered
 - `src/paper/paper-dashboard-runtime-adapter.js` composes a compatible in-process paper session snapshot with read-only feed and strategy providers.
-- It validates PAPER_ONLY mode and complete, internally consistent ledger event counts before projection.
+- It validates PAPER_ONLY mode, complete ledger counts, sequential event numbering, event identifiers, and hash field shape before projection. Risk state is read from the same atomic session snapshot as broker and ledger state to avoid cross-read races.
 - It derives positions from broker state and only uses a durable POSITION_MARKED record when its quantity matches the current broker position.
 - It builds analytics from the persistent ledger adapter; it does not synthesize equity marks.
 - The existing dashboard view model remains the only UI projection and enforces fixed read-only permissions.
