@@ -35,6 +35,7 @@ export function createBinanceSpotBookTickerSupervisor({
       onQuote: quote => onQuote(quote),
       onState: event => {
         states.set(symbol, event.state);
+        if (event.state === "CONNECTED") errors.delete(symbol);
         onState(event);
       },
       onError: error => {
