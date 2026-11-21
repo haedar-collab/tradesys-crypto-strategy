@@ -39,9 +39,8 @@ test("4I.25 multi-symbol dashboard simulation survives feed loss, recovery, kill
       });
       assert.equal(entry.status, "FILLED");
       await session.markToMarket(Object.fromEntries(
-        symbols.filter(x => session && true).map(x => [x.symbol,
-          quote(clock.now(), x.bid, x.ask, x.symbol)])
-      ).filter(([symbol]) => symbols.indexOf(symbols.find(x => x.symbol === symbol)) <= symbols.indexOf(item)));
+        symbols.filter(x => symbols.indexOf(x) <= symbols.indexOf(item)).map(x => [x.symbol,
+          quote(clock.now(), x.bid, x.ask, x.symbol)]));
     }
 
     let snapshot = await session.snapshot();
