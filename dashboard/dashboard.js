@@ -73,7 +73,9 @@ function render(vm) {
 }
 function loadSnapshot(snapshot) {
   if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) throw new TypeError("Snapshot harus berupa object JSON.");
-  const vm = buildPaperDashboardViewModel({ ...snapshot, now: Date.now() });
+  const vm = snapshot.viewModel && snapshot.viewModel.mode === "PAPER_ONLY"
+    ? snapshot.viewModel
+    : buildPaperDashboardViewModel({ ...snapshot, now: Date.now() });
   render(vm);
   setText("load-status", "Snapshot berhasil dimuat · " + new Date().toLocaleString("id-ID"));
 }
@@ -93,3 +95,46 @@ $("load-demo").addEventListener("click", () => {
   setText("load-status", "Contoh kosong dimuat. Belum ada data runtime.");
 });
 render(buildPaperDashboardViewModel(EMPTY_SNAPSHOT));
+
+
+let runtimeTimer = null;
+let runtimeBusy = false;
+async function refreshRuntime() {
+  if (runtimeBusy) return;
+  runtimeBusy = true;
+  try {
+    const response = await fetch("/api/paper-dashboard", {
+      method: "GET", cache: "no-store", credentials: "same-origin",
+      headers: { "accept": "application/json" }
+    });
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    const payload = await response.json();
+    if (payload.schemaVersion !== 1 || !payload.viewModel ||
+        payload.viewModel.mode !== "PAPER_ONLY" ||
+        payload.viewModel.permissions?.maySubmitOrders !== false ||
+        payload.viewModel.permissions?.mayMutateLedger !== false ||
+        payload.viewModel.permissions?.mayResetRisk !== false) {
+      throw new Error("Respons runtime tidak valid atau bukan read-only.");
+    }
+    render(payload.viewModel);
+    setText("load-status", "Runtime terhubung · diperbarui " +
+      new Date(payload.generatedAt).toLocaleTimeString("id-ID"));
+  } catch (error) {
+    render(buildPaperDashboardViewModel(EMPTY_SNAPSHOT));
+    setText("load-status", "Runtime terputus / tidak tersedia · " + error.message);
+  } finally {
+    runtimeBusy = false;
+  }
+}
+$("connect-runtime").addEventListener("click", async () => {
+  if (runtimeTimer !== null) {
+    clearInterval(runtimeTimer);
+    runtimeTimer = null;
+    $("connect-runtime").textContent = "Hubungkan runtime";
+    setText("load-status", "Pembaruan runtime dihentikan.");
+    return;
+  }
+  $("connect-runtime").textContent = "Putuskan runtime";
+  await refreshRuntime();
+  runtimeTimer = setInterval(refreshRuntime, 3000);
+});
