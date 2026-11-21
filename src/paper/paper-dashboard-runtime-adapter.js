@@ -77,6 +77,7 @@ export async function createPaperDashboardRuntimeSnapshot({
     quote: clone(rawFeed.quote ?? null),
     signal: clone(rawStrategy.signal ?? null),
     acceptance: clone(rawStrategy.acceptance ?? null),
+    screener: clone(rawStrategy.screener ?? null),
     ledgerSnapshot,
     performanceReport,
     riskStatus,
