@@ -1,5 +1,6 @@
 const EPSILON = 1e-8;
 const clone = (value) => structuredClone(value);
+const canonicalConfig = (value) => JSON.stringify(Object.fromEntries(Object.entries(value ?? {}).sort(([a], [b]) => a.localeCompare(b))));
 const closeEnough = (a, b) => Number.isFinite(a) && Number.isFinite(b) &&
   Math.abs(a - b) <= EPSILON * Math.max(1, Math.abs(a), Math.abs(b));
 
