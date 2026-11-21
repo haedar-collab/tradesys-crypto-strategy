@@ -7,10 +7,10 @@
 import { evaluateCausalMultiTimeframeSetup } from "../engine/causal-mtf.js";
 
 const FRAMES = Object.freeze([
-  ["weekly", "1w"],
-  ["daily", "1d"],
-  ["h4", "4h"],
-  ["h1", "1h"]
+  ["weekly", "1w", 604800000],
+  ["daily", "1d", 86400000],
+  ["h4", "4h", 14400000],
+  ["h1", "1h", 3600000]
 ]);
 const DEFAULT_MINIMUM_BARS = Object.freeze({
   weekly: 220, daily: 220, h4: 220, h1: 60
@@ -78,8 +78,13 @@ export async function runBinanceSpotMtfScreener({
 
   const results = await Promise.all(symbols.map(async symbol => {
     try {
-      const entries = await Promise.all(FRAMES.map(async ([key, interval]) => {
-        const rows = await fetchKlines({ symbol, interval, evaluationTime });
+      const entries = await Promise.all(FRAMES.map(async ([key, interval, intervalMs]) => {
+        const response = await fetchKlines({
+          symbol, interval, evaluationTime,
+          startTime: evaluationTime - intervalMs * 230,
+          endTime: evaluationTime
+        });
+        const rows = Array.isArray(response) ? response : response?.bars;
         return [key, normalizeFetchedBars(rows, key)];
       }));
       const candles = Object.fromEntries(entries);
