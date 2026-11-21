@@ -10,10 +10,11 @@ function makeSession({ positions = [], events = [] } = {}) {
   return {
     snapshot: async () => ({
       mode: "PAPER_ONLY",
+      risk: { halted: false, allowed: true, status: "OK", haltReasons: [] },
       broker: { cash: 9500, initialCash: 10000, positions, orders: [], feesPaid: 0 },
       ledger: { status: "COMPLETE", eventCount: ledgerEvents.length, lastSequence: ledgerEvents.length, lastHash: "f".repeat(64), events: ledgerEvents }
     }),
-    riskStatus: () => ({ halted: false, allowed: true, status: "OK", haltReasons: [] })
+    riskStatus: () => ({ halted: true, allowed: false, status: "KILL_SWITCH_LATCHED", haltReasons: ["SHOULD_NOT_BE_READ"] })
   };
 }
 
