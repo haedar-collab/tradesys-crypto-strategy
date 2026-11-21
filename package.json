@@ -9,6 +9,6 @@
     "test:coverage": "node --experimental-test-coverage --test"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.0.0"
   }
 }
