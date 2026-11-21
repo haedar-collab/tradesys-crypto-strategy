@@ -1,3 +1,4 @@
+import { writeFile } from "node:fs/promises";
 import { createBinanceSpotBookTickerFeed } from "../src/data/binance-spot-book-ticker-feed.js";
 import { validateBinanceSpotQuote } from "../src/data/binance-spot-quote-contract.js";
 
@@ -54,7 +55,6 @@ function verifySymbol(symbol) {
           });
         },
         onError: error => {
-          // A transient socket error may be followed by bounded reconnect.
           process.stderr.write("[feed-error] " + symbol + ": " + (error?.message ?? String(error)) + "\n");
         }
       });
@@ -76,5 +76,13 @@ const report = {
   failed,
   success: failed.length === 0 && passed.length === SYMBOLS.length
 };
-console.log(JSON.stringify(report, null, 2));
+const serialized = JSON.stringify(report, null, 2);
+console.log(serialized);
+if (process.env.BINANCE_SMOKE_REPORT_PATH) {
+  await writeFile(process.env.BINANCE_SMOKE_REPORT_PATH, serialized + "\n", {
+    encoding: "utf8",
+    mode: 0o600,
+    flag: "w"
+  });
+}
 if (!report.success) process.exitCode = 1;
