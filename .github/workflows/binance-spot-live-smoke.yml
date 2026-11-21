@@ -1,0 +1,21 @@
+name: Binance Spot Live WebSocket Smoke
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-websocket-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify public Binance Spot WebSocket quotes
+        run: node scripts/binance-spot-live-smoke.js
