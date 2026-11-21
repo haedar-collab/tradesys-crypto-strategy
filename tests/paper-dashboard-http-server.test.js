@@ -62,3 +62,16 @@ test("transport enforces loopback binding and response size", async () => {
     assert.equal((await fetch(base + "/api/paper-dashboard")).status, 503);
   });
 });
+
+test("transport serves dashboard assets from the same loopback origin", async () => {
+  await withServer({ getSnapshot: async () => validSnapshot() }, async base => {
+    const page = await fetch(base + "/dashboard/");
+    assert.equal(page.status, 200);
+    assert.match(page.headers.get("content-security-policy"), /connect-src 'self'/);
+    assert.match(await page.text(), /Paper Trading Dashboard/);
+    const script = await fetch(base + "/dashboard/dashboard.js");
+    assert.equal(script.status, 200);
+    assert.match(await script.text(), /api\/paper-dashboard/);
+    assert.equal((await fetch(base + "/dashboard/..%2F..%2Fpackage.json")).status, 404);
+  });
+});
