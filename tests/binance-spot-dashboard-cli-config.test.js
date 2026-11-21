@@ -36,7 +36,7 @@ test("CLI permits explicit loopback and a validated custom symbol set", () => {
 
 test("CLI rejects public bind, malformed port, duplicate and excessive symbols", () => {
   const base = ["--ledger", "./var/paper.jsonl"];
-  assert.throws(() => parseBinanceSpotDashboardCliArgs([...base, "--host", "0.0.0.0"]), /loopback/);
+  assert.throws(() => parseBinanceSpotDashboardCliArgs([...base, "--host", "0.0.0.0"]), /public interfaces|loopback/);
   assert.throws(() => parseBinanceSpotDashboardCliArgs([...base, "--port", "65536"]), /port/);
   assert.throws(() => parseBinanceSpotDashboardCliArgs([...base, "--port", "8.5"]), /integer/);
   assert.throws(() => parseBinanceSpotDashboardCliArgs([...base, "--symbols", "BTCUSDT,BTCUSDT"]), /unique/);
