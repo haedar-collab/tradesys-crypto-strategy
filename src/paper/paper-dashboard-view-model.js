@@ -11,6 +11,7 @@ export function buildPaperDashboardViewModel({
   quote = null,
   signal = null,
   acceptance = null,
+  screener = null,
   ledgerSnapshot = null,
   performanceReport = null,
   riskStatus = null,
@@ -72,8 +73,13 @@ export function buildPaperDashboardViewModel({
     riskStatus.allowed === true || riskStatus.allowNewEntries === true ? "ALLOWED" :
     riskStatus.allowed === false ? "BLOCKED" : "UNKNOWN";
 
-  const acceptanceDecision = acceptance?.decision ??
-    acceptance?.status ?? signal?.acceptanceDecision ?? "NOT_EVALUATED";
+  const acceptanceDecision = signal?.decision ?? signal?.acceptanceDecision ??
+    acceptance?.decision ?? acceptance?.status ?? "NOT_EVALUATED";
+  const screenerResults = Array.isArray(screener?.results) ? screener.results.map(item => Object.freeze({
+    symbol: String(item.symbol ?? "UNKNOWN"),
+    state: String(item.state ?? "UNKNOWN"),
+    reasons: Object.freeze(Array.isArray(item.candidate?.reasons) ? [...item.candidate.reasons] : [])
+  })) : [];
 
   return Object.freeze({
     mode: "PAPER_ONLY",
@@ -91,6 +97,14 @@ export function buildPaperDashboardViewModel({
       healthySymbolCount: Number.isSafeInteger(feedStatus?.healthyCount) ? feedStatus.healthyCount : null,
       symbolCount: Number.isSafeInteger(feedStatus?.symbolCount) ? feedStatus.symbolCount : null,
       feeds: Object.freeze(feedSymbols.map(feed => Object.freeze(feed)))
+    }),
+    screener: Object.freeze({
+      status: screener?.status ?? "UNAVAILABLE",
+      symbolCount: Number.isSafeInteger(screener?.symbolCount) ? screener.symbolCount : 0,
+      candidateCount: Number.isSafeInteger(screener?.candidateCount) ? screener.candidateCount : 0,
+      waitCount: Number.isSafeInteger(screener?.waitCount) ? screener.waitCount : 0,
+      dataErrorCount: Number.isSafeInteger(screener?.dataErrorCount) ? screener.dataErrorCount : 0,
+      results: Object.freeze(screenerResults)
     }),
     strategy: Object.freeze({
       symbol: signal?.symbol ?? null,
