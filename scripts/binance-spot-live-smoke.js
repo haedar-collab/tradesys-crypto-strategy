@@ -1,73 +1,80 @@
-#!/usr/bin/env node
 import { createBinanceSpotBookTickerFeed } from "../src/data/binance-spot-book-ticker-feed.js";
+import { validateBinanceSpotQuote } from "../src/data/binance-spot-quote-contract.js";
 
-const symbol = (process.argv[2] ?? "BTCUSDT").toUpperCase();
-const timeoutMs = Number(process.env.BINANCE_SMOKE_TIMEOUT_MS ?? 15_000);
+const SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT"];
+const TIMEOUT_MS = 20_000;
 
-if (!/^[A-Z0-9]{5,20}$/.test(symbol)) {
-  console.error("Usage: node scripts/binance-spot-live-smoke.js [BTCUSDT]");
-  process.exitCode = 2;
-} else if (typeof globalThis.WebSocket !== "function") {
-  console.error("This Node.js runtime does not expose globalThis.WebSocket. Use a supported Node.js release or provide a WebSocket runtime.");
-  process.exitCode = 2;
-} else if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1_000 || timeoutMs > 120_000) {
-  console.error("BINANCE_SMOKE_TIMEOUT_MS must be an integer from 1000 to 120000.");
-  process.exitCode = 2;
-} else {
-  let settled = false;
-  let feed;
-  let timeout;
+if (typeof globalThis.WebSocket !== "function") {
+  throw new Error("Node.js global WebSocket is unavailable; use Node.js 22+");
+}
 
-  const finish = (code, result) => {
-    if (settled) return;
-    settled = true;
-    clearTimeout(timeout);
-    feed?.stop();
-    console.log(JSON.stringify(result, null, 2));
-    process.exitCode = code;
-  };
+function verifySymbol(symbol) {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let feed;
+    const timeout = setTimeout(() => {
+      finish(new Error(symbol + " did not produce a valid quote within " + TIMEOUT_MS + "ms"));
+    }, TIMEOUT_MS);
 
-  feed = createBinanceSpotBookTickerFeed({
-    symbol,
-    WebSocketCtor: globalThis.WebSocket,
-    staleAfterMs: Math.max(timeoutMs, 5_000),
-    onQuote: quote => {
-      const ageMs = Date.now() - quote.receivedAt;
-      const valid = quote.symbol === symbol &&
-        quote.source === "BINANCE_SPOT_WS_BOOK_TICKER" &&
-        quote.transport === "WSS" &&
-        quote.feedStatus === "CONNECTED" &&
-        Number.isFinite(quote.bid) && quote.bid > 0 &&
-        Number.isFinite(quote.ask) && quote.ask >= quote.bid &&
-        ageMs >= 0 && ageMs < 5_000;
+    function finish(error, result) {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      feed?.stop();
+      if (error) reject(error);
+      else resolve(result);
+    }
 
-      finish(valid ? 0 : 1, {
-        status: valid ? "LIVE_QUOTE_RECEIVED" : "INVALID_LIVE_QUOTE",
+    try {
+      feed = createBinanceSpotBookTickerFeed({
         symbol,
-        stream: quote.stream,
-        eventTimeBasis: quote.eventTimeBasis,
-        bid: quote.bid,
-        ask: quote.ask,
-        updateId: quote.updateId,
-        receivedAt: new Date(quote.receivedAt).toISOString(),
-        receiveAgeMs: ageMs,
-        endpoint: feed.getUrl()
+        WebSocketCtor: globalThis.WebSocket,
+        staleAfterMs: 10_000,
+        reconnectBaseMs: 500,
+        reconnectMaxMs: 2_000,
+        onQuote: quote => {
+          const checked = validateBinanceSpotQuote({
+            quote,
+            symbol,
+            now: Date.now(),
+            maxAgeMs: 10_000
+          });
+          if (!checked.valid) {
+            finish(new Error(symbol + " quote rejected: " + checked.reason));
+            return;
+          }
+          finish(null, {
+            symbol,
+            bid: quote.bid,
+            ask: quote.ask,
+            spread: quote.ask - quote.bid,
+            ageMs: Date.now() - quote.receivedAt,
+            eventTimeBasis: quote.eventTimeBasis,
+            source: quote.source
+          });
+        },
+        onError: error => {
+          // A transient socket error may be followed by bounded reconnect.
+          process.stderr.write("[feed-error] " + symbol + ": " + (error?.message ?? String(error)) + "\n");
+        }
       });
-    },
-    onError: error => {
-      console.error("Binance WebSocket adapter error:", error?.message ?? String(error));
+      feed.start();
+    } catch (error) {
+      finish(error);
     }
   });
-
-  timeout = setTimeout(() => {
-    finish(1, {
-      status: "LIVE_QUOTE_TIMEOUT",
-      symbol,
-      timeoutMs,
-      endpoint: feed.getUrl()
-    });
-  }, timeoutMs);
-
-  console.log(`Connecting to Binance Spot ${symbol} bookTicker...`);
-  feed.start();
 }
+
+const results = await Promise.allSettled(SYMBOLS.map(verifySymbol));
+const passed = results.filter(result => result.status === "fulfilled").map(result => result.value);
+const failed = results.filter(result => result.status === "rejected").map(result => result.reason.message);
+const report = {
+  test: "BINANCE_SPOT_PUBLIC_WEBSOCKET_SMOKE",
+  checkedAt: new Date().toISOString(),
+  requestedSymbols: SYMBOLS,
+  passed,
+  failed,
+  success: failed.length === 0 && passed.length === SYMBOLS.length
+};
+console.log(JSON.stringify(report, null, 2));
+if (!report.success) process.exitCode = 1;
