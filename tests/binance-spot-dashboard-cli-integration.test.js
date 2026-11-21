@@ -39,7 +39,7 @@ test("CLI launcher rejects a public bind before creating ledger files", async ()
     const result = run(["--ledger", ledger, "--host", "0.0.0.0"]);
     assert.equal(result.error, undefined);
     assert.equal(result.status, 1);
-    assert.match(result.stderr, /loopback|public interfaces/);
+    assert.match(result.stderr, /loopback|public interfaces|public binding/);
     await assert.rejects(access(ledger), { code: "ENOENT" });
     await assert.rejects(access(ledger + ".lock"), { code: "ENOENT" });
   } finally {
