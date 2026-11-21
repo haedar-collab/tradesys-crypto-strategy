@@ -9,9 +9,9 @@
 - Invalid permission envelopes, oversized responses, and provider failures fail closed.
 
 ## Host integration
-Create the HTTP server with a `getSnapshot` callback that calls `createPaperDashboardRuntimeSnapshot(...)`, then listen on a loopback port. The application host owns lifecycle, session creation, feed provider, strategy provider, and shutdown. Do not pass exchange credentials to this transport.
+Start the HTTP server with `await startPaperDashboardHttpServer({ port, host: "127.0.0.1", getSnapshot })`; the helper binds the socket to loopback before returning. The callback calls `createPaperDashboardRuntimeSnapshot(...)`. The application host owns session creation, feed provider, strategy provider, and shutdown. Do not pass exchange credentials to this transport.
 
-The dashboard can request `/api/paper-dashboard` from the same origin. A reverse proxy or public bind is intentionally not provided.
+The dashboard can request `/api/paper-dashboard` from the same origin. The static dashboard must be served by a trusted local host on that origin; this transport intentionally does not serve static assets. A reverse proxy or public bind is not supported.
 
 ## Security and limitations
 - Loopback binding limits exposure to the local machine; it is not user authentication and does not protect against malicious local processes.
