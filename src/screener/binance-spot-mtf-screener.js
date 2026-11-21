@@ -17,9 +17,12 @@ const DEFAULT_MINIMUM_BARS = Object.freeze({
 });
 const VALID_SYMBOL = /^[A-Z0-9]{5,20}$/;
 
-function normalizeFetchedBars(rows, timeframe) {
+function normalizeFetchedBars(rows, timeframe, cutoffTime) {
   if (!Array.isArray(rows)) throw new TypeError(timeframe + " klines must be an array");
-  return rows.map((bar, index) => {
+  if (!Number.isSafeInteger(cutoffTime) || cutoffTime < 0) {
+    throw new TypeError(timeframe + " candle cutoff must be a non-negative UTC epoch timestamp");
+  }
+  const normalized = rows.map((bar, index) => {
     if (!bar || typeof bar !== "object" || Array.isArray(bar)) {
       throw new TypeError(timeframe + " kline " + index + " must be an object");
     }
@@ -38,6 +41,10 @@ function normalizeFetchedBars(rows, timeframe) {
     }
     return candle;
   });
+  // Enforce the closed-candle boundary here as well as in the REST client.
+  // Injected providers and future adapters must not be able to pass a live bar
+  // into a historical strategy evaluation.
+  return normalized.filter(candle => candle.openTime < cutoffTime && candle.closeTime < cutoffTime);
 }
 
 function summarizeDecision(decision) {
@@ -85,7 +92,9 @@ export async function runBinanceSpotMtfScreener({
           endTime: evaluationTime
         });
         const rows = Array.isArray(response) ? response : response?.bars;
-        return [key, normalizeFetchedBars(rows, key)];
+        const cutoffTime = Array.isArray(response) ? evaluationTime :
+          (response?.serverTime ?? evaluationTime);
+        return [key, normalizeFetchedBars(rows, key, cutoffTime)];
       }));
       const candles = Object.fromEntries(entries);
       const decision = evaluateCausalMultiTimeframeSetup(candles, {
