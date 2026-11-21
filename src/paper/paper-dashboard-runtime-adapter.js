@@ -12,6 +12,9 @@ function validateSessionSnapshot(snapshot) {
       !Number.isSafeInteger(snapshot.ledger.eventCount) ||
       snapshot.ledger.eventCount !== snapshot.ledger.events.length ||
       snapshot.ledger.lastSequence !== snapshot.ledger.eventCount ||
+      !snapshot.ledger.events.every((event, index) =>
+        event && event.sequence === index + 1 && typeof event.eventId === "string" &&
+        typeof event.hash === "string" && event.hash.length === 64) ||
       !Number.isFinite(snapshot.broker.cash) ||
       !Array.isArray(snapshot.broker.positions)) {
     throw new Error("runtime dashboard snapshot rejected: incomplete or inconsistent paper session snapshot");
@@ -31,8 +34,7 @@ export async function createPaperDashboardRuntimeSnapshot({
   maxQuoteAgeMs = 5_000,
   now = () => Date.now()
 } = {}) {
-  if (!session || typeof session.snapshot !== "function" ||
-      typeof session.riskStatus !== "function") {
+  if (!session || typeof session.snapshot !== "function") {
     throw new TypeError("a read-only compatible paper session is required");
   }
   if (typeof feedProvider !== "function" || typeof strategyProvider !== "function" || typeof now !== "function") {
@@ -46,7 +48,9 @@ export async function createPaperDashboardRuntimeSnapshot({
   if (!isRecord(rawFeed) || !isRecord(rawStrategy)) {
     throw new TypeError("feed and strategy providers must return objects");
   }
-  const riskStatus = clone(session.riskStatus());
+  // Use risk from the same atomic session snapshot; a second status read could
+  // race with an order or mark update and display mismatched portfolio/risk.
+  const riskStatus = clone(state.risk ?? null);
   const ledgerSnapshot = clone(state.ledger);
   const latestMark = [...ledgerSnapshot.events].reverse().find(event => event.type === "POSITION_MARKED");
   const marks = new Map((latestMark?.payload?.marks ?? []).map(mark => [mark.symbol, mark]));
