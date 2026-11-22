@@ -112,7 +112,8 @@ export function backtestRange(h1, decisions, { from, to, initialCapital = 10_000
 export function accountTradeReturns(backtest, initialCapital = 10_000) {
   let equity = initialCapital;
   return backtest.trades.map(trade => {
-    const r = trade.netPnl / equity;
+    // Portfolio trades carry the marked equity at entry; otherwise compound.
+    const r = trade.netPnl / (Number.isFinite(trade.equityAtEntry) ? trade.equityAtEntry : equity);
     equity += trade.netPnl;
     return { entryTime: trade.entryTime, exitTime: trade.exitTime, netPnl: trade.netPnl, accountReturn: r, netReturnPct: r * 100 };
   });
