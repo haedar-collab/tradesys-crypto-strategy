@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased — 2026-11-22 PAPER_ONLY trading engine (#4)
+
+- Feature: `--paper-trading` starts a PAPER_ONLY trading engine (off by default). Every 5 s it:
+  - marks open positions every 30 s, only while positions exist, using healthy live bookTicker quotes;
+  - manages plan exits: stop first, then TP1 40% / TP2 40% / TP3 remainder, with the stop moving to the entry fill after TP1. The stage is derived from durable ledger fills, so it survives restarts;
+  - opens new positions only from screener `BUY_CANDIDATE`s, and only if `--acceptance-report` passes the strategy acceptance gate. Without that gate, entries stay blocked.
+- Entry rules: 0.5% equity risk to the plan stop, capped at 20% of equity, minimum notional 10 USDT, at most 3 positions and one per symbol. The live price must still fit the plan (stop < fill < TP1, RR to TP2 ≥ 1.5, ≤ 1% above the evaluated fill). Setups have deterministic ids, so a setup is entered at most once.
+- The session's persistent risk gate and kill switch still apply. Exits keep working while the switch is latched. The HTTP dashboard stays read-only; only the engine receives the session handle.
+- Session: raw feed quotes (`eventTime`, no `timestamp`) are always provenance-validated and normalized, so the live feed can drive sessions whose immutable header has `requireMarketDataProvenance: false`.
+
 ## Unreleased — 2026-11-22 rate limiter behind Cloudflare
 
 - Fix (#11 follow-up): on Render the per-client login lockout never triggered (verified live: 11 wrong passwords → 11× 401, no 429). Render is fronted by Cloudflare, so the last `X-Forwarded-For` hop is a Cloudflare edge node that changes per request. With `trustProxy`, the client is now keyed by `CF-Connecting-IP` (set by Cloudflare, overwriting client values), then `True-Client-IP`, then the last XFF hop. The server logs which source is used and lockout events, never the addresses themselves.

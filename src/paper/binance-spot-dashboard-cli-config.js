@@ -20,10 +20,10 @@ export function parseBinanceSpotDashboardCliArgs(argv = []) {
     throw new TypeError("arguments must be an array of strings");
   }
   const values = new Map();
-  const flags = new Set(["--help", "--exclusive-volume", "--trust-proxy"]);
+  const flags = new Set(["--help", "--exclusive-volume", "--trust-proxy", "--paper-trading"]);
   const valued = new Set([
     "--ledger", "--host", "--port", "--symbols",
-    "--selected-symbol", "--max-quote-age-ms"
+    "--selected-symbol", "--max-quote-age-ms", "--acceptance-report"
   ]);
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -99,8 +99,16 @@ export function parseBinanceSpotDashboardCliArgs(argv = []) {
   // used for login rate limiting comes from the proxy's X-Forwarded-For entry.
   const trustProxy = values.has("--trust-proxy") || process.env.RENDER === "true";
 
+  const paperTrading = values.has("--paper-trading");
+  const acceptanceReportPath = values.has("--acceptance-report") ? resolve(values.get("--acceptance-report")) : null;
+  if (acceptanceReportPath && !paperTrading) {
+    throw new Error("--acceptance-report requires --paper-trading");
+  }
+
   return Object.freeze({
     help: false,
+    paperTrading,
+    acceptanceReportPath,
     exclusiveVolume,
     trustProxy,
     filePath: resolve(ledger),
@@ -127,6 +135,11 @@ Options:
                             instance (e.g. a Render disk): a lock created before
                             this container started is reclaimed. Automatic when
                             RENDER=true.
+  --paper-trading           Run the PAPER_ONLY trading engine: marks open
+                            positions every 30 s and manages plan exits.
+                            New entries additionally need --acceptance-report.
+  --acceptance-report PATH  Strategy validation report (JSON). Entries open
+                            only if it passes the strategy acceptance gate.
   --trust-proxy             Use the last X-Forwarded-For entry as the client
                             address for login rate limiting (only behind a
                             trusted reverse proxy). Automatic when RENDER=true.

@@ -9,8 +9,14 @@ export async function submitStrategyBuyToPaper({
   session,
   acceptanceReport,
   signal,
-  quote
+  quote,
+  plan = null
 } = {}) {
+  if (plan !== null && (typeof plan !== "object" ||
+      !["stop", "tp1", "tp2", "tp3"].every(key => Number.isFinite(plan[key]) && plan[key] > 0) ||
+      !(plan.stop < plan.tp1 && plan.tp1 < plan.tp2 && plan.tp2 < plan.tp3))) {
+    throw new TypeError("plan must contain ascending positive stop < tp1 < tp2 < tp3");
+  }
   if (!session || typeof session.submitMarketOrder !== "function") {
     throw new TypeError("persistent paper session is required");
   }
@@ -35,7 +41,9 @@ export async function submitStrategyBuyToPaper({
     side: "BUY",
     quantity: signal.quantity,
     quote,
-    strategyAcceptance: acceptance
+    strategyAcceptance: acceptance,
+    // Persisted with the order intent so exits can be derived from the ledger.
+    ...(plan ? { paperPlan: { stop: plan.stop, tp1: plan.tp1, tp2: plan.tp2, tp3: plan.tp3 } } : {})
   });
   return Object.freeze({
     status: "SUBMITTED_TO_PAPER",

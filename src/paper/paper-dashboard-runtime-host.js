@@ -17,8 +17,15 @@ export async function startPaperDashboardRuntimeHost({
   maxQuoteAgeMs = 5_000,
   auth = null,
   trustProxy = false,
-  now = () => Date.now()
+  now = () => Date.now(),
+  // Optional background worker that may mutate the session (e.g. the paper
+  // trading engine). It is the only component that receives the session
+  // handle; the HTTP transport stays read-only.
+  sessionWorkerFactory = null
 } = {}) {
+  if (sessionWorkerFactory !== null && typeof sessionWorkerFactory !== "function") {
+    throw new TypeError("sessionWorkerFactory must be a function");
+  }
   if (typeof filePath !== "string" || filePath.trim() === "") {
     throw new TypeError("a persistent paper ledger filePath is required");
   }
@@ -34,6 +41,7 @@ export async function startPaperDashboardRuntimeHost({
   });
   let server;
   let feedStarted = false;
+  let worker = null;
   try {
     if (typeof feedProvider.start === "function") {
       await feedProvider.start();
@@ -52,7 +60,15 @@ export async function startPaperDashboardRuntimeHost({
         now
       })
     });
+    if (sessionWorkerFactory) {
+      worker = sessionWorkerFactory({ session });
+      if (!worker || typeof worker.start !== "function" || typeof worker.stop !== "function") {
+        throw new TypeError("sessionWorkerFactory must return { start, stop }");
+      }
+      worker.start();
+    }
   } catch (error) {
+    if (server) await new Promise(resolve => server.close(() => resolve()));
     if (feedStarted && typeof feedProvider.stop === "function") {
       await Promise.resolve().then(() => feedProvider.stop()).catch(() => {});
     }
@@ -68,6 +84,8 @@ export async function startPaperDashboardRuntimeHost({
       // same feed/server/session teardown rather than returning prematurely.
       closePromise ??= (async () => {
         let closeError = null;
+        // Stop the session worker first so no order is in flight at teardown.
+        if (worker) { try { await worker.stop(); } catch (error) { closeError = error; } worker = null; }
         try {
           if (feedStarted && typeof feedProvider.stop === "function") {
             try { await feedProvider.stop(); } catch (error) { closeError = error; }

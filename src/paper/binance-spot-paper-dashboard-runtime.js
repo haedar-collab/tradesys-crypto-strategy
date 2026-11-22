@@ -1,6 +1,7 @@
 import { createBinanceSpotMultiSymbolDashboardFeedProvider } from "../data/binance-spot-multi-symbol-dashboard-feed-provider.js";
 import { startPaperDashboardRuntimeHost } from "./paper-dashboard-runtime-host.js";
 import { createBinanceSpotMtfScreenerProvider } from "../data/binance-spot-mtf-screener-provider.js";
+import { createPaperTradingEngine } from "./paper-trading-engine.js";
 
 export const DEFAULT_BINANCE_SPOT_DASHBOARD_SYMBOLS = Object.freeze([
   "BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT"
@@ -28,7 +29,10 @@ export async function startBinanceSpotPaperDashboardRuntime({
   now = () => Date.now(),
   strategyProvider,
   screenerRefreshIntervalMs = 60_000,
-  screenerFetchKlines
+  screenerFetchKlines,
+  // { acceptanceReport, options } enables the PAPER_ONLY trading engine; off by default.
+  paperTrading = null,
+  log = message => process.stdout.write(message + "\n")
 } = {}) {
   if (typeof filePath !== "string" || filePath.trim() === "") {
     throw new TypeError("a persistent paper ledger filePath is required");
@@ -42,11 +46,34 @@ export async function startBinanceSpotPaperDashboardRuntime({
     ...(screenerFetchKlines ? { fetchKlines: screenerFetchKlines } : {}),
     now
   });
+  let engine = null;
+  const dashboardStrategyProvider = paperTrading
+    ? async () => {
+      const snapshot = await effectiveStrategyProvider();
+      const status = engine?.status();
+      // Surface the real evidence-gate decision instead of NOT_EVALUATED.
+      return status ? { ...snapshot, acceptance: status.acceptance } : snapshot;
+    }
+    : effectiveStrategyProvider;
   const runtime = await startPaperDashboardRuntimeHost({
     filePath,
     sessionOptions,
     feedProvider,
-    strategyProvider: effectiveStrategyProvider,
+    strategyProvider: dashboardStrategyProvider,
+    sessionWorkerFactory: paperTrading ? ({ session }) => {
+      engine = createPaperTradingEngine({
+        session,
+        getFeedSnapshot: () => feedProvider.getSnapshot(),
+        getScreenerSnapshot: effectiveStrategyProvider,
+        acceptanceReport: paperTrading.acceptanceReport ?? null,
+        options: paperTrading.options ?? {},
+        now,
+        log
+      });
+      const status = engine.status();
+      log("[paper] trading engine enabled; entries " + (status.entriesEnabled ? "ENABLED" : "BLOCKED (acceptance " + status.acceptance.decision + ")"));
+      return engine;
+    } : null,
     host,
     port,
     maxQuoteAgeMs,
@@ -58,6 +85,7 @@ export async function startBinanceSpotPaperDashboardRuntime({
     address: runtime.address,
     close: runtime.close,
     selectedSymbol,
-    symbols: Object.freeze([...symbols])
+    symbols: Object.freeze([...symbols]),
+    paperTradingStatus: () => engine?.status() ?? null
   });
 }
