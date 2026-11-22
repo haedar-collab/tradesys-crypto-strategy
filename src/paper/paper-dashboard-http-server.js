@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { timingSafeEqual } from "node:crypto";
-import { createDashboardAuthLimiter, clientKey } from "./dashboard-auth-limiter.js";
+import { createDashboardAuthLimiter, resolveClientAddress } from "./dashboard-auth-limiter.js";
 const MAX_RESPONSE_BYTES = 1_048_576;
 const LOOPBACKS = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
 
@@ -47,8 +47,11 @@ export async function startPaperDashboardHttpServer({
   maxResponseBytes = MAX_RESPONSE_BYTES,
   auth = null,
   trustProxy = false,
-  authLimiter = auth ? createDashboardAuthLimiter() : null
+  authLimiter = auth ? createDashboardAuthLimiter() : null,
+  log = message => process.stdout.write(message + "\n")
 } = {}) {
+  if (typeof log !== "function") throw new TypeError("log must be a function");
+  let lastClientAddressSource = null;
   if (typeof trustProxy !== "boolean") throw new TypeError("trustProxy must be a boolean");
   if (typeof getSnapshot !== "function") throw new TypeError("getSnapshot must be a function");
   const loopbackHost = host === "127.0.0.1" || host === "::1";
@@ -71,7 +74,12 @@ export async function startPaperDashboardHttpServer({
       return;
     }
     if (auth && new URL(request.url ?? "/", "http://localhost").pathname !== "/healthz") {
-      const key = clientKey(request, { trustProxy });
+      const { key, source } = resolveClientAddress(request, { trustProxy });
+      if (source !== lastClientAddressSource) {
+        // Operational visibility without logging any address itself.
+        lastClientAddressSource = source;
+        log("[auth] client address source for login rate limiting: " + source);
+      }
       const presented = typeof request.headers.authorization === "string";
       if (authLimiter) {
         const gate = authLimiter.check(key);
@@ -88,7 +96,10 @@ export async function startPaperDashboardHttpServer({
         }
       }
       if (!isAuthorized(request.headers.authorization, auth)) {
-        if (authLimiter && presented) authLimiter.recordFailure(key);
+        if (authLimiter && presented) {
+          authLimiter.recordFailure(key);
+          if (!authLimiter.check(key).allowed) log("[auth] a client was locked out after repeated failed logins (source: " + source + ")");
+        }
         response.writeHead(401, {
           "www-authenticate": 'Basic realm="Tradesys Crypto", charset="UTF-8"',
           "cache-control": "no-store",

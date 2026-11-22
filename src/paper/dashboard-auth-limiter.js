@@ -71,18 +71,39 @@ export function createDashboardAuthLimiter({
   return Object.freeze({ check, recordFailure, recordSuccess, status });
 }
 
+const IP_LIKE = /^[0-9A-Fa-f:.]{2,45}$/;
+const single = value => Array.isArray(value) ? value[0] : value;
+
 /**
- * Client key for rate limiting. Behind a trusted reverse proxy (Render) the
- * socket address is the proxy, so use the LAST X-Forwarded-For entry: that is
- * the address the trusted proxy itself appended. Earlier entries are
- * client-controlled and must never be trusted.
+ * Resolve the client address used for rate limiting, and where it came from.
+ *
+ * Without trustProxy the socket address is used. Behind a trusted edge, in
+ * order of preference:
+ *  1. CF-Connecting-IP: Render is fronted by Cloudflare, which sets this to the
+ *     connecting client and overwrites any client-supplied value.
+ *  2. True-Client-IP: same semantics on edges that use it.
+ *  3. The LAST X-Forwarded-For entry: the address the nearest trusted proxy
+ *     appended. On a multi-hop edge (Cloudflare -> Render) this may be an edge
+ *     node that changes per request, which is why 1-2 take precedence.
+ * Leftmost X-Forwarded-For entries are client-controlled and never trusted.
  */
-export function clientKey(request, { trustProxy = false } = {}) {
+export function resolveClientAddress(request, { trustProxy = false } = {}) {
   const socketAddress = request.socket?.remoteAddress ?? "unknown";
-  if (!trustProxy) return socketAddress;
-  const header = request.headers?.["x-forwarded-for"];
+  if (!trustProxy) return { key: socketAddress, source: "socket" };
+  const headers = request.headers ?? {};
+  for (const name of ["cf-connecting-ip", "true-client-ip"]) {
+    const value = single(headers[name])?.trim();
+    if (value && IP_LIKE.test(value)) return { key: value, source: name };
+  }
+  const header = headers["x-forwarded-for"];
   const value = Array.isArray(header) ? header.join(",") : header;
-  if (typeof value !== "string" || !value.trim()) return socketAddress;
-  const last = value.split(",").map(part => part.trim()).filter(Boolean).at(-1);
-  return last && last.length <= 64 ? last : socketAddress;
+  const last = typeof value === "string"
+    ? value.split(",").map(part => part.trim()).filter(Boolean).at(-1) : undefined;
+  if (last && IP_LIKE.test(last)) return { key: last, source: "x-forwarded-for-last" };
+  return { key: socketAddress, source: "socket" };
+}
+
+/** Client key for rate limiting (see resolveClientAddress). */
+export function clientKey(request, options = {}) {
+  return resolveClientAddress(request, options).key;
 }

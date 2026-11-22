@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createDashboardAuthLimiter, clientKey } from "../src/paper/dashboard-auth-limiter.js";
+import { createDashboardAuthLimiter, clientKey, resolveClientAddress } from "../src/paper/dashboard-auth-limiter.js";
 import { startPaperDashboardHttpServer } from "../src/paper/paper-dashboard-http-server.js";
 
 const AUTH = { username: "owner", password: "correct-horse-battery-staple-42" };
@@ -109,4 +109,39 @@ test("CLI enables trustProxy with --trust-proxy or automatically on Render", asy
   } finally {
     if (saved === undefined) delete process.env.RENDER; else process.env.RENDER = saved;
   }
+});
+
+
+test("resolveClientAddress prefers the edge-set CF-Connecting-IP over rotating X-Forwarded-For hops", () => {
+  const req = (headers) => ({ socket: { remoteAddress: "10.0.0.1" }, headers });
+  assert.deepEqual(resolveClientAddress(req({ "cf-connecting-ip": "203.0.113.9", "x-forwarded-for": "203.0.113.9, 172.70.1.2" }), { trustProxy: true }),
+    { key: "203.0.113.9", source: "cf-connecting-ip" });
+  assert.deepEqual(resolveClientAddress(req({ "true-client-ip": "2001:db8::7" }), { trustProxy: true }),
+    { key: "2001:db8::7", source: "true-client-ip" });
+  // Garbage in the edge header falls back to the last forwarded hop.
+  assert.deepEqual(resolveClientAddress(req({ "cf-connecting-ip": "<script>", "x-forwarded-for": "1.1.1.1, 172.70.1.2" }), { trustProxy: true }),
+    { key: "172.70.1.2", source: "x-forwarded-for-last" });
+  // Never trusted without trustProxy.
+  assert.deepEqual(resolveClientAddress(req({ "cf-connecting-ip": "203.0.113.9" })), { key: "10.0.0.1", source: "socket" });
+});
+
+test("HTTP: behind Cloudflare -> Render, lockout works although the edge hop changes on every request", async () => {
+  const logs = [];
+  await withServer({ trustProxy: true, log: line => logs.push(line), authLimiter: createDashboardAuthLimiter({ maxFailuresPerClient: 3 }) }, async base => {
+    const viaEdge = (i, extra = {}) => ({
+      "cf-connecting-ip": "198.51.100.7",
+      "x-forwarded-for": "198.51.100.7, 172.70." + (i % 250) + "." + (i % 7 + 1),  // rotating Cloudflare hop
+      ...extra
+    });
+    for (let i = 0; i < 3; i++) {
+      assert.equal((await get(base, "/api/paper-dashboard", viaEdge(i, { authorization: basic("owner", "guess" + i) }))).status, 401);
+    }
+    assert.equal((await get(base, "/api/paper-dashboard", viaEdge(9, { authorization: basic(AUTH.username, AUTH.password) }))).status, 429);
+    // Another real client through the same edge is unaffected.
+    const other = { "cf-connecting-ip": "203.0.113.9", "x-forwarded-for": "203.0.113.9, 172.70.9.9", authorization: basic(AUTH.username, AUTH.password) };
+    assert.equal((await get(base, "/api/paper-dashboard", other)).status, 503);
+  });
+  assert.ok(logs.some(line => line.includes("source for login rate limiting: cf-connecting-ip")));
+  assert.ok(logs.some(line => line.includes("locked out")));
+  assert.ok(logs.every(line => !line.includes("198.51.100.7") && !line.includes("203.0.113.9")), "addresses are never logged");
 });
