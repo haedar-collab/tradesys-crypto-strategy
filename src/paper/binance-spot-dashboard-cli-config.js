@@ -57,7 +57,15 @@ export function parseBinanceSpotDashboardCliArgs(argv = []) {
     : null;
   const remoteEnabled = process.env.TRADESYS_ALLOW_REMOTE === "true";
   if (!LOOPBACK_HOSTS.has(host) && !(host === "0.0.0.0" && remoteEnabled && auth && auth.password.length >= 24)) {
-    throw new Error("public binding requires TRADESYS_ALLOW_REMOTE=true, TRADESYS_DASHBOARD_USER, and TRADESYS_DASHBOARD_PASSWORD (minimum 24 characters)");
+    // Name every unmet requirement (never the secret values) so hosting logs
+    // show the actual cause of a failed start.
+    const unmet = [];
+    if (host !== "0.0.0.0") unmet.push("--host must be 127.0.0.1, ::1 or 0.0.0.0");
+    if (!remoteEnabled) unmet.push("TRADESYS_ALLOW_REMOTE is not \"true\"");
+    if (!dashboardUsername) unmet.push("TRADESYS_DASHBOARD_USER is not set");
+    if (!dashboardPassword) unmet.push("TRADESYS_DASHBOARD_PASSWORD is not set");
+    else if (dashboardPassword.length < 24) unmet.push("TRADESYS_DASHBOARD_PASSWORD has " + dashboardPassword.length + " characters; at least 24 are required");
+    throw new Error("public binding requires TRADESYS_ALLOW_REMOTE=true, TRADESYS_DASHBOARD_USER, and TRADESYS_DASHBOARD_PASSWORD (minimum 24 characters). Unmet: " + unmet.join("; "));
   }
   if (auth && auth.password.length < 24) {
     throw new Error("TRADESYS_DASHBOARD_PASSWORD must contain at least 24 characters");

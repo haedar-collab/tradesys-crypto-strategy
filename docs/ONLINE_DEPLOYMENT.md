@@ -36,6 +36,8 @@
 - Do not expose the Node service except through Render's HTTPS web-service endpoint.
 - Keep the repository branch and deployment branch aligned. The Blueprint has auto-deploy disabled to prevent an unreviewed commit from being published.
 - The app is a release candidate. Complete live WebSocket smoke, live REST screener, browser, and paper-observation checks before relying on it operationally.
+- After a crash the next start reclaims the ledger lock automatically when its owner is provably dead; any other lock still requires review in the Render shell.
+- If startup fails with `paper recovery audit blocked activation: REVIEW`, an order was interrupted before a durable fill. Suspend the service, open the Render shell and run `npm run paper:resolve-review -- --ledger /var/data/paper-ledger.jsonl --list`, then resolve each order with `--client-order-id ID --reviewer NAME --note "evidence"`. Resume the service afterwards.
 - Basic authentication is a simple single-user access gate, not multi-user account management or role-based access control. Rotate the password if it is exposed.
 
 ## Local development

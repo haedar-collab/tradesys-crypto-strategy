@@ -4,6 +4,12 @@ const canonicalConfig = (value) => JSON.stringify(Object.fromEntries(Object.entr
 const closeEnough = (a, b) => Number.isFinite(a) && Number.isFinite(b) &&
   Math.abs(a - b) <= EPSILON * Math.max(1, Math.abs(a), Math.abs(b));
 
+export const OPERATOR_REVIEW_RESOLUTIONS = Object.freeze(["CONFIRMED_NOT_FILLED"]);
+const MANUAL_REVIEW_PATTERN = /manual review required/i;
+export function isManualReviewRejection(entry) {
+  return entry?.type === "ORDER_REJECTED" && MANUAL_REVIEW_PATTERN.test(entry.payload?.message ?? "");
+}
+
 function finding(code, severity, message, reference = null, action = null) {
   return { code, severity, message, reference, action };
 }
@@ -66,7 +72,8 @@ export function auditPaperRecovery({ ledgerSnapshot, brokerSnapshot, initialCash
   const fills = new Map();
   const rejections = new Map();
   const riskEvents = [];
-  for (const entry of events) {
+  const reviewResolutions = new Map();
+  for (const [index, entry] of events.entries()) {
     if (!entry || typeof entry.eventId !== "string" || ids.has(entry.eventId)) {
       findings.push(finding("DUPLICATE_OR_INVALID_EVENT_ID", "CRITICAL",
         "Ledger contains a duplicate or invalid event identifier.", entry?.eventId ?? null,
@@ -92,14 +99,49 @@ export function auditPaperRecovery({ ledgerSnapshot, brokerSnapshot, initialCash
       } else target.set(id, entry);
     }
     if (entry.type === "RISK_EVENT") riskEvents.push(entry);
+    if (entry.type === "OPERATOR_REVIEW_RESOLVED") {
+      const id = payload.clientOrderId;
+      const rejection = typeof id === "string" ? rejections.get(id) : undefined;
+      if (typeof id !== "string" || !id ||
+          !OPERATOR_REVIEW_RESOLUTIONS.includes(payload.resolution) ||
+          typeof payload.reviewer !== "string" || !payload.reviewer.trim() ||
+          typeof payload.note !== "string" || !payload.note.trim()) {
+        findings.push(finding("OPERATOR_REVIEW_RESOLUTION_INVALID", "CRITICAL",
+          "An operator review resolution is malformed.", entry.eventId,
+          "Inspect the resolution record; do not activate until it is understood."));
+      } else if (reviewResolutions.has(id)) {
+        findings.push(finding("DUPLICATE_OPERATOR_REVIEW_RESOLUTION", "CRITICAL",
+          "More than one operator review resolution exists for a clientOrderId.", id,
+          "Inspect the full event history."));
+      } else if (!rejection || !isManualReviewRejection(rejection) ||
+          events.indexOf(rejection) > index) {
+        findings.push(finding("OPERATOR_REVIEW_RESOLUTION_WITHOUT_PENDING_REVIEW", "CRITICAL",
+          "An operator review resolution does not follow a recovery rejection that required manual review.", id,
+          "Inspect the resolution record and its preceding events."));
+      } else {
+        reviewResolutions.set(id, entry);
+      }
+    }
   }
 
   for (const [id, entry] of rejections) {
-    if (/manual review required/i.test(entry.payload?.message ?? "")) {
+    if (!isManualReviewRejection(entry)) continue;
+    const resolution = reviewResolutions.get(id);
+    if (resolution) {
+      findings.push(finding("INTERRUPTED_ORDER_REVIEW_RESOLVED", "INFO",
+        "An interrupted submission was reviewed and resolved by an operator.",
+        { clientOrderId: id, resolution: resolution.payload.resolution, reviewer: resolution.payload.reviewer, resolutionEventId: resolution.eventId },
+        null));
+    } else {
       findings.push(finding("INTERRUPTED_ORDER_REQUIRES_MANUAL_REVIEW", "ERROR",
         "A prior interrupted submission was safely rejected during recovery but still requires operator review.", id,
-        "Verify external execution evidence before treating the intent as resolved."));
+        "Verify external execution evidence, then record the outcome with resolveInterruptedPaperOrder (npm run paper:resolve-review)."));
     }
+  }
+  for (const id of reviewResolutions.keys()) {
+    if (fills.has(id)) findings.push(finding("RESOLVED_REVIEW_HAS_FILL", "CRITICAL",
+      "An order resolved as not filled also has a durable fill.", id,
+      "Do not activate trading; investigate the conflicting records."));
   }
   for (const [id] of intents) {
     if (!fills.has(id) && !rejections.has(id)) {

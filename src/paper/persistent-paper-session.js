@@ -220,11 +220,21 @@ export async function createPersistentPaperSession({
   async function evaluateEntryRisk(input) {
     if (input.side === "SELL") return { allowed: true, reason: "EXIT_ORDERS_REMAIN_ALLOWED" };
     if (input.riskGate?.allowed === false) return { allowed: false, reason: "UPSTREAM_RISK_VETO" };
-    const snapshot = projectedBuySnapshot(input);
-    if (!snapshot) return { allowed: false, reason: "RISK_DATA_UNAVAILABLE" };
-    const result = riskMonitor.evaluate(snapshot);
+    // 1) Evaluate the ACTUAL portfolio. Only real equity may move peak/day
+    //    baselines or latch the kill switch.
+    const current = currentRiskSnapshot();
+    const projected = projectedBuySnapshot(input);
+    if (!current || !projected) return { allowed: false, reason: "RISK_DATA_UNAVAILABLE" };
+    const actual = riskMonitor.evaluate(current);
     await persistRiskState("ORDER_ENTRY_CHECK");
-    return { allowed: result.allowNewEntries === true, reason: result.reasons.join(",") || (result.halted ? "KILL_SWITCH_LATCHED" : "RISK_ALLOWED"), result };
+    if (actual.allowNewEntries !== true) {
+      const detail = actual.reasons.join(",");
+      return { allowed: false, reason: actual.halted ? "KILL_SWITCH_LATCHED" + (detail ? ":" + detail : "") : detail || "RISK_BLOCKED", result: actual };
+    }
+    // 2) Check the hypothetical post-trade portfolio without side effects: an
+    //    oversized order is rejected on its own and never halts the session.
+    const result = riskMonitor.preview(projected);
+    return { allowed: result.allowNewEntries === true, reason: result.reasons.join(",") || "RISK_ALLOWED", result };
   }
 
   async function submitMarketOrderSerial(input) {

@@ -83,3 +83,23 @@ test("CLI allows remote bind only with explicit opt-in and strong credentials", 
     }
   }
 });
+
+test("remote binding failure names the unmet requirement without echoing secrets", async () => {
+  const { parseBinanceSpotDashboardCliArgs } = await import("../src/paper/binance-spot-dashboard-cli-config.js");
+  const saved = { ...process.env };
+  try {
+    process.env.TRADESYS_ALLOW_REMOTE = "true";
+    process.env.TRADESYS_DASHBOARD_USER = "owner";
+    process.env.TRADESYS_DASHBOARD_PASSWORD = "short-pass1";
+    let message = "";
+    try { parseBinanceSpotDashboardCliArgs(["--ledger", "./x.jsonl", "--host", "0.0.0.0"]); }
+    catch (error) { message = error.message; }
+    assert.match(message, /^public binding requires/);
+    assert.match(message, /TRADESYS_DASHBOARD_PASSWORD has 11 characters; at least 24 are required/);
+    assert.doesNotMatch(message, /short-pass1/);
+  } finally {
+    for (const key of ["TRADESYS_ALLOW_REMOTE", "TRADESYS_DASHBOARD_USER", "TRADESYS_DASHBOARD_PASSWORD"]) {
+      if (key in saved) process.env[key] = saved[key]; else delete process.env[key];
+    }
+  }
+});

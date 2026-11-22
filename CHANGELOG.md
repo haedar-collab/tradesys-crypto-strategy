@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — 2026-11-22 audit remediation
+
+- Fix: a rejected pre-trade risk check (e.g. an oversized BUY) no longer latches the session-wide kill switch or moves peak/day-start baselines. Actual equity is evaluated first; the projected post-trade portfolio is checked with the side-effect-free `riskMonitor.preview()`.
+- Fix: an order interrupted before a durable fill no longer blocks activation forever. Operators record a hash-chained `OPERATOR_REVIEW_RESOLVED` event (`npm run paper:resolve-review`); the recovery audit verifies it and reports INFO instead of REVIEW. Forged, duplicate or out-of-order resolutions fail the audit.
+- Fix: a ledger lock left by a crashed process (OOM, SIGKILL, container restart with PID reuse) is reclaimed when the owner is provably dead (hostname + Linux boot id + PID + process start time). Live, foreign-host, legacy and malformed locks still fail closed.
+- Fix: a failed ledger write/fsync rolls the file back to the last acknowledged record and poisons the handle, so a later append can no longer extend a torn or unacknowledged hash chain.
+- Fix: the 4H liquidity-sweep entry trigger now reaches the SMC decision gate (`toSweepEvidence`); previously a boolean was passed where `{ confirmed: true }` was expected, disabling that trigger. Signal frequency changes, so re-run prior validation reports.
+- Improve: remote-binding startup errors name the unmet requirement (e.g. password length) without echoing secrets.
+
 ## 0.1.0 — Foundation
 - Establish strategy-only repository responsibility.
 - Define the v1 input/output contract.
