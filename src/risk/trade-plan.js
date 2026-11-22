@@ -29,12 +29,22 @@ export function buildLongPlan(input, options = {}) {
     invalidation:{type:"CLOSED_4H_CLOSE_BELOW_ZONE_LOW",price:input.zone.lo}};
 }
 
-export function advanceLongPosition(position, bar) {
+export const EXIT_MODELS = Object.freeze(["SCALE_OUT_BREAKEVEN", "SINGLE_TP2"]);
+
+export function advanceLongPosition(position, bar, { exitModel = "SCALE_OUT_BREAKEVEN" } = {}) {
+  if (!EXIT_MODELS.includes(exitModel)) throw new RangeError("unknown exit model: " + exitModel);
   if(!position||!bar||![position.stop,position.entry,position.tp1,position.tp2,position.tp3,bar.high,bar.low].every(Number.isFinite)||
     bar.low>bar.high||position.stop>position.entry) {
     return {status:"WAIT_DATA",reasons:["INVALID_POSITION_OR_BAR"]};
   }
   if(position.status==="CLOSED") return {...position,exits:[]};
+  if(exitModel==="SINGLE_TP2"){
+    // Fixed stop, whole position exits at TP2; stop checked first (conservative).
+    const remaining=position.remaining??1;
+    if(bar.low<=position.stop) return {...position,remaining:0,status:"CLOSED",exits:[{fraction:remaining,price:position.stop,reason:"STOP_LOSS"}]};
+    if(bar.high>=position.tp2) return {...position,remaining:0,stage:2,status:"CLOSED",exits:[{fraction:remaining,price:position.tp2,reason:"TP2"}]};
+    return {...position,exits:[]};
+  }
   let stage=position.stage??0, remaining=position.remaining??1, stop=position.stop;
   const exits=[];
   const take=(fraction,price,reason)=>{
