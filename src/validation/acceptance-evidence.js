@@ -180,9 +180,11 @@ export function aggregateBacktests(perSymbol) {
 export function buildAcceptanceEvidence({ symbols, start, end, folds = 6, benchmarkDaily,
   baseCosts = { feeBps: 10, slippageBps: 5 }, stressCosts = { feeBps: 20, slippageBps: 20 },
   riskPct = 1, initialCapital = 10_000, dataQuality, bootstrap = { blockLength: 5, simulations: 2_000, seed: 42 },
-  execution = {} }) {
+  execution = {},
+  // Strategy-agnostic hook: (symbolData, { from, to, initialCapital, riskPct, feeBps, slippageBps, ... }) => backtest.
+  runBacktest = (s, options) => backtestRange(s.h1, s.decisions, options) }) {
   const run = costs => symbols.map(s => ({ symbol: s.symbol,
-    backtest: backtestRange(s.h1, s.decisions, { from: start, to: end, initialCapital, riskPct, ...execution, ...costs }) }));
+    backtest: runBacktest(s, { from: start, to: end, initialCapital, riskPct, ...execution, ...costs }) }));
   const base = run(baseCosts);
   const stress = run(stressCosts);
   const oos = aggregateBacktests(base);
@@ -190,7 +192,7 @@ export function buildAcceptanceEvidence({ symbols, start, end, folds = 6, benchm
 
   const foldResults = chronologicalFolds(start, end, folds).map(fold => {
     const agg = aggregateBacktests(symbols.map(s => ({ symbol: s.symbol,
-      backtest: backtestRange(s.h1, s.decisions, { from: fold.from, to: fold.to, initialCapital, riskPct, ...execution, ...baseCosts }) })));
+      backtest: runBacktest(s, { from: fold.from, to: fold.to, initialCapital, riskPct, ...execution, ...baseCosts }) })));
     return { ...fold, fromIso: new Date(fold.from).toISOString(), toIso: new Date(fold.to).toISOString(),
       tradeCount: agg.tradeCount, netReturnPct: agg.netReturnPct, profitFactor: agg.profitFactor, maxDrawdownPct: agg.maxDrawdownPct };
   });
