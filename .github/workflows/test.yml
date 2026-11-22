@@ -9,6 +9,8 @@ on:
   pull_request:
     branches:
       - main
+      - "foundation/**"
+      - "feature/**"
 
 permissions:
   contents: read

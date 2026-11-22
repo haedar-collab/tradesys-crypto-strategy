@@ -11,6 +11,6 @@
     "paper:resolve-review": "node scripts/resolve-paper-order-review.js"
   },
   "engines": {
-    "node": ">=22.0.0"
+    "node": "22.x"
   }
 }
