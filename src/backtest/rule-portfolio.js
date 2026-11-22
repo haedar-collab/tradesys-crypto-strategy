@@ -6,15 +6,35 @@
  * Research only; no orders.
  */
 import { prepareRuleIndicators, entrySignal, exitSignal, RULE_STRATEGIES } from "./rule-strategies.js";
+import { sma } from "../indicators/index.js";
 
 export const TF_R = Object.freeze({
   ...RULE_STRATEGIES.TF, id: "TF", variant: "TF-R",
   trailAtr: 3, maxPositionPct: 20
 });
 
+/** Round 4 candidate (PROTOCOL-ROUND-4.md): TF-R + BTC SMA200 filter, 0.5% risk, 5% heat cap. */
+export const TF_R2 = Object.freeze({
+  ...TF_R, variant: "TF-R2", riskPct: 0.5, marketFilterSma: 200, maxOpenRiskPct: 5, minRiskBudgetPct: 0.1
+});
+
+/** Days (openTime) on which the market filter allows new entries: close > SMA(period), causal. */
+export function marketFilterDays(bars, period = 200) {
+  const closes = bars.map(b => b.close);
+  const trend = sma(closes, period);
+  return new Set(bars.filter((b, i) => trend[i] != null && b.close > trend[i]).map(b => b.openTime));
+}
+
 export function runRulePortfolioBacktest(seriesBySymbol, strategy = TF_R, {
-  from = -Infinity, to = Infinity, initialCapital = 100_000, riskPct = 1, feeBps = 10, slippageBps = 5
+  from = -Infinity, to = Infinity, initialCapital = 100_000, riskPct: riskPctOption = 1, feeBps = 10, slippageBps = 5,
+  marketFilterBars = null
 } = {}) {
+  // A strategy that fixes its own risk per trade (TF-R2) overrides the caller default.
+  const riskPct = strategy.riskPct ?? riskPctOption;
+  if (strategy.marketFilterSma && !Array.isArray(marketFilterBars)) {
+    throw new TypeError("this strategy requires marketFilterBars (BTCUSDT daily bars)");
+  }
+  const allowedDays = strategy.marketFilterSma ? marketFilterDays(marketFilterBars, strategy.marketFilterSma) : null;
   const symbols = Object.keys(seriesBySymbol).sort(); // alphabetical processing order (protocol)
   if (symbols.length === 0) throw new TypeError("at least one symbol is required");
   const fee = feeBps / 10_000, slip = slippageBps / 10_000;
@@ -38,7 +58,7 @@ export function runRulePortfolioBacktest(seriesBySymbol, strategy = TF_R, {
     cash += proceeds - exitFee;
     const netPnl = proceeds - exitFee - p.cost - p.entryFee;
     trades.push({ symbol, entryTime: p.entryTime, exitTime: time, entry: p.entryFill, exit: fill, quantity: p.qty,
-      notional: p.cost, netPnl, equityAtEntry: p.equityAtEntry, returnPct: netPnl / p.cost * 100, reason, barsHeld: p.barsHeld });
+      notional: p.cost, netPnl, equityAtEntry: p.equityAtEntry, initialRisk: p.initialRisk, returnPct: netPnl / p.cost * 100, reason, barsHeld: p.barsHeld });
     s.pos = null;
   };
 
@@ -61,11 +81,19 @@ export function runRulePortfolioBacktest(seriesBySymbol, strategy = TF_R, {
       const riskQty = equity * riskPct / 100 / (entryFill - stop);
       const capQty = equity * strategy.maxPositionPct / 100 / entryFill;
       const cashQty = cash / (entryFill * (1 + fee));
-      const qty = Math.min(riskQty, capQty, cashQty);
+      let qty = Math.min(riskQty, capQty, cashQty);
+      if (strategy.maxOpenRiskPct) {
+        // Portfolio heat: sum of open positions' initial risk plus this trade's risk.
+        const openRisk = symbols.reduce((sum, sym) => sum + (state[sym].pos?.initialRisk ?? 0), 0);
+        const budget = equity * strategy.maxOpenRiskPct / 100 - openRisk;
+        if (budget < equity * (strategy.minRiskBudgetPct ?? 0) / 100) continue;
+        qty = Math.min(qty, budget / (entryFill - stop));
+      }
       if (!(qty > 0) || qty * entryFill < 1) continue;
       const cost = qty * entryFill, entryFee = cost * fee;
       cash -= cost + entryFee;
-      s.pos = { qty, entryFill, cost, entryFee, stop, highestClose: -Infinity, entryTime: day, equityAtEntry: equity, barsHeld: 0 };
+      s.pos = { qty, entryFill, cost, entryFee, stop, initialRisk: qty * (entryFill - stop),
+        highestClose: -Infinity, entryTime: day, equityAtEntry: equity, barsHeld: 0 };
     }
     // 2) Intrabar stops (including the entry bar), then close-of-day updates.
     for (const symbol of symbols) {
@@ -81,7 +109,8 @@ export function runRulePortfolioBacktest(seriesBySymbol, strategy = TF_R, {
         if (atrNow != null) s.pos.stop = Math.max(s.pos.stop, s.pos.highestClose - strategy.trailAtr * atrNow);
         const reason = exitSignal(strategy, s.ind, i, s.pos.barsHeld);
         if (reason) s.pendingExit = reason;
-      } else if (s.pendingEntry === null && entrySignal(strategy, s.ind, i)) {
+      } else if (s.pendingEntry === null && entrySignal(strategy, s.ind, i) &&
+          (!allowedDays || allowedDays.has(day))) {
         s.pendingEntry = i;
       }
     }

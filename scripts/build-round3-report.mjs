@@ -10,7 +10,7 @@ import { dirname, resolve } from "node:path";
 import { createHash } from "node:crypto";
 import { buildAcceptanceEvidence, assessDataQuality } from "../src/validation/acceptance-evidence.js";
 import { evaluateStrategyAcceptance } from "../src/validation/strategy-acceptance.js";
-import { runRulePortfolioBacktest, TF_R } from "../src/backtest/rule-portfolio.js";
+import { runRulePortfolioBacktest, TF_R, TF_R2 } from "../src/backtest/rule-portfolio.js";
 import { BASE, fetchKlines } from "./lib/binance-history.mjs";
 
 export const ROUND3_SETS = Object.freeze({
@@ -24,7 +24,12 @@ const arg = (n, f) => { const i = process.argv.indexOf(n); return i >= 0 ? proce
 const setName = arg("--set", "development");
 const requested = ROUND3_SETS[setName];
 if (!requested) throw new Error("--set must be development or holdout");
-const out = resolve(arg("--out", `research/strategy-research/round-3/${setName}-TF-R.json`));
+// Round 3: TF-R; round 4: TF-R2 (adds BTC filter, 0.5% risk, heat cap). Same symbol sets.
+const CANDIDATES = { "TF-R": { strategy: TF_R, round: 3 }, "TF-R2": { strategy: TF_R2, round: 4 } };
+const candidateId = arg("--candidate", "TF-R");
+const candidate = CANDIDATES[candidateId];
+if (!candidate) throw new Error("--candidate must be TF-R or TF-R2");
+const out = resolve(arg("--out", `research/strategy-research/round-${candidate.round}/${setName}-${candidateId}.json`));
 const log = m => process.stderr.write("[round-3] " + m + "\n");
 
 const series = {}, dropped = [];
@@ -36,15 +41,17 @@ for (const symbol of requested) {
   log(symbol + ": " + bars.length + " daily bars from " + new Date(bars[0].openTime).toISOString().slice(0, 10));
 }
 const symbols = Object.keys(series);
+// BTC drives the regime groups and (TF-R2) the market filter; it is traded only if in the set.
 const benchmarkDaily = series.BTCUSDT ?? await fetchKlines("BTCUSDT", "1d", Date.UTC(2015, 0, 1), END);
+const marketFilterBars = candidate.strategy.marketFilterSma ? benchmarkDaily : null;
 const dataQuality = assessDataQuality(symbols.map(symbol => ({ symbol, interval: "1d", candles: series[symbol], from: START, to: END })));
 
 const evidence = buildAcceptanceEvidence({
   symbols: [{ symbol: "PORTFOLIO", series }],
   start: START, end: END, folds: 6, benchmarkDaily, dataQuality, initialCapital: CAPITAL,
-  runBacktest: (s, options) => runRulePortfolioBacktest(s.series, TF_R, options)
+  runBacktest: (s, options) => runRulePortfolioBacktest(s.series, candidate.strategy, { ...options, marketFilterBars })
 });
-const full = runRulePortfolioBacktest(series, TF_R, { from: START, to: END, initialCapital: CAPITAL });
+const full = runRulePortfolioBacktest(series, candidate.strategy, { from: START, to: END, initialCapital: CAPITAL, marketFilterBars });
 const bySymbol = {};
 for (const t of full.trades) {
   const b = bySymbol[t.symbol] ??= { symbol: t.symbol, tradeCount: 0, netPnl: 0, wins: 0, maxNotionalShare: 0 };
@@ -62,10 +69,11 @@ const report = {
     tradeCount: full.tradeCount, profitFactor: full.profitFactor, winRatePct: full.winRatePct },
   evaluatedAt: new Date().toISOString(),
   provenance: {
-    protocol: "research/strategy-research/PROTOCOL-ROUND-3.md", candidate: TF_R, set: setName,
+    protocol: "research/strategy-research/PROTOCOL-ROUND-" + candidate.round + ".md", candidate: candidate.strategy, set: setName,
     symbols, droppedSymbols: dropped, source: BASE + "/api/v3/klines (public Binance Spot daily bars)",
     period: { start: new Date(START).toISOString(), end: new Date(END).toISOString() },
-    execution: { sharedCapital: CAPITAL, riskPct: 1, maxPositionPct: TF_R.maxPositionPct, leverage: "none",
+    execution: { sharedCapital: CAPITAL, riskPct: candidate.strategy.riskPct ?? 1, maxPositionPct: candidate.strategy.maxPositionPct,
+      maxOpenRiskPct: candidate.strategy.maxOpenRiskPct ?? null, marketFilter: candidate.strategy.marketFilterSma ? "BTCUSDT close > SMA200" : null, leverage: "none",
       feeBps: 10, slippageBps: 5, stress: "20/20 bps", drawdown: "combined marked equity at daily closes" },
     parameterFitting: "NONE: all parameters fixed in the pre-registered protocol", datasetFingerprintSha256: fingerprint
   },
@@ -74,4 +82,4 @@ const report = {
 };
 await mkdir(dirname(out), { recursive: true });
 await writeFile(out, JSON.stringify(report, null, 2) + "\n");
-log("TF-R on " + setName + ": " + decision.decision + " -> " + out);
+log(candidateId + " on " + setName + ": " + decision.decision + " -> " + out);

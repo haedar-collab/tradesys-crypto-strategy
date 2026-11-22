@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { runRulePortfolioBacktest, TF_R } from "../src/backtest/rule-portfolio.js";
+import { runRulePortfolioBacktest, TF_R, TF_R2, marketFilterDays } from "../src/backtest/rule-portfolio.js";
 import { RULE_STRATEGIES, runRuleStrategyBacktest } from "../src/backtest/rule-strategies.js";
 
 const D = 86_400_000;
@@ -46,4 +46,34 @@ test("portfolio decisions are causal: altering future bars does not change the p
   assert.ok(upTo(a).length > 300);
   assert.deepEqual(upTo(a), upTo(b));
   assert.notDeepEqual(a, b);
+});
+
+
+test("TF-R2: market filter blocks new entries while BTC is below its SMA200", () => {
+  const closes = base(); closes.push(160, 161, 162, 163, 164);
+  const asset = mk(closes);
+  const btcUp = mk(closes.map((_, i) => 100 + i));                       // always above SMA200 after warm-up
+  const btcDown = mk(closes.map((_, i) => 1000 - i));                    // always below
+  const up = runRulePortfolioBacktest({ X: asset }, TF_R2, { marketFilterBars: btcUp });
+  const down = runRulePortfolioBacktest({ X: asset }, TF_R2, { marketFilterBars: btcDown });
+  assert.ok(up.tradeCount >= 1);
+  assert.equal(down.tradeCount, 0);
+  assert.throws(() => runRulePortfolioBacktest({ X: asset }, TF_R2), /marketFilterBars/);
+  assert.ok(marketFilterDays(btcUp).size > 0 && marketFilterDays(btcDown).size === 0);
+});
+
+test("TF-R2: 0.5% risk per trade and the 5% portfolio heat cap bound total open risk", () => {
+  // Wide candles (ATR ~ 20% of price): positions are small, so cash never binds and only the heat cap does.
+  const wide = closes => closes.map((c, i) => ({ openTime: i * D, closeTime: (i + 1) * D - 1, open: c, high: c * 1.1, low: c * 0.9, close: c }));
+  const closes = base(); closes.push(200, 201, 202);
+  const btc = mk(closes.map((_, i) => 100 + i));
+  const series = Object.fromEntries(Array.from({ length: 15 }, (_, k) => ["S" + String(k).padStart(2, "0"), wide(closes)]));
+  const r = runRulePortfolioBacktest(series, TF_R2, { marketFilterBars: btc, feeBps: 0, slippageBps: 0 });
+  const day = Math.min(...r.trades.map(t => t.entryTime));
+  const sameDay = r.trades.filter(t => t.entryTime === day);
+  const equity = sameDay[0].equityAtEntry;
+  for (const t of sameDay) assert.ok(Math.abs(t.initialRisk - equity * 0.005) < 1e-6, "each trade risks 0.5%");
+  assert.equal(sameDay.length, 10, "10 x 0.5% exactly fill the 5% heat budget; the other 5 are skipped");
+  assert.ok(sameDay.reduce((s, t) => s + t.initialRisk, 0) <= equity * 0.05 + 1e-6);
+  assert.ok(sameDay.reduce((s, t) => s + t.notional, 0) < equity * 0.5, "cash was not the binding constraint");
 });
