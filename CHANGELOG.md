@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — 2026-11-22 rate limiter behind Cloudflare
+
+- Fix (#11 follow-up): on Render the per-client login lockout never triggered (verified live: 11 wrong passwords → 11× 401, no 429). Render is fronted by Cloudflare, so the last `X-Forwarded-For` hop is a Cloudflare edge node that changes per request. With `trustProxy`, the client is now keyed by `CF-Connecting-IP` (set by Cloudflare, overwriting client values), then `True-Client-IP`, then the last XFF hop. The server logs which source is used and lockout events, never the addresses themselves.
+
 ## Unreleased — 2026-11-22 audit follow-up (#8, #9, #11)
 
 - Perf (#8): the ledger verifies its hash chain once at open and then serves deep-frozen in-memory snapshots (cached until the next append). Each snapshot does an O(1) file-size check, and `ledger.verify()` performs a full re-read. Same-size tampering is detected by `verify()` and on reopen, no longer on every poll. The dashboard adapter shares the frozen ledger instead of cloning it and caches the performance report per ledger version. At 172,800 events: snapshot 1,448 ms → 0.3 ms; dashboard poll 1,732 ms → 4.8 ms.
