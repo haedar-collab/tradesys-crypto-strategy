@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { timingSafeEqual } from "node:crypto";
+import { createDashboardAuthLimiter, clientKey } from "./dashboard-auth-limiter.js";
 const MAX_RESPONSE_BYTES = 1_048_576;
 const LOOPBACKS = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
 
@@ -44,8 +45,11 @@ export async function startPaperDashboardHttpServer({
   host = "127.0.0.1",
   port = 0,
   maxResponseBytes = MAX_RESPONSE_BYTES,
-  auth = null
+  auth = null,
+  trustProxy = false,
+  authLimiter = auth ? createDashboardAuthLimiter() : null
 } = {}) {
+  if (typeof trustProxy !== "boolean") throw new TypeError("trustProxy must be a boolean");
   if (typeof getSnapshot !== "function") throw new TypeError("getSnapshot must be a function");
   const loopbackHost = host === "127.0.0.1" || host === "::1";
   const validAuth = auth && typeof auth.username === "string" && auth.username.length > 0 &&
@@ -66,14 +70,34 @@ export async function startPaperDashboardHttpServer({
       sendJson(response, 403, { error: "LOOPBACK_ONLY" });
       return;
     }
-    if (auth && new URL(request.url ?? "/", "http://localhost").pathname !== "/healthz" && !isAuthorized(request.headers.authorization, auth)) {
-      response.writeHead(401, {
-        "www-authenticate": 'Basic realm="Tradesys Crypto", charset="UTF-8"',
-        "cache-control": "no-store",
-        "x-content-type-options": "nosniff"
-      });
-      response.end("Authentication required");
-      return;
+    if (auth && new URL(request.url ?? "/", "http://localhost").pathname !== "/healthz") {
+      const key = clientKey(request, { trustProxy });
+      const presented = typeof request.headers.authorization === "string";
+      if (authLimiter) {
+        const gate = authLimiter.check(key);
+        if (!gate.allowed) {
+          // Locked-out clients are rejected before their credentials are evaluated.
+          response.writeHead(429, {
+            "retry-after": String(Math.max(1, Math.ceil(gate.retryAfterMs / 1000))),
+            "cache-control": "no-store",
+            "x-content-type-options": "nosniff",
+            "content-type": "text/plain; charset=utf-8"
+          });
+          response.end("Too many failed sign-in attempts. Try again later.");
+          return;
+        }
+      }
+      if (!isAuthorized(request.headers.authorization, auth)) {
+        if (authLimiter && presented) authLimiter.recordFailure(key);
+        response.writeHead(401, {
+          "www-authenticate": 'Basic realm="Tradesys Crypto", charset="UTF-8"',
+          "cache-control": "no-store",
+          "x-content-type-options": "nosniff"
+        });
+        response.end("Authentication required");
+        return;
+      }
+      authLimiter?.recordSuccess(key);
     }
     if (request.method !== "GET") {
       response.setHeader("allow", "GET");

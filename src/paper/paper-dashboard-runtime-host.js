@@ -16,6 +16,7 @@ export async function startPaperDashboardRuntimeHost({
   port = 0,
   maxQuoteAgeMs = 5_000,
   auth = null,
+  trustProxy = false,
   now = () => Date.now()
 } = {}) {
   if (typeof filePath !== "string" || filePath.trim() === "") {
@@ -42,6 +43,7 @@ export async function startPaperDashboardRuntimeHost({
       host,
       port,
       auth,
+      trustProxy,
       getSnapshot: () => createPaperDashboardRuntimeSnapshot({
         session,
         feedProvider,
