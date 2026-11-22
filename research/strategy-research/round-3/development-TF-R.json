@@ -1,0 +1,2880 @@
+{
+  "dataQuality": {
+    "status": "PASS",
+    "policy": {
+      "maxMissingRatio": 0.001,
+      "maxGapHours": 24,
+      "structuralIssuesAllowed": 0
+    },
+    "checks": [
+      {
+        "symbol": "BTCUSDT",
+        "interval": "1d",
+        "barCount": 2882,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "ETHUSDT",
+        "interval": "1d",
+        "barCount": 2882,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "SOLUSDT",
+        "interval": "1d",
+        "barCount": 2294,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "BNBUSDT",
+        "interval": "1d",
+        "barCount": 2882,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "XRPUSDT",
+        "interval": "1d",
+        "barCount": 2882,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "ADAUSDT",
+        "interval": "1d",
+        "barCount": 2882,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "DOGEUSDT",
+        "interval": "1d",
+        "barCount": 2697,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "LINKUSDT",
+        "interval": "1d",
+        "barCount": 2867,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "LTCUSDT",
+        "interval": "1d",
+        "barCount": 2882,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "TRXUSDT",
+        "interval": "1d",
+        "barCount": 2882,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "DOTUSDT",
+        "interval": "1d",
+        "barCount": 2287,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "AVAXUSDT",
+        "interval": "1d",
+        "barCount": 2252,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "ATOMUSDT",
+        "interval": "1d",
+        "barCount": 2764,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "ETCUSDT",
+        "interval": "1d",
+        "barCount": 2882,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "XLMUSDT",
+        "interval": "1d",
+        "barCount": 2882,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      }
+    ]
+  },
+  "outOfSample": {
+    "tradeCount": 327,
+    "profitFactor": 1.712015580846317,
+    "netReturnPct": 303.38566089953633,
+    "maxDrawdownPct": 42.168482207961965,
+    "winRatePct": 38.226299694189606
+  },
+  "walkForward": {
+    "method": "CHRONOLOGICAL_SEGMENTS_FIXED_PARAMETERS",
+    "folds": [
+      {
+        "index": 0,
+        "from": 1546300800000,
+        "to": 1587801600000,
+        "fromIso": "2019-01-01T00:00:00.000Z",
+        "toIso": "2020-04-25T08:00:00.000Z",
+        "tradeCount": 36,
+        "netReturnPct": 28.745813554348953,
+        "profitFactor": 2.5242597643525553,
+        "maxDrawdownPct": 17.173695864827497
+      },
+      {
+        "index": 1,
+        "from": 1587801600000,
+        "to": 1629302400000,
+        "fromIso": "2020-04-25T08:00:00.000Z",
+        "toIso": "2021-08-18T16:00:00.000Z",
+        "tradeCount": 110,
+        "netReturnPct": 99.28890516876675,
+        "profitFactor": 2.3654747686237254,
+        "maxDrawdownPct": 20.364568139216733
+      },
+      {
+        "index": 2,
+        "from": 1629302400000,
+        "to": 1670803200000,
+        "fromIso": "2021-08-18T16:00:00.000Z",
+        "toIso": "2022-12-12T00:00:00.000Z",
+        "tradeCount": 40,
+        "netReturnPct": -18.89353570169694,
+        "profitFactor": 0.21193938445247623,
+        "maxDrawdownPct": 27.294821030428245
+      },
+      {
+        "index": 3,
+        "from": 1670803200000,
+        "to": 1712304000000,
+        "fromIso": "2022-12-12T00:00:00.000Z",
+        "toIso": "2024-04-05T08:00:00.000Z",
+        "tradeCount": 78,
+        "netReturnPct": 32.27979934966785,
+        "profitFactor": 1.637827421656144,
+        "maxDrawdownPct": 27.436796532768
+      },
+      {
+        "index": 4,
+        "from": 1712304000000,
+        "to": 1753804800000,
+        "fromIso": "2024-04-05T08:00:00.000Z",
+        "toIso": "2025-07-29T16:00:00.000Z",
+        "tradeCount": 40,
+        "netReturnPct": 29.806559340213433,
+        "profitFactor": 2.438714828442724,
+        "maxDrawdownPct": 23.17829844083652
+      },
+      {
+        "index": 5,
+        "from": 1753804800000,
+        "to": 1795305600000,
+        "fromIso": "2025-07-29T16:00:00.000Z",
+        "toIso": "2026-11-22T00:00:00.000Z",
+        "tradeCount": 31,
+        "netReturnPct": 3.3952166559903185,
+        "profitFactor": 1.2309785548939463,
+        "maxDrawdownPct": 10.097395088281347
+      }
+    ]
+  },
+  "regimeAnalysis": {
+    "benchmark": "BTCUSDT daily close, 20-bar trend and realized volatility",
+    "groups": [
+      {
+        "regime": "BEARISH_HIGH",
+        "tradeCount": 23,
+        "meanNetReturnPct": -0.3823871038034337,
+        "winRatePct": 17.391304347826086,
+        "totalCompoundedReturnPct": -8.556659596739324
+      },
+      {
+        "regime": "BEARISH_NORMAL",
+        "tradeCount": 8,
+        "meanNetReturnPct": -0.3432407615528764,
+        "winRatePct": 37.5,
+        "totalCompoundedReturnPct": -2.7279143897178115
+      },
+      {
+        "regime": "BULLISH_HIGH",
+        "tradeCount": 202,
+        "meanNetReturnPct": 0.36845474524421534,
+        "winRatePct": 35.148514851485146,
+        "totalCompoundedReturnPct": 98.14519466662772
+      },
+      {
+        "regime": "BULLISH_NORMAL",
+        "tradeCount": 50,
+        "meanNetReturnPct": 1.4767510288139527,
+        "winRatePct": 60,
+        "totalCompoundedReturnPct": 100.28470106753038
+      },
+      {
+        "regime": "SIDEWAYS_HIGH",
+        "tradeCount": 21,
+        "meanNetReturnPct": 1.3223076933769615,
+        "winRatePct": 38.095238095238095,
+        "totalCompoundedReturnPct": 27.231271771913114
+      },
+      {
+        "regime": "SIDEWAYS_NORMAL",
+        "tradeCount": 23,
+        "meanNetReturnPct": 0.11750161577619977,
+        "winRatePct": 39.130434782608695,
+        "totalCompoundedReturnPct": 2.4707878788176707
+      }
+    ]
+  },
+  "costStress": {
+    "feeBps": 20,
+    "slippageBps": 20,
+    "profitFactor": 1.61830779627491,
+    "netReturnPct": 255.28684074866516,
+    "tradeCount": 329
+  },
+  "blockBootstrap": {
+    "blockLength": 5,
+    "simulations": 2000,
+    "seed": 42,
+    "maxDrawdownPct": {
+      "p50": 18.739060566907412,
+      "p95": 31.850150890923995,
+      "p99": 38.87854503319116
+    },
+    "netReturnPct": {
+      "p05": 75.9697444611166,
+      "median": 351.2608266156158,
+      "p95": 1176.009661573313
+    },
+    "probabilityOfLoss": 0.003
+  },
+  "perSymbol": [
+    {
+      "symbol": "SOLUSDT",
+      "tradeCount": 14,
+      "netPnl": 90370.4,
+      "wins": 7,
+      "maxNotionalShare": 0.1113428448975326,
+      "contributionPct": 90.37
+    },
+    {
+      "symbol": "BNBUSDT",
+      "tradeCount": 29,
+      "netPnl": 80756.72,
+      "wins": 16,
+      "maxNotionalShare": 0.19999999999999998,
+      "contributionPct": 80.76
+    },
+    {
+      "symbol": "ADAUSDT",
+      "tradeCount": 19,
+      "netPnl": 60608.75,
+      "wins": 10,
+      "maxNotionalShare": 0.12722167088523503,
+      "contributionPct": 60.61
+    },
+    {
+      "symbol": "BTCUSDT",
+      "tradeCount": 30,
+      "netPnl": 46610.7,
+      "wins": 13,
+      "maxNotionalShare": 0.2,
+      "contributionPct": 46.61
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "tradeCount": 19,
+      "netPnl": 44900.38,
+      "wins": 6,
+      "maxNotionalShare": 0.1252202768681152,
+      "contributionPct": 44.9
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "tradeCount": 9,
+      "netPnl": 29425.04,
+      "wins": 5,
+      "maxNotionalShare": 0.10215956353636041,
+      "contributionPct": 29.43
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tradeCount": 32,
+      "netPnl": 27594.14,
+      "wins": 16,
+      "maxNotionalShare": 0.1696305083949278,
+      "contributionPct": 27.59
+    },
+    {
+      "symbol": "XRPUSDT",
+      "tradeCount": 17,
+      "netPnl": 10121.75,
+      "wins": 7,
+      "maxNotionalShare": 0.1300803590572505,
+      "contributionPct": 10.12
+    },
+    {
+      "symbol": "ETCUSDT",
+      "tradeCount": 19,
+      "netPnl": 4347.73,
+      "wins": 6,
+      "maxNotionalShare": 0.12310810664970528,
+      "contributionPct": 4.35
+    },
+    {
+      "symbol": "LINKUSDT",
+      "tradeCount": 31,
+      "netPnl": 2714.72,
+      "wins": 8,
+      "maxNotionalShare": 0.15128258102518718,
+      "contributionPct": 2.71
+    },
+    {
+      "symbol": "TRXUSDT",
+      "tradeCount": 38,
+      "netPnl": -8968.3,
+      "wins": 12,
+      "maxNotionalShare": 0.2,
+      "contributionPct": -8.97
+    },
+    {
+      "symbol": "XLMUSDT",
+      "tradeCount": 16,
+      "netPnl": -10952.23,
+      "wins": 4,
+      "maxNotionalShare": 0.13266740447129466,
+      "contributionPct": -10.95
+    },
+    {
+      "symbol": "DOTUSDT",
+      "tradeCount": 9,
+      "netPnl": -14169.74,
+      "wins": 2,
+      "maxNotionalShare": 0.09635496750970537,
+      "contributionPct": -14.17
+    },
+    {
+      "symbol": "ATOMUSDT",
+      "tradeCount": 19,
+      "netPnl": -26039.92,
+      "wins": 5,
+      "maxNotionalShare": 0.12391834279629788,
+      "contributionPct": -26.04
+    },
+    {
+      "symbol": "LTCUSDT",
+      "tradeCount": 26,
+      "netPnl": -33934.48,
+      "wins": 8,
+      "maxNotionalShare": 0.1304321385115956,
+      "contributionPct": -33.93
+    }
+  ],
+  "tradeLog": [
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1546992000000,
+      "exitTime": 1547337600000,
+      "netPnl": -1015.1254,
+      "accountReturnPct": -1.0151
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1549756800000,
+      "exitTime": 1554940800000,
+      "netPnl": 6738.0808,
+      "accountReturnPct": 6.8072
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1550534400000,
+      "exitTime": 1555804800000,
+      "netPnl": 4058.1945,
+      "accountReturnPct": 4.0754
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1553299200000,
+      "exitTime": 1555804800000,
+      "netPnl": 2575.5026,
+      "accountReturnPct": 2.4272
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1554249600000,
+      "exitTime": 1558051200000,
+      "netPnl": 9154.0948,
+      "accountReturnPct": 7.8015
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1554681600000,
+      "exitTime": 1554681600000,
+      "netPnl": -1233.3227,
+      "accountReturnPct": -1.0195
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1554768000000,
+      "exitTime": 1554940800000,
+      "netPnl": -1207.1212,
+      "accountReturnPct": -1.0221
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1554768000000,
+      "exitTime": 1554940800000,
+      "netPnl": -1204.6251,
+      "accountReturnPct": -1.02
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1555632000000,
+      "exitTime": 1557187200000,
+      "netPnl": -596.8292,
+      "accountReturnPct": -0.5291
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1557619200000,
+      "exitTime": 1560124800000,
+      "netPnl": 2152.9076,
+      "accountReturnPct": 1.829
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1557878400000,
+      "exitTime": 1558051200000,
+      "netPnl": -798.9446,
+      "accountReturnPct": -0.6502
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1557964800000,
+      "exitTime": 1561852800000,
+      "netPnl": 1693.397,
+      "accountReturnPct": 1.3356
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1557964800000,
+      "exitTime": 1558051200000,
+      "netPnl": -1288.7079,
+      "accountReturnPct": -1.0164
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1557964800000,
+      "exitTime": 1558051200000,
+      "netPnl": -1290.9415,
+      "accountReturnPct": -1.0182
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1558915200000,
+      "exitTime": 1559606400000,
+      "netPnl": -1222.9079,
+      "accountReturnPct": -1.0206
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1558915200000,
+      "exitTime": 1561593600000,
+      "netPnl": 420.629,
+      "accountReturnPct": 0.351
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1559001600000,
+      "exitTime": 1560038400000,
+      "netPnl": -1225.4877,
+      "accountReturnPct": -1.0147
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1559520000000,
+      "exitTime": 1559606400000,
+      "netPnl": -1231.3297,
+      "accountReturnPct": -1.0168
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1561075200000,
+      "exitTime": 1561593600000,
+      "netPnl": 2082.3573,
+      "accountReturnPct": 1.7761
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1561161600000,
+      "exitTime": 1561593600000,
+      "netPnl": -386.1738,
+      "accountReturnPct": -0.3249
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1570665600000,
+      "exitTime": 1571097600000,
+      "netPnl": -1179.032,
+      "accountReturnPct": -1.0149
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1573689600000,
+      "exitTime": 1574121600000,
+      "netPnl": -1173.6646,
+      "accountReturnPct": -1.0206
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1576454400000,
+      "exitTime": 1576540800000,
+      "netPnl": -1155.5962,
+      "accountReturnPct": -1.0153
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1578787200000,
+      "exitTime": 1581811200000,
+      "netPnl": 6559.2537,
+      "accountReturnPct": 5.8219
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1579219200000,
+      "exitTime": 1579392000000,
+      "netPnl": -1193.9139,
+      "accountReturnPct": -1.0158
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1579305600000,
+      "exitTime": 1579824000000,
+      "netPnl": -1214.4327,
+      "accountReturnPct": -1.0187
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1579651200000,
+      "exitTime": 1581811200000,
+      "netPnl": 2758.3672,
+      "accountReturnPct": 2.3552
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1580256000000,
+      "exitTime": 1582588800000,
+      "netPnl": -161.5901,
+      "accountReturnPct": -0.1327
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1580256000000,
+      "exitTime": 1581811200000,
+      "netPnl": 1466.3662,
+      "accountReturnPct": 1.2046
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1580428800000,
+      "exitTime": 1581811200000,
+      "netPnl": 3935.195,
+      "accountReturnPct": 3.1552
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1580428800000,
+      "exitTime": 1582588800000,
+      "netPnl": 2429.6957,
+      "accountReturnPct": 1.9481
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1580428800000,
+      "exitTime": 1581811200000,
+      "netPnl": 32.9139,
+      "accountReturnPct": 0.0264
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1580860800000,
+      "exitTime": 1581811200000,
+      "netPnl": 596.5892,
+      "accountReturnPct": 0.4888
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1580947200000,
+      "exitTime": 1581811200000,
+      "netPnl": 482.3362,
+      "accountReturnPct": 0.3754
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1581033600000,
+      "exitTime": 1581811200000,
+      "netPnl": 468.8007,
+      "accountReturnPct": 0.3571
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1587686400000,
+      "exitTime": 1589068800000,
+      "netPnl": -105.7199,
+      "accountReturnPct": -0.0821
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1588896000000,
+      "exitTime": 1589068800000,
+      "netPnl": -1335.2586,
+      "accountReturnPct": -1.0241
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1589068800000,
+      "exitTime": 1589068800000,
+      "netPnl": -1318.5914,
+      "accountReturnPct": -1.0171
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1589932800000,
+      "exitTime": 1590019200000,
+      "netPnl": -1286.2553,
+      "accountReturnPct": -1.0203
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1590710400000,
+      "exitTime": 1592179200000,
+      "netPnl": 994.7221,
+      "accountReturnPct": 0.7972
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1590883200000,
+      "exitTime": 1592179200000,
+      "netPnl": -1294.0399,
+      "accountReturnPct": -1.0228
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1591056000000,
+      "exitTime": 1591833600000,
+      "netPnl": -1303.593,
+      "accountReturnPct": -1.024
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1591056000000,
+      "exitTime": 1591920000000,
+      "netPnl": -1300.1171,
+      "accountReturnPct": -1.0212
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1591142400000,
+      "exitTime": 1591833600000,
+      "netPnl": -1278.2932,
+      "accountReturnPct": -1.0181
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1591574400000,
+      "exitTime": 1591833600000,
+      "netPnl": -1297.3427,
+      "accountReturnPct": -1.0207
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1592956800000,
+      "exitTime": 1593216000000,
+      "netPnl": -1221.5202,
+      "accountReturnPct": -1.0239
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1593648000000,
+      "exitTime": 1598054400000,
+      "netPnl": 2729.583,
+      "accountReturnPct": 2.3117
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1594080000000,
+      "exitTime": 1595808000000,
+      "netPnl": 3041.4254,
+      "accountReturnPct": 2.5576
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1594166400000,
+      "exitTime": 1595808000000,
+      "netPnl": 760.1799,
+      "accountReturnPct": 0.6284
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1594166400000,
+      "exitTime": 1594339200000,
+      "netPnl": 3231.0215,
+      "accountReturnPct": 2.6708
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1594339200000,
+      "exitTime": 1596326400000,
+      "netPnl": -416.8692,
+      "accountReturnPct": -0.3214
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1594598400000,
+      "exitTime": 1594857600000,
+      "netPnl": -1357.9018,
+      "accountReturnPct": -1.0308
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1595462400000,
+      "exitTime": 1596326400000,
+      "netPnl": 4871.1609,
+      "accountReturnPct": 3.7312
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1595635200000,
+      "exitTime": 1599091200000,
+      "netPnl": 1292.518,
+      "accountReturnPct": 0.9905
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1595894400000,
+      "exitTime": 1596326400000,
+      "netPnl": -863.3953,
+      "accountReturnPct": -0.6491
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1595894400000,
+      "exitTime": 1596326400000,
+      "netPnl": -244.7386,
+      "accountReturnPct": -0.184
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1595980800000,
+      "exitTime": 1596326400000,
+      "netPnl": 1114.2987,
+      "accountReturnPct": 0.8274
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1596326400000,
+      "exitTime": 1596326400000,
+      "netPnl": -1525.6508,
+      "accountReturnPct": -1.0249
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1596326400000,
+      "exitTime": 1596326400000,
+      "netPnl": -26.7292,
+      "accountReturnPct": -0.018
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1596499200000,
+      "exitTime": 1597968000000,
+      "netPnl": 4569.3459,
+      "accountReturnPct": 3.4328
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1597017600000,
+      "exitTime": 1599091200000,
+      "netPnl": 1784.6829,
+      "accountReturnPct": 1.2914
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1597104000000,
+      "exitTime": 1597190400000,
+      "netPnl": -1414.5386,
+      "accountReturnPct": -1.023
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1597363200000,
+      "exitTime": 1598313600000,
+      "netPnl": -1428.1973,
+      "accountReturnPct": -1.0195
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1597363200000,
+      "exitTime": 1597968000000,
+      "netPnl": 1033.0769,
+      "accountReturnPct": 0.7374
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1597708800000,
+      "exitTime": 1598313600000,
+      "netPnl": -1497.259,
+      "accountReturnPct": -1.0317
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1597708800000,
+      "exitTime": 1598054400000,
+      "netPnl": -1477.2842,
+      "accountReturnPct": -1.0179
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1599004800000,
+      "exitTime": 1599004800000,
+      "netPnl": -1399.6059,
+      "accountReturnPct": -1.0213
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1599004800000,
+      "exitTime": 1599264000000,
+      "netPnl": -1390.0484,
+      "accountReturnPct": -1.0143
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1599955200000,
+      "exitTime": 1600646400000,
+      "netPnl": -1313.1653,
+      "accountReturnPct": -1.0143
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1603324800000,
+      "exitTime": 1606348800000,
+      "netPnl": 6259.8046,
+      "accountReturnPct": 4.8847
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1604707200000,
+      "exitTime": 1606348800000,
+      "netPnl": 1660.9153,
+      "accountReturnPct": 1.2513
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1604707200000,
+      "exitTime": 1606348800000,
+      "netPnl": 1294.1069,
+      "accountReturnPct": 0.9749
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1605398400000,
+      "exitTime": 1606348800000,
+      "netPnl": 15551.2231,
+      "accountReturnPct": 11.6272
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1605916800000,
+      "exitTime": 1606348800000,
+      "netPnl": 1292.58,
+      "accountReturnPct": 0.8814
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1606003200000,
+      "exitTime": 1606003200000,
+      "netPnl": -1620.788,
+      "accountReturnPct": -1.0245
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1606003200000,
+      "exitTime": 1606003200000,
+      "netPnl": -1613.6202,
+      "accountReturnPct": -1.02
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1606003200000,
+      "exitTime": 1606348800000,
+      "netPnl": -1608.4254,
+      "accountReturnPct": -1.0167
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1606003200000,
+      "exitTime": 1606003200000,
+      "netPnl": -1063.054,
+      "accountReturnPct": -0.672
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1606176000000,
+      "exitTime": 1606348800000,
+      "netPnl": -1464.5895,
+      "accountReturnPct": -0.8802
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1606176000000,
+      "exitTime": 1606348800000,
+      "netPnl": 2522.7811,
+      "accountReturnPct": 1.5162
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1606262400000,
+      "exitTime": 1606262400000,
+      "netPnl": -798.6516,
+      "accountReturnPct": -0.4393
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1606780800000,
+      "exitTime": 1607644800000,
+      "netPnl": -1518.5777,
+      "accountReturnPct": -1.0222
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1608163200000,
+      "exitTime": 1610323200000,
+      "netPnl": 8752.914,
+      "accountReturnPct": 5.9526
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1608163200000,
+      "exitTime": 1608681600000,
+      "netPnl": -1500.6067,
+      "accountReturnPct": -1.0205
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1608249600000,
+      "exitTime": 1610323200000,
+      "netPnl": 2280.1638,
+      "accountReturnPct": 1.5386
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1608508800000,
+      "exitTime": 1608681600000,
+      "netPnl": -1524.2979,
+      "accountReturnPct": -1.0178
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1609113600000,
+      "exitTime": 1610323200000,
+      "netPnl": 4669.7825,
+      "accountReturnPct": 3.1112
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1609200000000,
+      "exitTime": 1610323200000,
+      "netPnl": -140.768,
+      "accountReturnPct": -0.0929
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1609286400000,
+      "exitTime": 1610323200000,
+      "netPnl": 2549.7686,
+      "accountReturnPct": 1.6691
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1609545600000,
+      "exitTime": 1610323200000,
+      "netPnl": 2926.7348,
+      "accountReturnPct": 1.9148
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1609977600000,
+      "exitTime": 1610323200000,
+      "netPnl": -1888.426,
+      "accountReturnPct": -1.0117
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1609977600000,
+      "exitTime": 1610323200000,
+      "netPnl": -1888.0419,
+      "accountReturnPct": -1.0115
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1609977600000,
+      "exitTime": 1610064000000,
+      "netPnl": -1886.424,
+      "accountReturnPct": -1.0106
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1610323200000,
+      "exitTime": 1610323200000,
+      "netPnl": -1856.6842,
+      "accountReturnPct": -1.0129
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1610755200000,
+      "exitTime": 1611273600000,
+      "netPnl": -1208.3381,
+      "accountReturnPct": -0.767
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1610755200000,
+      "exitTime": 1614038400000,
+      "netPnl": 1530.438,
+      "accountReturnPct": 0.9715
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1610928000000,
+      "exitTime": 1611273600000,
+      "netPnl": -1605.182,
+      "accountReturnPct": -1.0095
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1610928000000,
+      "exitTime": 1611187200000,
+      "netPnl": -1614.2085,
+      "accountReturnPct": -1.0152
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1611100800000,
+      "exitTime": 1611187200000,
+      "netPnl": -1590.9243,
+      "accountReturnPct": -1.0113
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1611878400000,
+      "exitTime": 1611964800000,
+      "netPnl": -1542.728,
+      "accountReturnPct": -1.013
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1612224000000,
+      "exitTime": 1613347200000,
+      "netPnl": 4946.0453,
+      "accountReturnPct": 3.282
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1612224000000,
+      "exitTime": 1613779200000,
+      "netPnl": 43487.538,
+      "accountReturnPct": 28.8566
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1612310400000,
+      "exitTime": 1613952000000,
+      "netPnl": 244.7974,
+      "accountReturnPct": 0.162
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1612569600000,
+      "exitTime": 1613347200000,
+      "netPnl": 2034.164,
+      "accountReturnPct": 1.2831
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1612828800000,
+      "exitTime": 1614038400000,
+      "netPnl": 181.0075,
+      "accountReturnPct": 0.11
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1612915200000,
+      "exitTime": 1614038400000,
+      "netPnl": -561.7813,
+      "accountReturnPct": -0.3261
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1613001600000,
+      "exitTime": 1613952000000,
+      "netPnl": 2232.2172,
+      "accountReturnPct": 1.2406
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1613088000000,
+      "exitTime": 1613952000000,
+      "netPnl": -1095.3008,
+      "accountReturnPct": -0.5908
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1613174400000,
+      "exitTime": 1614038400000,
+      "netPnl": -1269.9717,
+      "accountReturnPct": -0.6595
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1613433600000,
+      "exitTime": 1613952000000,
+      "netPnl": -1880.4747,
+      "accountReturnPct": -1.0095
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1613865600000,
+      "exitTime": 1613952000000,
+      "netPnl": -2211.4789,
+      "accountReturnPct": -1.012
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1614384000000,
+      "exitTime": 1618704000000,
+      "netPnl": -514.7756,
+      "accountReturnPct": -0.2605
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1615680000000,
+      "exitTime": 1615852800000,
+      "netPnl": -2001.8775,
+      "accountReturnPct": -1.018
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1617235200000,
+      "exitTime": 1617753600000,
+      "netPnl": 1513.206,
+      "accountReturnPct": 0.775
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1617408000000,
+      "exitTime": 1618704000000,
+      "netPnl": -81.9276,
+      "accountReturnPct": -0.042
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1617494400000,
+      "exitTime": 1618704000000,
+      "netPnl": -626.9339,
+      "accountReturnPct": -0.3212
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1617667200000,
+      "exitTime": 1618704000000,
+      "netPnl": 3283.3948,
+      "accountReturnPct": 1.6293
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1617667200000,
+      "exitTime": 1618704000000,
+      "netPnl": 5682.2158,
+      "accountReturnPct": 2.8196
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1617840000000,
+      "exitTime": 1619136000000,
+      "netPnl": 5895.3932,
+      "accountReturnPct": 2.9842
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1618099200000,
+      "exitTime": 1618704000000,
+      "netPnl": -916.3348,
+      "accountReturnPct": -0.4367
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1618185600000,
+      "exitTime": 1618617600000,
+      "netPnl": 33729.1475,
+      "accountReturnPct": 15.9069
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1618358400000,
+      "exitTime": 1618704000000,
+      "netPnl": -2320.4046,
+      "accountReturnPct": -1.0266
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1618358400000,
+      "exitTime": 1618704000000,
+      "netPnl": -2289.0973,
+      "accountReturnPct": -1.0127
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1618444800000,
+      "exitTime": 1618704000000,
+      "netPnl": -2353.5125,
+      "accountReturnPct": -1.0129
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1618444800000,
+      "exitTime": 1618704000000,
+      "netPnl": -2359.9429,
+      "accountReturnPct": -1.0156
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1618531200000,
+      "exitTime": 1618704000000,
+      "netPnl": -2518.3068,
+      "accountReturnPct": -1.0113
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1618790400000,
+      "exitTime": 1621382400000,
+      "netPnl": 1598.0876,
+      "accountReturnPct": 0.6727
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1619568000000,
+      "exitTime": 1621209600000,
+      "netPnl": 3820.364,
+      "accountReturnPct": 1.6205
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1620086400000,
+      "exitTime": 1620864000000,
+      "netPnl": -2446.3021,
+      "accountReturnPct": -1.0142
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1620086400000,
+      "exitTime": 1620604800000,
+      "netPnl": 9305.9267,
+      "accountReturnPct": 3.8581
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1620172800000,
+      "exitTime": 1620518400000,
+      "netPnl": -2033.1755,
+      "accountReturnPct": -0.8423
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1620172800000,
+      "exitTime": 1621123200000,
+      "netPnl": -2076.6495,
+      "accountReturnPct": -0.8603
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1620259200000,
+      "exitTime": 1620864000000,
+      "netPnl": -2572.6513,
+      "accountReturnPct": -1.0133
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1620345600000,
+      "exitTime": 1621382400000,
+      "netPnl": -327.1976,
+      "accountReturnPct": -0.1257
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1620432000000,
+      "exitTime": 1620777600000,
+      "netPnl": -2611.4167,
+      "accountReturnPct": -1.0102
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1628121600000,
+      "exitTime": 1630972800000,
+      "netPnl": 4385.9469,
+      "accountReturnPct": 1.8712
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1628380800000,
+      "exitTime": 1630972800000,
+      "netPnl": 4320.4239,
+      "accountReturnPct": 1.8203
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1628553600000,
+      "exitTime": 1630972800000,
+      "netPnl": -62.1109,
+      "accountReturnPct": -0.0262
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1628640000000,
+      "exitTime": 1630972800000,
+      "netPnl": 8478.3322,
+      "accountReturnPct": 3.584
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1628640000000,
+      "exitTime": 1630972800000,
+      "netPnl": 2951.4835,
+      "accountReturnPct": 1.2477
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1628726400000,
+      "exitTime": 1630972800000,
+      "netPnl": 1543.9284,
+      "accountReturnPct": 0.6382
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1628899200000,
+      "exitTime": 1632096000000,
+      "netPnl": 32041.4414,
+      "accountReturnPct": 12.6728
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1628985600000,
+      "exitTime": 1629936000000,
+      "netPnl": -2208.4859,
+      "accountReturnPct": -0.8607
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1629072000000,
+      "exitTime": 1629244800000,
+      "netPnl": -2662.2941,
+      "accountReturnPct": -1.0143
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1629244800000,
+      "exitTime": 1630022400000,
+      "netPnl": 11234.68,
+      "accountReturnPct": 4.5181
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1629331200000,
+      "exitTime": 1630972800000,
+      "netPnl": 360.5286,
+      "accountReturnPct": 0.1396
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1629504000000,
+      "exitTime": 1629936000000,
+      "netPnl": -2890.4181,
+      "accountReturnPct": -1.0146
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1630454400000,
+      "exitTime": 1630972800000,
+      "netPnl": -2894.1204,
+      "accountReturnPct": -0.9748
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1630713600000,
+      "exitTime": 1630972800000,
+      "netPnl": -2904.2518,
+      "accountReturnPct": -0.8849
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1630886400000,
+      "exitTime": 1630972800000,
+      "netPnl": -3388.4037,
+      "accountReturnPct": -1.016
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1630972800000,
+      "exitTime": 1630972800000,
+      "netPnl": -1367.7479,
+      "accountReturnPct": -0.4021
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1631318400000,
+      "exitTime": 1632182400000,
+      "netPnl": -71.4757,
+      "accountReturnPct": -0.0239
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1631491200000,
+      "exitTime": 1632096000000,
+      "netPnl": -3026.2341,
+      "accountReturnPct": -1.0103
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1631491200000,
+      "exitTime": 1632096000000,
+      "netPnl": -3038.9557,
+      "accountReturnPct": -1.0146
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1631836800000,
+      "exitTime": 1633910400000,
+      "netPnl": -2156.4641,
+      "accountReturnPct": -0.7369
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1633564800000,
+      "exitTime": 1637020800000,
+      "netPnl": 1739.9292,
+      "accountReturnPct": 0.6354
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1634169600000,
+      "exitTime": 1636502400000,
+      "netPnl": 466.6388,
+      "accountReturnPct": 0.1703
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1634774400000,
+      "exitTime": 1637020800000,
+      "netPnl": -101.5025,
+      "accountReturnPct": -0.0364
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1635552000000,
+      "exitTime": 1637107200000,
+      "netPnl": 1151.1346,
+      "accountReturnPct": 0.4129
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1635897600000,
+      "exitTime": 1637193600000,
+      "netPnl": -1261.1806,
+      "accountReturnPct": -0.4438
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1636329600000,
+      "exitTime": 1638576000000,
+      "netPnl": 2233.1504,
+      "accountReturnPct": 0.7665
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1636416000000,
+      "exitTime": 1637020800000,
+      "netPnl": -3009.9495,
+      "accountReturnPct": -1.0172
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1636416000000,
+      "exitTime": 1637107200000,
+      "netPnl": -1271.8554,
+      "accountReturnPct": -0.4298
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1636416000000,
+      "exitTime": 1636502400000,
+      "netPnl": -3016.0742,
+      "accountReturnPct": -1.0193
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1636502400000,
+      "exitTime": 1636502400000,
+      "netPnl": -2999.1499,
+      "accountReturnPct": -1.0182
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1637020800000,
+      "exitTime": 1637020800000,
+      "netPnl": -2896.2462,
+      "accountReturnPct": -1.021
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1641254400000,
+      "exitTime": 1642723200000,
+      "netPnl": -2675.5841,
+      "accountReturnPct": -1.0132
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1647993600000,
+      "exitTime": 1649203200000,
+      "netPnl": -2657.5797,
+      "accountReturnPct": -1.0167
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1651708800000,
+      "exitTime": 1651708800000,
+      "netPnl": -2633.7344,
+      "accountReturnPct": -1.0179
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1658966400000,
+      "exitTime": 1660867200000,
+      "netPnl": -13.1435,
+      "accountReturnPct": -0.0051
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1662768000000,
+      "exitTime": 1663113600000,
+      "netPnl": -2598.2582,
+      "accountReturnPct": -1.0146
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1663891200000,
+      "exitTime": 1664323200000,
+      "netPnl": -2577.7731,
+      "accountReturnPct": -1.0169
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1667088000000,
+      "exitTime": 1667865600000,
+      "netPnl": 1036.8676,
+      "accountReturnPct": 0.4132
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1667088000000,
+      "exitTime": 1667865600000,
+      "netPnl": -2545.6984,
+      "accountReturnPct": -1.0146
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1667606400000,
+      "exitTime": 1667865600000,
+      "netPnl": -2633.11,
+      "accountReturnPct": -1.0201
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1667606400000,
+      "exitTime": 1667865600000,
+      "netPnl": -2644.9406,
+      "accountReturnPct": -1.0247
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1669248000000,
+      "exitTime": 1671148800000,
+      "netPnl": -2479.1113,
+      "accountReturnPct": -1.0155
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1673481600000,
+      "exitTime": 1677283200000,
+      "netPnl": 1746.7888,
+      "accountReturnPct": 0.7229
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1673568000000,
+      "exitTime": 1676073600000,
+      "netPnl": 2694.4799,
+      "accountReturnPct": 1.1106
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1673568000000,
+      "exitTime": 1677801600000,
+      "netPnl": 989.3387,
+      "accountReturnPct": 0.4078
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1673654400000,
+      "exitTime": 1675987200000,
+      "netPnl": 3875.0334,
+      "accountReturnPct": 1.5893
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1673740800000,
+      "exitTime": 1678233600000,
+      "netPnl": 2053.715,
+      "accountReturnPct": 0.8192
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1674518400000,
+      "exitTime": 1677542400000,
+      "netPnl": -1078.5794,
+      "accountReturnPct": -0.4161
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1674518400000,
+      "exitTime": 1675900800000,
+      "netPnl": -2653.9356,
+      "accountReturnPct": -1.0237
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1674864000000,
+      "exitTime": 1675900800000,
+      "netPnl": -1502.8679,
+      "accountReturnPct": -0.5791
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1676505600000,
+      "exitTime": 1677196800000,
+      "netPnl": -2657.9856,
+      "accountReturnPct": -1.0212
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1676505600000,
+      "exitTime": 1677801600000,
+      "netPnl": -2696.5122,
+      "accountReturnPct": -1.036
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1676764800000,
+      "exitTime": 1677801600000,
+      "netPnl": -2658.2158,
+      "accountReturnPct": -1.0196
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1679097600000,
+      "exitTime": 1679875200000,
+      "netPnl": -2466.2227,
+      "accountReturnPct": -1.0286
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1679097600000,
+      "exitTime": 1682035200000,
+      "netPnl": 237.1839,
+      "accountReturnPct": 0.0989
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1679097600000,
+      "exitTime": 1682035200000,
+      "netPnl": 1477.415,
+      "accountReturnPct": 0.6162
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1679443200000,
+      "exitTime": 1679443200000,
+      "netPnl": -2449.3746,
+      "accountReturnPct": -1.0207
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1680048000000,
+      "exitTime": 1681948800000,
+      "netPnl": -1573.9546,
+      "accountReturnPct": -0.6717
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1680134400000,
+      "exitTime": 1681862400000,
+      "netPnl": -386.1086,
+      "accountReturnPct": -0.1632
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1680566400000,
+      "exitTime": 1680825600000,
+      "netPnl": -2393.9652,
+      "accountReturnPct": -1.0159
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1681430400000,
+      "exitTime": 1682035200000,
+      "netPnl": -2109.7335,
+      "accountReturnPct": -0.8832
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1681689600000,
+      "exitTime": 1681862400000,
+      "netPnl": -2526.3713,
+      "accountReturnPct": -1.0416
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1681689600000,
+      "exitTime": 1681862400000,
+      "netPnl": -2488.4994,
+      "accountReturnPct": -1.026
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1681862400000,
+      "exitTime": 1681862400000,
+      "netPnl": -2479.9745,
+      "accountReturnPct": -1.0259
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1683331200000,
+      "exitTime": 1683504000000,
+      "netPnl": -2333.6528,
+      "accountReturnPct": -1.0484
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1684627200000,
+      "exitTime": 1686268800000,
+      "netPnl": 1461.7895,
+      "accountReturnPct": 0.6636
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1687392000000,
+      "exitTime": 1690156800000,
+      "netPnl": -910.5034,
+      "accountReturnPct": -0.4106
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1687910400000,
+      "exitTime": 1688601600000,
+      "netPnl": -1994.3923,
+      "accountReturnPct": -0.8969
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1688169600000,
+      "exitTime": 1688947200000,
+      "netPnl": -2286.9206,
+      "accountReturnPct": -1.0194
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1688169600000,
+      "exitTime": 1688601600000,
+      "netPnl": -2288.501,
+      "accountReturnPct": -1.0201
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1689292800000,
+      "exitTime": 1689552000000,
+      "netPnl": -2249.6999,
+      "accountReturnPct": -1.0386
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1689292800000,
+      "exitTime": 1689552000000,
+      "netPnl": -2221.9319,
+      "accountReturnPct": -1.0258
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1689292800000,
+      "exitTime": 1690243200000,
+      "netPnl": -2205.6763,
+      "accountReturnPct": -1.0183
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1689292800000,
+      "exitTime": 1689292800000,
+      "netPnl": -2199.9947,
+      "accountReturnPct": -1.0157
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1689292800000,
+      "exitTime": 1689292800000,
+      "netPnl": -2206.4287,
+      "accountReturnPct": -1.0186
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1689897600000,
+      "exitTime": 1690156800000,
+      "netPnl": -2098.4189,
+      "accountReturnPct": -1.021
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1690329600000,
+      "exitTime": 1691366400000,
+      "netPnl": -2051.4325,
+      "accountReturnPct": -1.0203
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1695859200000,
+      "exitTime": 1697068800000,
+      "netPnl": -260.9008,
+      "accountReturnPct": -0.1311
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1696118400000,
+      "exitTime": 1696204800000,
+      "netPnl": -2056.9783,
+      "accountReturnPct": -1.0267
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1697760000000,
+      "exitTime": 1704240000000,
+      "netPnl": 53850.9384,
+      "accountReturnPct": 27.3774
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1697932800000,
+      "exitTime": 1700179200000,
+      "netPnl": 9456.0167,
+      "accountReturnPct": 4.7268
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1698105600000,
+      "exitTime": 1702252800000,
+      "netPnl": 6818.0296,
+      "accountReturnPct": 3.3132
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1698105600000,
+      "exitTime": 1700524800000,
+      "netPnl": 3152.1451,
+      "accountReturnPct": 1.5318
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1698192000000,
+      "exitTime": 1699920000000,
+      "netPnl": 3006.4782,
+      "accountReturnPct": 1.4691
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1698364800000,
+      "exitTime": 1698710400000,
+      "netPnl": -2142.3598,
+      "accountReturnPct": -1.0298
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1698796800000,
+      "exitTime": 1700524800000,
+      "netPnl": 617.0369,
+      "accountReturnPct": 0.2859
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1698883200000,
+      "exitTime": 1704240000000,
+      "netPnl": 20670.372,
+      "accountReturnPct": 9.335
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1699228800000,
+      "exitTime": 1700179200000,
+      "netPnl": 9.8947,
+      "accountReturnPct": 0.0044
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1700092800000,
+      "exitTime": 1704240000000,
+      "netPnl": 12518.054,
+      "accountReturnPct": 4.7678
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1700265600000,
+      "exitTime": 1700524800000,
+      "netPnl": -2553.9753,
+      "accountReturnPct": -1.0199
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1701561600000,
+      "exitTime": 1704240000000,
+      "netPnl": -923.7223,
+      "accountReturnPct": -0.3644
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1701734400000,
+      "exitTime": 1704240000000,
+      "netPnl": -1415.2198,
+      "accountReturnPct": -0.5513
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1701820800000,
+      "exitTime": 1704240000000,
+      "netPnl": 5721.2214,
+      "accountReturnPct": 2.1764
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1701993600000,
+      "exitTime": 1702252800000,
+      "netPnl": -2351.8058,
+      "accountReturnPct": -0.8574
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1702425600000,
+      "exitTime": 1704240000000,
+      "netPnl": -2957.1171,
+      "accountReturnPct": -1.0171
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1703203200000,
+      "exitTime": 1709596800000,
+      "netPnl": 14150.81,
+      "accountReturnPct": 4.3142
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1704758400000,
+      "exitTime": 1705017600000,
+      "netPnl": -3139.3568,
+      "accountReturnPct": -1.0309
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1704931200000,
+      "exitTime": 1705622400000,
+      "netPnl": -2800.5046,
+      "accountReturnPct": -0.9198
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1704931200000,
+      "exitTime": 1705881600000,
+      "netPnl": -3121.588,
+      "accountReturnPct": -1.0253
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1705190400000,
+      "exitTime": 1705363200000,
+      "netPnl": -3150.9053,
+      "accountReturnPct": -1.0408
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1706918400000,
+      "exitTime": 1709596800000,
+      "netPnl": -32.0861,
+      "accountReturnPct": -0.011
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1707091200000,
+      "exitTime": 1709251200000,
+      "netPnl": 7612.1481,
+      "accountReturnPct": 2.5997
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1707782400000,
+      "exitTime": 1709596800000,
+      "netPnl": 10809.715,
+      "accountReturnPct": 3.5775
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1707955200000,
+      "exitTime": 1709596800000,
+      "netPnl": 7177.463,
+      "accountReturnPct": 2.3404
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1709078400000,
+      "exitTime": 1709596800000,
+      "netPnl": 17014.8416,
+      "accountReturnPct": 5.1109
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1709164800000,
+      "exitTime": 1709596800000,
+      "netPnl": -2354.7966,
+      "accountReturnPct": -0.6721
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1709251200000,
+      "exitTime": 1709596800000,
+      "netPnl": 118.6998,
+      "accountReturnPct": 0.0342
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1709337600000,
+      "exitTime": 1709596800000,
+      "netPnl": -3663.5017,
+      "accountReturnPct": -1.021
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1709424000000,
+      "exitTime": 1709596800000,
+      "netPnl": -3689.5382,
+      "accountReturnPct": -1.0161
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1709769600000,
+      "exitTime": 1710460800000,
+      "netPnl": -3413.1573,
+      "accountReturnPct": -1.0185
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1709769600000,
+      "exitTime": 1710806400000,
+      "netPnl": 8367.1157,
+      "accountReturnPct": 2.4969
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1709856000000,
+      "exitTime": 1712707200000,
+      "netPnl": 3071.6171,
+      "accountReturnPct": 0.9091
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1710201600000,
+      "exitTime": 1712016000000,
+      "netPnl": -912.4792,
+      "accountReturnPct": -0.2668
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1710201600000,
+      "exitTime": 1710460800000,
+      "netPnl": -3516.2288,
+      "accountReturnPct": -1.0281
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1710201600000,
+      "exitTime": 1710633600000,
+      "netPnl": -3473.5848,
+      "accountReturnPct": -1.0156
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1710201600000,
+      "exitTime": 1710460800000,
+      "netPnl": -3506.0826,
+      "accountReturnPct": -1.0251
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1710201600000,
+      "exitTime": 1710374400000,
+      "netPnl": -3478.8324,
+      "accountReturnPct": -1.0171
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1710201600000,
+      "exitTime": 1710460800000,
+      "netPnl": -3481.9859,
+      "accountReturnPct": -1.018
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1711670400000,
+      "exitTime": 1712102400000,
+      "netPnl": -3361.1214,
+      "accountReturnPct": -1.0117
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1711756800000,
+      "exitTime": 1712016000000,
+      "netPnl": -3369.1021,
+      "accountReturnPct": -1.0167
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1715385600000,
+      "exitTime": 1716076800000,
+      "netPnl": -3330.922,
+      "accountReturnPct": -1.0474
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1716336000000,
+      "exitTime": 1718064000000,
+      "netPnl": -2744.0942,
+      "accountReturnPct": -0.872
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1716854400000,
+      "exitTime": 1717718400000,
+      "netPnl": -3223.9071,
+      "accountReturnPct": -1.0217
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1717545600000,
+      "exitTime": 1717977600000,
+      "netPnl": -3247.042,
+      "accountReturnPct": -1.0373
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1719878400000,
+      "exitTime": 1720137600000,
+      "netPnl": -2578.7418,
+      "accountReturnPct": -0.8441
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1720656000000,
+      "exitTime": 1721692800000,
+      "netPnl": -246.634,
+      "accountReturnPct": -0.0814
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1721174400000,
+      "exitTime": 1722729600000,
+      "netPnl": -2546.2987,
+      "accountReturnPct": -0.8379
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1721606400000,
+      "exitTime": 1722470400000,
+      "netPnl": -3114.0216,
+      "accountReturnPct": -1.0212
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1724112000000,
+      "exitTime": 1725408000000,
+      "netPnl": 2802.5147,
+      "accountReturnPct": 0.9436
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1727136000000,
+      "exitTime": 1727740800000,
+      "netPnl": -3093.4594,
+      "accountReturnPct": -1.0318
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1729036800000,
+      "exitTime": 1734652800000,
+      "netPnl": 18288.2329,
+      "accountReturnPct": 6.1637
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1729296000000,
+      "exitTime": 1730592000000,
+      "netPnl": 1448.0678,
+      "accountReturnPct": 0.4868
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1729382400000,
+      "exitTime": 1729641600000,
+      "netPnl": -3080.31,
+      "accountReturnPct": -1.0311
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1729468800000,
+      "exitTime": 1733702400000,
+      "netPnl": 9301.1404,
+      "accountReturnPct": 3.1173
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1729814400000,
+      "exitTime": 1730764800000,
+      "netPnl": -1466.5589,
+      "accountReturnPct": -0.4939
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1730937600000,
+      "exitTime": 1734480000000,
+      "netPnl": 16344.3454,
+      "accountReturnPct": 5.3955
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1731110400000,
+      "exitTime": 1733702400000,
+      "netPnl": 32087.9451,
+      "accountReturnPct": 10.463
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1731110400000,
+      "exitTime": 1734566400000,
+      "netPnl": 5942.3239,
+      "accountReturnPct": 1.9376
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1731110400000,
+      "exitTime": 1733702400000,
+      "netPnl": 12078.2672,
+      "accountReturnPct": 3.9384
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1731196800000,
+      "exitTime": 1734652800000,
+      "netPnl": 534.3309,
+      "accountReturnPct": 0.1702
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1731283200000,
+      "exitTime": 1733702400000,
+      "netPnl": 9992.6215,
+      "accountReturnPct": 3.0077
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1731283200000,
+      "exitTime": 1733702400000,
+      "netPnl": 7043.1192,
+      "accountReturnPct": 2.12
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1734048000000,
+      "exitTime": 1734566400000,
+      "netPnl": -4288.6174,
+      "accountReturnPct": -1.011
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1736985600000,
+      "exitTime": 1737936000000,
+      "netPnl": -4080.2224,
+      "accountReturnPct": -1.0177
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1737244800000,
+      "exitTime": 1737936000000,
+      "netPnl": -4094.9898,
+      "accountReturnPct": -1.0185
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1744588800000,
+      "exitTime": 1749772800000,
+      "netPnl": 2889.3359,
+      "accountReturnPct": 0.7357
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1746144000000,
+      "exitTime": 1749081600000,
+      "netPnl": 4596.1214,
+      "accountReturnPct": 1.1776
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1746835200000,
+      "exitTime": 1749081600000,
+      "netPnl": -4163.3717,
+      "accountReturnPct": -1.0461
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1746835200000,
+      "exitTime": 1748563200000,
+      "netPnl": -4066.2823,
+      "accountReturnPct": -1.0217
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1746921600000,
+      "exitTime": 1747440000000,
+      "netPnl": -4098.3606,
+      "accountReturnPct": -1.0202
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1746921600000,
+      "exitTime": 1747267200000,
+      "netPnl": -4112.6498,
+      "accountReturnPct": -1.0238
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1747180800000,
+      "exitTime": 1747440000000,
+      "netPnl": -4089.2308,
+      "accountReturnPct": -1.0222
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1749600000000,
+      "exitTime": 1749772800000,
+      "netPnl": -3945.2145,
+      "accountReturnPct": -1.0238
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1752192000000,
+      "exitTime": 1754092800000,
+      "netPnl": -1978.7899,
+      "accountReturnPct": -0.5266
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1752192000000,
+      "exitTime": 1754092800000,
+      "netPnl": 5794.7511,
+      "accountReturnPct": 1.5421
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1752192000000,
+      "exitTime": 1753315200000,
+      "netPnl": 8012.0099,
+      "accountReturnPct": 2.1322
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1752278400000,
+      "exitTime": 1753315200000,
+      "netPnl": 348.1989,
+      "accountReturnPct": 0.0917
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1752278400000,
+      "exitTime": 1753833600000,
+      "netPnl": 2958.3686,
+      "accountReturnPct": 0.7791
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1752710400000,
+      "exitTime": 1754006400000,
+      "netPnl": 5530.0941,
+      "accountReturnPct": 1.3746
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1752796800000,
+      "exitTime": 1754006400000,
+      "netPnl": -1990.9581,
+      "accountReturnPct": -0.4752
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1753833600000,
+      "exitTime": 1754092800000,
+      "netPnl": -4303.4262,
+      "accountReturnPct": -1.0424
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1754697600000,
+      "exitTime": 1755561600000,
+      "netPnl": 992.9656,
+      "accountReturnPct": 0.2545
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1754784000000,
+      "exitTime": 1758067200000,
+      "netPnl": 1168.248,
+      "accountReturnPct": 0.2975
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1755043200000,
+      "exitTime": 1755475200000,
+      "netPnl": -4066.5949,
+      "accountReturnPct": -1.0204
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1755043200000,
+      "exitTime": 1756166400000,
+      "netPnl": -3119.7192,
+      "accountReturnPct": -0.7828
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1755129600000,
+      "exitTime": 1755129600000,
+      "netPnl": -3876.1588,
+      "accountReturnPct": -0.9625
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1755907200000,
+      "exitTime": 1758758400000,
+      "netPnl": 2826.1391,
+      "accountReturnPct": 0.7183
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1755907200000,
+      "exitTime": 1756166400000,
+      "netPnl": -4021.1572,
+      "accountReturnPct": -1.0221
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1756425600000,
+      "exitTime": 1758499200000,
+      "netPnl": 86.3033,
+      "accountReturnPct": 0.0228
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1757548800000,
+      "exitTime": 1758499200000,
+      "netPnl": 206.2708,
+      "accountReturnPct": 0.0544
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1757808000000,
+      "exitTime": 1757980800000,
+      "netPnl": -3946.7259,
+      "accountReturnPct": -1.0212
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1759449600000,
+      "exitTime": 1760054400000,
+      "netPnl": 1986.4482,
+      "accountReturnPct": 0.5278
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1760054400000,
+      "exitTime": 1760054400000,
+      "netPnl": -3942.3536,
+      "accountReturnPct": -1.0273
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1768348800000,
+      "exitTime": 1768867200000,
+      "netPnl": -3905.5195,
+      "accountReturnPct": -1.043
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1768521600000,
+      "exitTime": 1768867200000,
+      "netPnl": -2755.2382,
+      "accountReturnPct": -0.738
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1774051200000,
+      "exitTime": 1779926400000,
+      "netPnl": 11412.736,
+      "accountReturnPct": 3.1032
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1780012800000,
+      "exitTime": 1780444800000,
+      "netPnl": 1507.8265,
+      "accountReturnPct": 0.3976
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1786492800000,
+      "exitTime": 1788134400000,
+      "netPnl": -899.7929,
+      "accountReturnPct": -0.2364
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1786752000000,
+      "exitTime": 1789084800000,
+      "netPnl": 14468.8945,
+      "accountReturnPct": 3.8086
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1787184000000,
+      "exitTime": 1791417600000,
+      "netPnl": 12928.3813,
+      "accountReturnPct": 3.3128
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1787184000000,
+      "exitTime": 1789516800000,
+      "netPnl": 6854.61,
+      "accountReturnPct": 1.7565
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1787184000000,
+      "exitTime": 1791417600000,
+      "netPnl": 7265.4393,
+      "accountReturnPct": 1.8617
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1787184000000,
+      "exitTime": 1791417600000,
+      "netPnl": 8167.7042,
+      "accountReturnPct": 2.0929
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1788912000000,
+      "exitTime": 1789084800000,
+      "netPnl": -4508.5049,
+      "accountReturnPct": -1.0249
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1788912000000,
+      "exitTime": 1788912000000,
+      "netPnl": -3305.1296,
+      "accountReturnPct": -0.7514
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1789862400000,
+      "exitTime": 1792022400000,
+      "netPnl": -2187.9266,
+      "accountReturnPct": -0.5103
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1790035200000,
+      "exitTime": 1791417600000,
+      "netPnl": -4633.806,
+      "accountReturnPct": -1.0416
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1790035200000,
+      "exitTime": 1791417600000,
+      "netPnl": 721.7957,
+      "accountReturnPct": 0.1623
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1790121600000,
+      "exitTime": 1791331200000,
+      "netPnl": -4527.0163,
+      "accountReturnPct": -1.0214
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1790380800000,
+      "exitTime": 1791417600000,
+      "netPnl": -604.6433,
+      "accountReturnPct": -0.1359
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1791590400000,
+      "exitTime": 1791763200000,
+      "netPnl": -4210.4915,
+      "accountReturnPct": -1.0182
+    },
+    {
+      "symbol": "PORTFOLIO",
+      "entryTime": 1793318400000,
+      "exitTime": 1793318400000,
+      "netPnl": -2836.9003,
+      "accountReturnPct": -0.6984
+    }
+  ],
+  "portfolio": {
+    "endingEquity": 403385.66089953633,
+    "netReturnPct": 303.38566089953633,
+    "maxDrawdownPct": 42.168482207961965,
+    "tradeCount": 327,
+    "profitFactor": 1.7120155808463169,
+    "winRatePct": 38.226299694189606
+  },
+  "evaluatedAt": "2026-11-22T03:59:16.691Z",
+  "provenance": {
+    "protocol": "research/strategy-research/PROTOCOL-ROUND-3.md",
+    "candidate": {
+      "id": "TF",
+      "name": "Donchian 55/20 breakout with SMA200 filter",
+      "entryLookback": 55,
+      "exitLookback": 20,
+      "trendSma": 200,
+      "stopAtr": 2,
+      "variant": "TF-R",
+      "trailAtr": 3,
+      "maxPositionPct": 20
+    },
+    "set": "development",
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT",
+      "BNBUSDT",
+      "XRPUSDT",
+      "ADAUSDT",
+      "DOGEUSDT",
+      "LINKUSDT",
+      "LTCUSDT",
+      "TRXUSDT",
+      "DOTUSDT",
+      "AVAXUSDT",
+      "ATOMUSDT",
+      "ETCUSDT",
+      "XLMUSDT"
+    ],
+    "droppedSymbols": [],
+    "source": "https://data-api.binance.vision/api/v3/klines (public Binance Spot daily bars)",
+    "period": {
+      "start": "2019-01-01T00:00:00.000Z",
+      "end": "2026-11-22T00:00:00.000Z"
+    },
+    "execution": {
+      "sharedCapital": 100000,
+      "riskPct": 1,
+      "maxPositionPct": 20,
+      "leverage": "none",
+      "feeBps": 10,
+      "slippageBps": 5,
+      "stress": "20/20 bps",
+      "drawdown": "combined marked equity at daily closes"
+    },
+    "parameterFitting": "NONE: all parameters fixed in the pre-registered protocol",
+    "datasetFingerprintSha256": "4a988a854cf9cc5f408cb13a9d05b03071724e708023fbbf2d29adbad0117551"
+  },
+  "acceptance": {
+    "decision": "REJECT",
+    "eligibleForPaperTrading": false,
+    "failures": [
+      "oos_max_drawdown",
+      "bootstrap_p95_drawdown"
+    ],
+    "missingEvidence": [
+      "regime_sample_size"
+    ],
+    "checks": [
+      {
+        "name": "data_quality",
+        "status": "PASS",
+        "actual": "PASS",
+        "threshold": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "oos_trade_count",
+        "status": "PASS",
+        "actual": 327,
+        "threshold": 100,
+        "detail": ""
+      },
+      {
+        "name": "oos_profit_factor",
+        "status": "PASS",
+        "actual": 1.712015580846317,
+        "threshold": 1.2,
+        "detail": ""
+      },
+      {
+        "name": "oos_net_return",
+        "status": "PASS",
+        "actual": 303.38566089953633,
+        "threshold": "> 0",
+        "detail": ""
+      },
+      {
+        "name": "oos_max_drawdown",
+        "status": "FAIL",
+        "actual": 42.168482207961965,
+        "threshold": "<= 20",
+        "detail": ""
+      },
+      {
+        "name": "positive_fold_ratio",
+        "status": "PASS",
+        "actual": 0.8333333333333334,
+        "threshold": 0.6,
+        "detail": ""
+      },
+      {
+        "name": "regime_sample_size",
+        "status": "PENDING",
+        "actual": null,
+        "threshold": null,
+        "detail": "Each reported regime needs at least 20 trades; underpowered groups: BEARISH_NORMAL."
+      },
+      {
+        "name": "stressed_profit_factor",
+        "status": "PASS",
+        "actual": 1.61830779627491,
+        "threshold": 1,
+        "detail": ""
+      },
+      {
+        "name": "stressed_net_return",
+        "status": "PASS",
+        "actual": 255.28684074866516,
+        "threshold": "> 0",
+        "detail": ""
+      },
+      {
+        "name": "bootstrap_p95_drawdown",
+        "status": "FAIL",
+        "actual": 31.850150890923995,
+        "threshold": "<= 30",
+        "detail": ""
+      }
+    ]
+  }
+}
