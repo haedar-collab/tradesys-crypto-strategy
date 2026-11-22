@@ -64,12 +64,38 @@ async function processIdentity(pid) {
 }
 
 /**
+ * Wall-clock start time of this container's init process (PID 1), derived from
+ * the kernel boot time and PID 1's start ticks. Linux exposes start times in
+ * USER_HZ, which is fixed at 100 for the userspace ABI. Returns null when /proc
+ * is unavailable, which keeps the exclusive-volume rule fail-closed.
+ */
+export async function readContainerStartedAtMs() {
+  const [stat, init] = await Promise.all([readText("/proc/stat"), readText("/proc/1/stat")]);
+  const btime = stat?.match(/^btime (\d+)$/m)?.[1];
+  const fields = init ? init.slice(init.lastIndexOf(")") + 2).split(" ") : [];
+  const ticks = fields[19];
+  if (!btime || !/^\d+$/.test(ticks ?? "")) return null;
+  return Number(btime) * 1000 + Number(ticks) * 10;
+}
+
+const EXCLUSIVE_VOLUME_CLOCK_MARGIN_MS = 2_000;
+
+/**
  * Decide whether an existing lock was provably left behind by a dead process.
  * Only locks written by this module with a full process identity on the same
  * host can be reclaimed; anything else (legacy, malformed, foreign host, no
  * /proc) stays fail-closed for operator review.
  */
-async function isProvablyStaleLock(lock) {
+async function isProvablyStaleLock(lock, { exclusiveVolume = false, containerStartedAtMs = readContainerStartedAtMs } = {}) {
+  // Exclusive volume (e.g. a Render persistent disk, which can be attached to
+  // only one running instance): a lock created before this container started
+  // was necessarily written by a previous, now-dead container. This also
+  // covers legacy lock formats and locks from another instance hostname.
+  if (exclusiveVolume && lock && typeof lock === "object" &&
+      Number.isSafeInteger(lock.createdAt) && lock.createdAt > 0) {
+    const startedAt = await containerStartedAtMs();
+    if (Number.isFinite(startedAt) && lock.createdAt < startedAt - EXCLUSIVE_VOLUME_CLOCK_MARGIN_MS) return true;
+  }
   if (!lock || typeof lock !== "object" || typeof lock.token !== "string" ||
       !Number.isSafeInteger(lock.pid) || lock.pid <= 0 ||
       typeof lock.hostname !== "string" || typeof lock.bootId !== "string" ||
@@ -91,7 +117,13 @@ async function isProvablyStaleLock(lock) {
  * Append-only, hash-chained JSONL ledger. Each append is serialized and fsynced.
  * It stores supplied paper-trading events; it does not execute orders.
  */
-export async function createPersistentPaperLedger({ filePath } = {}) {
+export async function createPersistentPaperLedger({
+  filePath,
+  exclusiveVolume = false,
+  containerStartedAtMs = readContainerStartedAtMs
+} = {}) {
+  if (typeof exclusiveVolume !== "boolean") throw new TypeError("exclusiveVolume must be a boolean");
+  if (typeof containerStartedAtMs !== "function") throw new TypeError("containerStartedAtMs must be a function");
   if (typeof filePath !== "string" || !filePath.trim()) throw new TypeError("filePath is required");
   const path = resolve(filePath);
   await mkdir(dirname(path), { recursive: true });
@@ -112,7 +144,7 @@ export async function createPersistentPaperLedger({ filePath } = {}) {
     // restart) is reclaimed; every other lock still requires manual review.
     let existing = null;
     try { existing = JSON.parse(await readFile(lockPath, "utf8")); } catch { existing = null; }
-    if (!(await isProvablyStaleLock(existing))) throw new Error(lockedMessage);
+    if (!(await isProvablyStaleLock(existing, { exclusiveVolume, containerStartedAtMs }))) throw new Error(lockedMessage);
     const quarantine = lockPath + ".stale-" + randomUUID();
     try { await rename(lockPath, quarantine); }
     catch (renameError) {

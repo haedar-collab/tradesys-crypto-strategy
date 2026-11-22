@@ -34,7 +34,8 @@ try {
       host: config.host,
       port: config.port,
       maxQuoteAgeMs: config.maxQuoteAgeMs,
-      auth: config.auth
+      auth: config.auth,
+      sessionOptions: { exclusiveVolume: config.exclusiveVolume }
     });
     const address = runtime.address();
     // Install handlers before the readiness marker so an immediate SIGTERM is handled.

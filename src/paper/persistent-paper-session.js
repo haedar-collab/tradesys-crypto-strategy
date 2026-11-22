@@ -27,7 +27,8 @@ export async function createPersistentPaperSession({
   dailyLossLimitPct = 3,
   maxDrawdownPct = 10,
   maxExposurePct = 80,
-  now = () => Date.now()
+  now = () => Date.now(),
+  exclusiveVolume = false
 } = {}) {
   if (typeof now !== "function") throw new TypeError("now must be a function");
   if (!Number.isSafeInteger(riskMarkMaxAgeMs) || riskMarkMaxAgeMs < 0) {
@@ -35,7 +36,9 @@ export async function createPersistentPaperSession({
   }
   let clock = now();
   if (!Number.isSafeInteger(clock) || clock < 0) throw new TypeError("now must return UTC epoch milliseconds");
-  const ledger = await createPersistentPaperLedger({ filePath });
+  // exclusiveVolume is a storage/lock policy, not trading configuration, so it
+  // is deliberately not part of the immutable session header.
+  const ledger = await createPersistentPaperLedger({ filePath, exclusiveVolume });
   try {
   const broker = createPaperBroker({
     initialCash, feeBps, slippageBps, maxQuoteAgeMs, now: () => clock

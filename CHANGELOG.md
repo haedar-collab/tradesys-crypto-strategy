@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — 2026-11-22 Render restart fix
+
+- Fix: `npm run start:dashboard` now `exec`s Node. Previously `npm` did not forward SIGTERM through `sh -c`, so every Render restart or deploy killed Node without a clean shutdown and left the ledger lock behind (the 01:43 UTC deploy failed with "ledger is locked").
+- Fix: new exclusive-volume lock policy (`--exclusive-volume`, automatic when `RENDER=true`). A lock created before the current container started is reclaimed, because a Render disk can be attached to only one instance. This also recovers locks in the pre-fix format and locks from previous instance hostnames. The default policy elsewhere is unchanged (fail-closed).
+
 ## Unreleased — 2026-11-22 audit remediation
 
 - Fix: a rejected pre-trade risk check (e.g. an oversized BUY) no longer latches the session-wide kill switch or moves peak/day-start baselines. Actual equity is evaluated first; the projected post-trade portfolio is checked with the side-effect-free `riskMonitor.preview()`.
