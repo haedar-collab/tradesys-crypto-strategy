@@ -35,7 +35,11 @@ function frameEvidence(frame) {
   const last=frame.candles.length-1,p=frame.prepared,s=frame.structure;
   const finite=x=>Number.isFinite(x)?x:null;
   const e50=finite(p.e50.at(-1)),e200=finite(p.e200.at(-1));
-  return {asOf:frame.asOf,price:finite(frame.price),ema20:finite(p.e20.at(-1)),ema50:e50,ema200:e200,
+  // Remaining weight of the SMA seed inside EMA200; above ~5% the value still
+  // depends materially on where the candle window starts.
+  const ema200SeedWeight=frame.candles.length<200?1:Math.pow(1-2/201,frame.candles.length-200);
+  return {asOf:frame.asOf,price:finite(frame.price),bars:frame.candles.length,
+    ema200SeedWeight:Number(ema200SeedWeight.toFixed(6)),ema200Converged:ema200SeedWeight<=0.05,ema20:finite(p.e20.at(-1)),ema50:e50,ema200:e200,
     closeVsEma50:e50==null?null:frame.price-e50,closeVsEma200:e200==null?null:frame.price-e200,
     ema50VsEma200:e50==null||e200==null?null:e50-e200,eventTrend:s.trend,eventCount:s.events.length,
     lastEvent:s.events.at(-1)??null,confirmedHighPivotCount:p.piv.hi.filter(i=>i<=last-3).length,

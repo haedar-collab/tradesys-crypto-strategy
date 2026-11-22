@@ -12,6 +12,17 @@ const FRAMES = Object.freeze([
   ["h4", "4h", 14400000],
   ["h1", "1h", 3600000]
 ]);
+/**
+ * Bars requested per timeframe. EMA200 is seeded with an SMA, and the seed's
+ * weight decays as (1 - 2/201)^(n - 200): with 230 bars it is still ~74% and
+ * EMA200 can deviate ~3% from its converged value, which flips the daily
+ * regime and weekly/daily bias gates near crossovers and makes results depend
+ * on the fetch window. 1000 bars (one Binance page) brings the seed weight
+ * below 0.1%; for weekly that is effectively the full listing history.
+ */
+export const BINANCE_SPOT_SCREENER_LOOKBACK_BARS = Object.freeze({
+  weekly: 1000, daily: 1000, h4: 230, h1: 230
+});
 const DEFAULT_MINIMUM_BARS = Object.freeze({
   weekly: 220, daily: 220, h4: 220, h1: 60
 });
@@ -88,7 +99,7 @@ export async function runBinanceSpotMtfScreener({
       const entries = await Promise.all(FRAMES.map(async ([key, interval, intervalMs]) => {
         const response = await fetchKlines({
           symbol, interval, evaluationTime,
-          startTime: evaluationTime - intervalMs * 230,
+          startTime: evaluationTime - intervalMs * BINANCE_SPOT_SCREENER_LOOKBACK_BARS[key],
           endTime: evaluationTime
         });
         const rows = Array.isArray(response) ? response : response?.bars;

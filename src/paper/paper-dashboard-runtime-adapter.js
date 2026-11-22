@@ -26,6 +26,17 @@ async function boundedProvider(provider, timeoutMs, fallback) {
     return result;
   } finally { clearTimeout(timer); }
 }
+// The ledger returns the same frozen events array until the next append, so
+// the O(n) performance report is computed once per ledger change, not per poll.
+const performanceCache = new WeakMap();
+function cachedPerformanceReport(ledgerSnapshot, initialEquity) {
+  const key = Object.isFrozen(ledgerSnapshot.events) ? ledgerSnapshot.events : null;
+  const hit = key && performanceCache.get(key);
+  if (hit && hit.initialEquity === initialEquity) return hit.report;
+  const report = buildPaperPerformanceReportFromLedger({ ledgerSnapshot, initialEquity });
+  if (key) performanceCache.set(key, { initialEquity, report });
+  return report;
+}
 const feedFallback = reason => ({ status: { state: "DISCONNECTED", reason }, quote: null });
 const strategyFallback = reason => ({
   signal: null, acceptance: null,
@@ -84,8 +95,14 @@ export async function createPaperDashboardRuntimeSnapshot({
   // Use risk from the same atomic session snapshot; a second status read could
   // race with an order or mark update and display mismatched portfolio/risk.
   const riskStatus = clone(state.risk ?? null);
-  const ledgerSnapshot = clone(state.ledger);
-  const latestMark = [...ledgerSnapshot.events].reverse().find(event => event.type === "POSITION_MARKED");
+  // Ledger snapshots are deep-frozen and immutable: share them instead of
+  // cloning the whole event history on every dashboard poll.
+  const ledgerSnapshot = Object.isFrozen(state.ledger) && Object.isFrozen(state.ledger.events)
+    ? state.ledger : clone(state.ledger);
+  let latestMark;
+  for (let i = ledgerSnapshot.events.length - 1; i >= 0; i--) {
+    if (ledgerSnapshot.events[i].type === "POSITION_MARKED") { latestMark = ledgerSnapshot.events[i]; break; }
+  }
   const marks = new Map((latestMark?.payload?.marks ?? []).map(mark => [mark.symbol, mark]));
   const positions = state.broker.positions.map(position => {
     const mark = marks.get(position.symbol);
@@ -96,10 +113,7 @@ export async function createPaperDashboardRuntimeSnapshot({
         ? mark.markPrice : null
     };
   });
-  const performanceReport = buildPaperPerformanceReportFromLedger({
-    ledgerSnapshot,
-    initialEquity: state.broker.initialCash
-  });
+  const performanceReport = cachedPerformanceReport(ledgerSnapshot, state.broker.initialCash);
   const timestamp = now();
   if (!Number.isSafeInteger(timestamp) || timestamp < 0) throw new TypeError("now must return UTC epoch milliseconds");
 

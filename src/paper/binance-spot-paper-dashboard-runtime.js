@@ -24,6 +24,7 @@ export async function startBinanceSpotPaperDashboardRuntime({
   port = 8787,
   maxQuoteAgeMs = 5_000,
   auth = null,
+  trustProxy = false,
   now = () => Date.now(),
   strategyProvider,
   screenerRefreshIntervalMs = 60_000,
@@ -50,6 +51,7 @@ export async function startBinanceSpotPaperDashboardRuntime({
     port,
     maxQuoteAgeMs,
     auth,
+    trustProxy,
     now
   });
   return Object.freeze({

@@ -20,7 +20,7 @@ export function parseBinanceSpotDashboardCliArgs(argv = []) {
     throw new TypeError("arguments must be an array of strings");
   }
   const values = new Map();
-  const flags = new Set(["--help", "--exclusive-volume"]);
+  const flags = new Set(["--help", "--exclusive-volume", "--trust-proxy"]);
   const valued = new Set([
     "--ledger", "--host", "--port", "--symbols",
     "--selected-symbol", "--max-quote-age-ms"
@@ -95,9 +95,14 @@ export function parseBinanceSpotDashboardCliArgs(argv = []) {
   // exclusive there; elsewhere the operator must opt in explicitly.
   const exclusiveVolume = values.has("--exclusive-volume") || process.env.RENDER === "true";
 
+  // Behind Render's proxy the socket address is the proxy; the client address
+  // used for login rate limiting comes from the proxy's X-Forwarded-For entry.
+  const trustProxy = values.has("--trust-proxy") || process.env.RENDER === "true";
+
   return Object.freeze({
     help: false,
     exclusiveVolume,
+    trustProxy,
     filePath: resolve(ledger),
     host,
     auth,
@@ -122,6 +127,9 @@ Options:
                             instance (e.g. a Render disk): a lock created before
                             this container started is reclaimed. Automatic when
                             RENDER=true.
+  --trust-proxy             Use the last X-Forwarded-For entry as the client
+                            address for login rate limiting (only behind a
+                            trusted reverse proxy). Automatic when RENDER=true.
   TRADESYS_ALLOW_REMOTE=true enables protected remote binding only when both dashboard credentials are set.\n  TRADESYS_DASHBOARD_USER and TRADESYS_DASHBOARD_PASSWORD are required remotely; password minimum 24 characters.\n  --help                    Show this help
 
 This launcher is PAPER_ONLY and read-only. It never submits exchange orders.

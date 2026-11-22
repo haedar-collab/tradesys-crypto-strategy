@@ -1,4 +1,4 @@
-import { link, mkdir, open, readFile, rename, truncate, unlink } from "node:fs/promises";
+import { link, mkdir, open, readFile, rename, stat, truncate, unlink } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { hostname } from "node:os";
 import { createHash, randomUUID } from "node:crypto";
@@ -9,6 +9,13 @@ const TYPES = new Set(PAPER_LEDGER_EVENT_TYPES);
 const hash = (value) => createHash("sha256").update(value).digest("hex");
 const canonical = (value) => JSON.stringify(value);
 const clone = (value) => structuredClone(value);
+function deepFreeze(value) {
+  if (value && typeof value === "object" && !Object.isFrozen(value)) {
+    Object.freeze(value);
+    for (const key of Object.keys(value)) deepFreeze(value[key]);
+  }
+  return value;
+}
 
 function validateEvent(input) {
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new TypeError("event object is required");
@@ -211,7 +218,12 @@ export async function createPersistentPaperLedger({
   let sequence = recovered.events.length;
   let previousHash = recovered.lastHash;
   let committedBytes = Buffer.byteLength(raw, "utf8");
-  const ids = recovered.ids;
+  // The hash chain is fully verified once at open. Afterwards this process is
+  // the only writer (exclusive lock), so verified events are kept in memory,
+  // deep-frozen so callers can share them without defensive copies.
+  const events = recovered.events.map(deepFreeze);
+  const byId = new Map(events.map(event => [event.eventId, event]));
+  let cachedSnapshot = null;
   let queue = Promise.resolve();
   let closed = false;
   let poisoned = null;
@@ -223,8 +235,8 @@ export async function createPersistentPaperLedger({
         throw new Error("ledger is unavailable after a failed write; reopen it to re-verify the hash chain: " + poisoned.message);
       }
       validateEvent(input);
-      if (ids.has(input.eventId)) {
-        const existing = recovered.events.find((e) => e.eventId === input.eventId) ?? appended.find((e) => e.eventId === input.eventId);
+      if (byId.has(input.eventId)) {
+        const existing = byId.get(input.eventId);
         if (existing && existing.type === input.type && existing.timestamp === input.timestamp &&
             canonical(existing.payload) === canonical(input.payload)) return clone(existing);
         throw new Error("eventId already exists with different content");
@@ -249,25 +261,47 @@ export async function createPersistentPaperLedger({
       committedBytes += Buffer.byteLength(line, "utf8");
       sequence++;
       previousHash = entry.hash;
-      ids.add(input.eventId);
-      appended.push(entry);
+      deepFreeze(entry);
+      events.push(entry);
+      byId.set(entry.eventId, entry);
+      cachedSnapshot = null;
       return clone(entry);
     });
     queue = operation.catch(() => {});
     return operation;
   }
-  const appended = [];
   async function close() { await queue; if (closed) return; closed = true; await releaseLock(); }
+
+  /**
+   * O(1) snapshot of the verified in-memory chain (O(n) reference copy only
+   * after an append). A cheap size check detects outside modification of
+   * the file; use verify() for a full re-read and hash-chain re-verification.
+   */
   async function snapshot() {
+    await queue;
+    if (poisoned) throw new Error("ledger is unavailable after a failed write; reopen it to re-verify the hash chain");
+    const size = await stat(path).then(s => s.size, error => error.code === "ENOENT" ? 0 : Promise.reject(error));
+    if (size !== committedBytes) {
+      throw new Error("ledger file changed outside this process (expected " + committedBytes + " bytes, found " + size + "); reopen to re-verify");
+    }
+    cachedSnapshot ??= Object.freeze({ status: "COMPLETE", eventCount: events.length,
+      lastSequence: events.length, lastHash: previousHash,
+      events: Object.freeze(events.slice()) });
+    return cachedSnapshot;
+  }
+
+  /** Full re-read and hash-chain verification, compared with memory. */
+  async function verify() {
     await queue;
     const text = await readFile(path, "utf8").catch((error) => error.code === "ENOENT" ? "" : Promise.reject(error));
     const verified = verifyLines(text);
-    return Object.freeze({ status: "COMPLETE", eventCount: verified.events.length,
-      lastSequence: verified.events.length, lastHash: verified.lastHash,
-      events: Object.freeze(verified.events.map(clone)) });
+    if (verified.events.length !== events.length || verified.lastHash !== previousHash) {
+      throw new Error("ledger file diverges from the verified in-memory chain");
+    }
+    return Object.freeze({ status: "VERIFIED", eventCount: verified.events.length, lastHash: verified.lastHash });
   }
   return Object.freeze({
-    append, snapshot, close, filePath: path,
+    append, snapshot, verify, close, filePath: path,
     isPoisoned: () => poisoned !== null,
     reclaimedStaleLock
   });

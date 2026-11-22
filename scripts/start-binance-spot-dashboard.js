@@ -35,6 +35,7 @@ try {
       port: config.port,
       maxQuoteAgeMs: config.maxQuoteAgeMs,
       auth: config.auth,
+      trustProxy: config.trustProxy,
       sessionOptions: { exclusiveVolume: config.exclusiveVolume }
     });
     const address = runtime.address();
