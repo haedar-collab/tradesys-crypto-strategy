@@ -1,7 +1,11 @@
 import { fetchBinanceSpotKlines } from "./binance-spot-klines.js";
-import { runBinanceSpotMtfScreener } from "../screener/binance-spot-mtf-screener.js";
+import { runBinanceSpotMtfScreener, BINANCE_SPOT_SCREENER_LOOKBACK_BARS } from "../screener/binance-spot-mtf-screener.js";
 
 const INTERVAL_MS = Object.freeze({ "1w":604800000, "1d":86400000, "4h":14400000, "1h":3600000 });
+const LOOKBACK_BY_INTERVAL = Object.freeze({
+  "1w": BINANCE_SPOT_SCREENER_LOOKBACK_BARS.weekly, "1d": BINANCE_SPOT_SCREENER_LOOKBACK_BARS.daily,
+  "4h": BINANCE_SPOT_SCREENER_LOOKBACK_BARS.h4, "1h": BINANCE_SPOT_SCREENER_LOOKBACK_BARS.h1
+});
 
 const EMPTY_COUNTS = Object.freeze({ symbolCount: 0, candidateCount: 0, waitCount: 0, dataErrorCount: 0, results: Object.freeze([]) });
 
@@ -65,7 +69,7 @@ export function createBinanceSpotMtfScreenerProvider({
       fetchKlines: ({ symbol, interval }) => fetchKlines({
         symbol,
         interval,
-        startTime: evaluationTime - INTERVAL_MS[interval] * 230,
+        startTime: evaluationTime - INTERVAL_MS[interval] * LOOKBACK_BY_INTERVAL[interval],
         endTime: evaluationTime
       })
     });
