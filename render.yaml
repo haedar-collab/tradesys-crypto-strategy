@@ -5,7 +5,7 @@ services:
     plan: starter
     region: singapore
     buildCommand: npm install
-    startCommand: npm run start:dashboard -- --ledger /var/data/paper-ledger.jsonl --host 0.0.0.0 --port $PORT
+    startCommand: npm run start:dashboard -- --ledger /var/data/paper-ledger.jsonl --host 0.0.0.0 --port $PORT --exclusive-volume
     healthCheckPath: /healthz
     autoDeployTrigger: off
     disk:

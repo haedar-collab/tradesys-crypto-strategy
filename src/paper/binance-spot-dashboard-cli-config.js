@@ -20,7 +20,7 @@ export function parseBinanceSpotDashboardCliArgs(argv = []) {
     throw new TypeError("arguments must be an array of strings");
   }
   const values = new Map();
-  const flags = new Set(["--help"]);
+  const flags = new Set(["--help", "--exclusive-volume"]);
   const valued = new Set([
     "--ledger", "--host", "--port", "--symbols",
     "--selected-symbol", "--max-quote-age-ms"
@@ -91,8 +91,13 @@ export function parseBinanceSpotDashboardCliArgs(argv = []) {
     throw new Error("--selected-symbol must be included in --symbols");
   }
 
+  // Render persistent disks attach to a single instance, so the volume is
+  // exclusive there; elsewhere the operator must opt in explicitly.
+  const exclusiveVolume = values.has("--exclusive-volume") || process.env.RENDER === "true";
+
   return Object.freeze({
     help: false,
+    exclusiveVolume,
     filePath: resolve(ledger),
     host,
     auth,
@@ -113,6 +118,10 @@ Options:
   --symbols CSV             Comma-separated symbols (default BTCUSDT,ETHUSDT,SOLUSDT,BNBUSDT,XRPUSDT)
   --selected-symbol SYMBOL  Selected dashboard symbol (default first symbol)
   --max-quote-age-ms N      Quote freshness limit 100–300000 (default 5000)
+  --exclusive-volume        The ledger volume can be mounted by only one running
+                            instance (e.g. a Render disk): a lock created before
+                            this container started is reclaimed. Automatic when
+                            RENDER=true.
   TRADESYS_ALLOW_REMOTE=true enables protected remote binding only when both dashboard credentials are set.\n  TRADESYS_DASHBOARD_USER and TRADESYS_DASHBOARD_PASSWORD are required remotely; password minimum 24 characters.\n  --help                    Show this help
 
 This launcher is PAPER_ONLY and read-only. It never submits exchange orders.
