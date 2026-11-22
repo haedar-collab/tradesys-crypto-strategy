@@ -1,0 +1,1028 @@
+{
+  "dataQuality": {
+    "status": "PASS",
+    "policy": {
+      "maxMissingRatio": 0.001,
+      "maxGapHours": 24,
+      "structuralIssuesAllowed": 0
+    },
+    "checks": [
+      {
+        "symbol": "BTCUSDT",
+        "interval": "1h",
+        "barCount": 42863,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 1,
+        "longestGapHours": 1,
+        "status": "PASS"
+      },
+      {
+        "symbol": "BTCUSDT",
+        "interval": "4h",
+        "barCount": 10716,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "BTCUSDT",
+        "interval": "1d",
+        "barCount": 1786,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "ETHUSDT",
+        "interval": "1h",
+        "barCount": 42863,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 1,
+        "longestGapHours": 1,
+        "status": "PASS"
+      },
+      {
+        "symbol": "ETHUSDT",
+        "interval": "4h",
+        "barCount": 10716,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "ETHUSDT",
+        "interval": "1d",
+        "barCount": 1786,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "SOLUSDT",
+        "interval": "1h",
+        "barCount": 42863,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 1,
+        "longestGapHours": 1,
+        "status": "PASS"
+      },
+      {
+        "symbol": "SOLUSDT",
+        "interval": "4h",
+        "barCount": 10716,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "SOLUSDT",
+        "interval": "1d",
+        "barCount": 1786,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "BNBUSDT",
+        "interval": "1h",
+        "barCount": 42863,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 1,
+        "longestGapHours": 1,
+        "status": "PASS"
+      },
+      {
+        "symbol": "BNBUSDT",
+        "interval": "4h",
+        "barCount": 10716,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "BNBUSDT",
+        "interval": "1d",
+        "barCount": 1786,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "XRPUSDT",
+        "interval": "1h",
+        "barCount": 42863,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 1,
+        "longestGapHours": 1,
+        "status": "PASS"
+      },
+      {
+        "symbol": "XRPUSDT",
+        "interval": "4h",
+        "barCount": 10716,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "XRPUSDT",
+        "interval": "1d",
+        "barCount": 1786,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      }
+    ]
+  },
+  "outOfSample": {
+    "tradeCount": 57,
+    "profitFactor": 1.0971870862037556,
+    "netReturnPct": 0.6048858089780305,
+    "maxDrawdownPct": 7.715235872329437,
+    "winRatePct": 43.859649122807014
+  },
+  "walkForward": {
+    "method": "CHRONOLOGICAL_SEGMENTS_FIXED_PARAMETERS",
+    "folds": [
+      {
+        "index": 0,
+        "from": 1640995200000,
+        "to": 1666713600000,
+        "fromIso": "2022-01-01T00:00:00.000Z",
+        "toIso": "2022-10-25T16:00:00.000Z",
+        "tradeCount": 0,
+        "netReturnPct": 0,
+        "profitFactor": null,
+        "maxDrawdownPct": 0
+      },
+      {
+        "index": 1,
+        "from": 1666713600000,
+        "to": 1692432000000,
+        "fromIso": "2022-10-25T16:00:00.000Z",
+        "toIso": "2023-08-19T08:00:00.000Z",
+        "tradeCount": 8,
+        "netReturnPct": -0.8252048978267347,
+        "profitFactor": 0.2623312019111433,
+        "maxDrawdownPct": 2.591596602809607
+      },
+      {
+        "index": 2,
+        "from": 1692432000000,
+        "to": 1718150400000,
+        "fromIso": "2023-08-19T08:00:00.000Z",
+        "toIso": "2024-06-12T00:00:00.000Z",
+        "tradeCount": 9,
+        "netReturnPct": -0.17094412871322628,
+        "profitFactor": 0.8445286322431951,
+        "maxDrawdownPct": 3.419669224710754
+      },
+      {
+        "index": 3,
+        "from": 1718150400000,
+        "to": 1743868800000,
+        "fromIso": "2024-06-12T00:00:00.000Z",
+        "toIso": "2025-04-05T16:00:00.000Z",
+        "tradeCount": 12,
+        "netReturnPct": -0.23717767134131984,
+        "profitFactor": 0.8461830922763349,
+        "maxDrawdownPct": 4.88779424102475
+      },
+      {
+        "index": 4,
+        "from": 1743868800000,
+        "to": 1769587200000,
+        "fromIso": "2025-04-05T16:00:00.000Z",
+        "toIso": "2026-01-28T08:00:00.000Z",
+        "tradeCount": 25,
+        "netReturnPct": 1.7625754834294447,
+        "profitFactor": 1.5895502002377357,
+        "maxDrawdownPct": 4.4107859664935685
+      },
+      {
+        "index": 5,
+        "from": 1769587200000,
+        "to": 1795305600000,
+        "fromIso": "2026-01-28T08:00:00.000Z",
+        "toIso": "2026-11-22T00:00:00.000Z",
+        "tradeCount": 3,
+        "netReturnPct": -0.3910798498217649,
+        "profitFactor": 0.1331184772130367,
+        "maxDrawdownPct": 1.4888034652840914
+      }
+    ]
+  },
+  "regimeAnalysis": {
+    "benchmark": "BTCUSDT daily close, 20-bar trend and realized volatility",
+    "groups": [
+      {
+        "regime": "BEARISH_HIGH",
+        "tradeCount": 6,
+        "meanNetReturnPct": -0.06643665362232798,
+        "winRatePct": 50,
+        "totalCompoundedReturnPct": -0.433520992300096
+      },
+      {
+        "regime": "BEARISH_NORMAL",
+        "tradeCount": 3,
+        "meanNetReturnPct": 0.5938528525030926,
+        "winRatePct": 66.66666666666666,
+        "totalCompoundedReturnPct": 1.7703685313575468
+      },
+      {
+        "regime": "BULLISH_HIGH",
+        "tradeCount": 14,
+        "meanNetReturnPct": 0.36404354529855737,
+        "winRatePct": 64.28571428571429,
+        "totalCompoundedReturnPct": 5.0927416553874005
+      },
+      {
+        "regime": "BULLISH_NORMAL",
+        "tradeCount": 20,
+        "meanNetReturnPct": -0.24661435572734391,
+        "winRatePct": 30,
+        "totalCompoundedReturnPct": -4.950820925330801
+      },
+      {
+        "regime": "SIDEWAYS_HIGH",
+        "tradeCount": 4,
+        "meanNetReturnPct": -0.3292766729197372,
+        "winRatePct": 50,
+        "totalCompoundedReturnPct": -1.321825834076673
+      },
+      {
+        "regime": "SIDEWAYS_NORMAL",
+        "tradeCount": 10,
+        "meanNetReturnPct": 0.2787975860620972,
+        "winRatePct": 30,
+        "totalCompoundedReturnPct": 2.6328937535190944
+      }
+    ]
+  },
+  "costStress": {
+    "feeBps": 20,
+    "slippageBps": 20,
+    "profitFactor": 0.6583994542644735,
+    "netReturnPct": -2.232686644338262,
+    "tradeCount": 55
+  },
+  "blockBootstrap": {
+    "blockLength": 5,
+    "simulations": 2000,
+    "seed": 42,
+    "maxDrawdownPct": {
+      "p50": 8.742600437452019,
+      "p95": 16.086801338801585,
+      "p99": 19.68432430747152
+    },
+    "netReturnPct": {
+      "p05": -11.614235093911509,
+      "median": 4.421063239769563,
+      "p95": 27.86136318265255
+    },
+    "probabilityOfLoss": 0.34
+  },
+  "perSymbol": [
+    {
+      "symbol": "BTCUSDT",
+      "tradeCount": 18,
+      "netReturnPct": 3.0210961504688383,
+      "maxDrawdownPct": 3.9241181628534507,
+      "profitFactor": 1.2890050632846073,
+      "winRatePct": 50,
+      "signalCount": 125,
+      "stressNetReturnPct": -5.748015089356717
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tradeCount": 9,
+      "netReturnPct": 3.1734654330769496,
+      "maxDrawdownPct": 2.941408693588253,
+      "profitFactor": 1.7256818227490387,
+      "winRatePct": 55.55555555555556,
+      "signalCount": 75,
+      "stressNetReturnPct": 1.5076256160406531
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tradeCount": 3,
+      "netReturnPct": -1.8462210884078956,
+      "maxDrawdownPct": 2.2090723461509607,
+      "profitFactor": 0.14026526084361576,
+      "winRatePct": 33.33333333333333,
+      "signalCount": 6,
+      "stressNetReturnPct": -2.2128809291172558
+    },
+    {
+      "symbol": "BNBUSDT",
+      "tradeCount": 17,
+      "netReturnPct": -7.171920586672609,
+      "maxDrawdownPct": 7.715235872329437,
+      "profitFactor": 0.2663807009342571,
+      "winRatePct": 23.52941176470588,
+      "signalCount": 176,
+      "stressNetReturnPct": -8.923422305238693
+    },
+    {
+      "symbol": "XRPUSDT",
+      "tradeCount": 10,
+      "netReturnPct": 5.84800913642487,
+      "maxDrawdownPct": 2.8207065030823437,
+      "profitFactor": 2.3383301171709423,
+      "winRatePct": 60,
+      "signalCount": 126,
+      "stressNetReturnPct": 4.213259485980703
+    }
+  ],
+  "tradeLog": [
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1676257200000,
+      "exitTime": 1676275200000,
+      "netPnl": -108.8085,
+      "accountReturnPct": -1.0881
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1681293600000,
+      "exitTime": 1681891200000,
+      "netPnl": 69.9233,
+      "accountReturnPct": 0.6992
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1681700400000,
+      "exitTime": 1681729200000,
+      "netPnl": -111.3105,
+      "accountReturnPct": -1.1131
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1683388800000,
+      "exitTime": 1683565200000,
+      "netPnl": -110.5529,
+      "accountReturnPct": -1.1055
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1687996800000,
+      "exitTime": 1688130000000,
+      "netPnl": 37.7167,
+      "accountReturnPct": 0.3814
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1689026400000,
+      "exitTime": 1689616800000,
+      "netPnl": 39.0905,
+      "accountReturnPct": 0.3953
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1689865200000,
+      "exitTime": 1690189200000,
+      "netPnl": -123.6175,
+      "accountReturnPct": -1.2453
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1689883200000,
+      "exitTime": 1690048800000,
+      "netPnl": -105.0435,
+      "accountReturnPct": -1.0431
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1697752800000,
+      "exitTime": 1698040800000,
+      "netPnl": 179.5766,
+      "accountReturnPct": 1.8319
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1699956000000,
+      "exitTime": 1699984800000,
+      "netPnl": -106.2455,
+      "accountReturnPct": -1.0701
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1700604000000,
+      "exitTime": 1700607600000,
+      "netPnl": -109.1683,
+      "accountReturnPct": -1.0936
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1703620800000,
+      "exitTime": 1703869200000,
+      "netPnl": 43.8966,
+      "accountReturnPct": 0.4405
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1707739200000,
+      "exitTime": 1707775200000,
+      "netPnl": 195.3841,
+      "accountReturnPct": 1.9892
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1711195200000,
+      "exitTime": 1712023200000,
+      "netPnl": 39.8197,
+      "accountReturnPct": 0.4026
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1713236400000,
+      "exitTime": 1713279600000,
+      "netPnl": -105.2834,
+      "accountReturnPct": -1.0601
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1716840000000,
+      "exitTime": 1717052400000,
+      "netPnl": -110.8343,
+      "accountReturnPct": -1.128
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1716861600000,
+      "exitTime": 1716998400000,
+      "netPnl": -110.6647,
+      "accountReturnPct": -1.1209
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1722362400000,
+      "exitTime": 1722484800000,
+      "netPnl": -114.7385,
+      "accountReturnPct": -1.1811
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1726858800000,
+      "exitTime": 1727737200000,
+      "netPnl": 40.2377,
+      "accountReturnPct": 0.4122
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1729522800000,
+      "exitTime": 1729587600000,
+      "netPnl": -109.7942,
+      "accountReturnPct": -1.1437
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1730296800000,
+      "exitTime": 1730383200000,
+      "netPnl": -111.8887,
+      "accountReturnPct": -1.1414
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1731621600000,
+      "exitTime": 1734307200000,
+      "netPnl": 261.2317,
+      "accountReturnPct": 2.6956
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1732028400000,
+      "exitTime": 1732240800000,
+      "netPnl": 218.6065,
+      "accountReturnPct": 2.1841
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1734397200000,
+      "exitTime": 1734494400000,
+      "netPnl": -107.3366,
+      "accountReturnPct": -1.0715
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1735228800000,
+      "exitTime": 1735534800000,
+      "netPnl": -107.8649,
+      "accountReturnPct": -1.0547
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1735560000000,
+      "exitTime": 1736262000000,
+      "netPnl": 18.8453,
+      "accountReturnPct": 0.1986
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1740326400000,
+      "exitTime": 1740423600000,
+      "netPnl": -50.6247,
+      "accountReturnPct": -0.5324
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1741370400000,
+      "exitTime": 1741424400000,
+      "netPnl": -105.9897,
+      "accountReturnPct": -1.0474
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1742281200000,
+      "exitTime": 1743138000000,
+      "netPnl": 86.4469,
+      "accountReturnPct": 0.8633
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1745488800000,
+      "exitTime": 1746716400000,
+      "netPnl": 210.7355,
+      "accountReturnPct": 2.1175
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1747008000000,
+      "exitTime": 1747350000000,
+      "netPnl": 151.7562,
+      "accountReturnPct": 1.5025
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1747598400000,
+      "exitTime": 1747623600000,
+      "netPnl": 32.5373,
+      "accountReturnPct": 0.3202
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1750176000000,
+      "exitTime": 1750251600000,
+      "netPnl": -58.2578,
+      "accountReturnPct": -0.6159
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1751385600000,
+      "exitTime": 1752231600000,
+      "netPnl": 451.1346,
+      "accountReturnPct": 4.4006
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1751619600000,
+      "exitTime": 1751637600000,
+      "netPnl": -125.2994,
+      "accountReturnPct": -1.229
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1751914800000,
+      "exitTime": 1752181200000,
+      "netPnl": 377.3608,
+      "accountReturnPct": 3.7473
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1752552000000,
+      "exitTime": 1752696000000,
+      "netPnl": 234.1555,
+      "accountReturnPct": 2.3627
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1752876000000,
+      "exitTime": 1753290000000,
+      "netPnl": 120.0265,
+      "accountReturnPct": 1.1832
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1753732800000,
+      "exitTime": 1753797600000,
+      "netPnl": -108.539,
+      "accountReturnPct": -1.0854
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1754042400000,
+      "exitTime": 1754146800000,
+      "netPnl": -50.6632,
+      "accountReturnPct": -0.539
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1755180000000,
+      "exitTime": 1755205200000,
+      "netPnl": -106.2042,
+      "accountReturnPct": -1.0737
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1755183600000,
+      "exitTime": 1755478800000,
+      "netPnl": -118.9529,
+      "accountReturnPct": -1.1386
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1756209600000,
+      "exitTime": 1757754000000,
+      "netPnl": 117.099,
+      "accountReturnPct": 1.2524
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1757030400000,
+      "exitTime": 1758506400000,
+      "netPnl": 165.9981,
+      "accountReturnPct": 1.6172
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1757786400000,
+      "exitTime": 1757919600000,
+      "netPnl": 30.121,
+      "accountReturnPct": 0.3078
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1758283200000,
+      "exitTime": 1758474000000,
+      "netPnl": -118.065,
+      "accountReturnPct": -1.1031
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1758355200000,
+      "exitTime": 1758517200000,
+      "netPnl": -117.2243,
+      "accountReturnPct": -1.135
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1758571200000,
+      "exitTime": 1758819600000,
+      "netPnl": -51.3097,
+      "accountReturnPct": -0.542
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1759478400000,
+      "exitTime": 1759528800000,
+      "netPnl": 84.6519,
+      "accountReturnPct": 0.8991
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1761091200000,
+      "exitTime": 1761796800000,
+      "netPnl": 176.8643,
+      "accountReturnPct": 1.7321
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1761757200000,
+      "exitTime": 1761760800000,
+      "netPnl": -113.173,
+      "accountReturnPct": -1.085
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1767718800000,
+      "exitTime": 1767718800000,
+      "netPnl": -54.9742,
+      "accountReturnPct": -0.5787
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1768834800000,
+      "exitTime": 1768896000000,
+      "netPnl": -56.9224,
+      "accountReturnPct": -0.6027
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1768924800000,
+      "exitTime": 1768928400000,
+      "netPnl": -52.7783,
+      "accountReturnPct": -0.5622
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1769716800000,
+      "exitTime": 1769734800000,
+      "netPnl": -52.6189,
+      "accountReturnPct": -0.5636
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1789459200000,
+      "exitTime": 1789495200000,
+      "netPnl": -117.2173,
+      "accountReturnPct": -1.1284
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1790042400000,
+      "exitTime": 1790157600000,
+      "netPnl": 31.1926,
+      "accountReturnPct": 0.3037
+    }
+  ],
+  "evaluatedAt": "2026-11-22T03:35:35.265Z",
+  "provenance": {
+    "source": "https://data-api.binance.vision/api/v3/klines (public Binance Spot market data)",
+    "variant": {
+      "id": "V3",
+      "description": "minRR 2.0",
+      "strategyOptions": {
+        "minRR": 2,
+        "plan": {
+          "minRR": 2
+        }
+      },
+      "execution": {
+        "minRR": 2
+      }
+    },
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT",
+      "BNBUSDT",
+      "XRPUSDT"
+    ],
+    "period": {
+      "start": "2022-01-01T00:00:00.000Z",
+      "end": "2026-11-22T00:00:00.000Z"
+    },
+    "strategyEngineVersion": "0.2.0",
+    "lookbackBars": {
+      "weekly": 1000,
+      "daily": 1000,
+      "h4": 230,
+      "h1": 230
+    },
+    "evaluation": "causal replay at every closed H1 bar; entry at next H1 open",
+    "execution": {
+      "initialCapitalPerSymbol": 10000,
+      "riskPct": 1,
+      "feeBps": 10,
+      "slippageBps": 5,
+      "positionConcurrencyPerSymbol": 1
+    },
+    "parameterFitting": "NONE: fixed engine defaults; no parameter was tuned on this data by this pipeline",
+    "datasetFingerprintSha256": "1ae10929dadbdb0f94123123ae7e569f5ae4ac6e6e68eeaf0c3ad3842fd529d7",
+    "replayStats": {
+      "BTCUSDT": {
+        "evaluations": 42863,
+        "computed": 15516,
+        "skippedByDailyGate": 27347,
+        "candidates": 125,
+        "reasons": {
+          "DAILY_BIAS_NOT_BULLISH": 26352,
+          "PRICE_NOT_IN_ZONE": 4829,
+          "PLANNED_RR_BELOW_MINIMUM": 404,
+          "1H_DEMAND_ZONE_BROKEN": 582,
+          "ZONE_QUALITY_WEAK": 1959,
+          "FOUR_HOUR_STRUCTURE_BEARISH": 5161,
+          "NO_VALID_DEMAND_ZONE": 700,
+          "MARKET_REGIME_UNCONFIRMED": 1536,
+          "LTF_TRIGGER_TOO_FAR_FROM_ZONE": 460,
+          "CURRENT_RR_BELOW_MINIMUM": 89,
+          "BUY_CANDIDATE": 125,
+          "MARKET_REGIME_DOWNTREND": 648,
+          "NO_CONFIRMED_ENTRY_TRIGGER": 18
+        }
+      },
+      "ETHUSDT": {
+        "evaluations": 42863,
+        "computed": 10111,
+        "skippedByDailyGate": 32752,
+        "candidates": 75,
+        "reasons": {
+          "DAILY_BIAS_NOT_BULLISH": 32040,
+          "PRICE_NOT_IN_ZONE": 3094,
+          "FOUR_HOUR_STRUCTURE_BEARISH": 2953,
+          "MARKET_REGIME_UNCONFIRMED": 696,
+          "ZONE_QUALITY_WEAK": 1385,
+          "CURRENT_RR_BELOW_MINIMUM": 87,
+          "LTF_TRIGGER_TOO_FAR_FROM_ZONE": 238,
+          "1H_DEMAND_ZONE_BROKEN": 324,
+          "BUY_CANDIDATE": 75,
+          "NO_VALID_DEMAND_ZONE": 328,
+          "PLANNED_RR_BELOW_MINIMUM": 192,
+          "NO_CONFIRMED_ENTRY_TRIGGER": 11,
+          "MARKET_REGIME_DOWNTREND": 96,
+          "WEEKLY_BIAS_BEARISH": 1344
+        }
+      },
+      "SOLUSDT": {
+        "evaluations": 42863,
+        "computed": 28695,
+        "skippedByDailyGate": 14168,
+        "candidates": 6,
+        "reasons": {
+          "TIMEFRAME_NOT_READY": 24743,
+          "PRICE_NOT_IN_ZONE": 1237,
+          "FOUR_HOUR_STRUCTURE_BEARISH": 1451,
+          "1H_DEMAND_ZONE_BROKEN": 99,
+          "DAILY_BIAS_NOT_BULLISH": 13248,
+          "ZONE_QUALITY_WEAK": 381,
+          "LTF_TRIGGER_TOO_FAR_FROM_ZONE": 90,
+          "MARKET_REGIME_UNCONFIRMED": 312,
+          "NO_VALID_DEMAND_ZONE": 48,
+          "CURRENT_RR_BELOW_MINIMUM": 4,
+          "PLANNED_RR_BELOW_MINIMUM": 20,
+          "BUY_CANDIDATE": 6,
+          "MARKET_REGIME_DOWNTREND": 48,
+          "WEEKLY_BIAS_BEARISH": 1176
+        }
+      },
+      "BNBUSDT": {
+        "evaluations": 42863,
+        "computed": 13975,
+        "skippedByDailyGate": 28888,
+        "candidates": 176,
+        "reasons": {
+          "TIMEFRAME_NOT_READY": 552,
+          "DAILY_BIAS_NOT_BULLISH": 29232,
+          "MARKET_REGIME_UNCONFIRMED": 888,
+          "FOUR_HOUR_STRUCTURE_BEARISH": 4292,
+          "ZONE_QUALITY_WEAK": 1874,
+          "PRICE_NOT_IN_ZONE": 4219,
+          "1H_DEMAND_ZONE_BROKEN": 542,
+          "LTF_TRIGGER_TOO_FAR_FROM_ZONE": 303,
+          "BUY_CANDIDATE": 176,
+          "CURRENT_RR_BELOW_MINIMUM": 60,
+          "PLANNED_RR_BELOW_MINIMUM": 384,
+          "NO_VALID_DEMAND_ZONE": 312,
+          "NO_CONFIRMED_ENTRY_TRIGGER": 5,
+          "MARKET_REGIME_DOWNTREND": 24
+        }
+      },
+      "XRPUSDT": {
+        "evaluations": 42863,
+        "computed": 15310,
+        "skippedByDailyGate": 27553,
+        "candidates": 126,
+        "reasons": {
+          "TIMEFRAME_NOT_READY": 4752,
+          "DAILY_BIAS_NOT_BULLISH": 27815,
+          "ZONE_QUALITY_WEAK": 1971,
+          "FOUR_HOUR_STRUCTURE_BEARISH": 2646,
+          "MARKET_REGIME_UNCONFIRMED": 792,
+          "NO_VALID_DEMAND_ZONE": 608,
+          "LTF_TRIGGER_TOO_FAR_FROM_ZONE": 211,
+          "PRICE_NOT_IN_ZONE": 2925,
+          "BUY_CANDIDATE": 126,
+          "1H_DEMAND_ZONE_BROKEN": 358,
+          "PLANNED_RR_BELOW_MINIMUM": 404,
+          "CURRENT_RR_BELOW_MINIMUM": 107,
+          "NO_CONFIRMED_ENTRY_TRIGGER": 4,
+          "MARKET_REGIME_DOWNTREND": 144
+        }
+      }
+    },
+    "runtimeSeconds": 295
+  },
+  "acceptance": {
+    "decision": "REJECT",
+    "eligibleForPaperTrading": false,
+    "failures": [
+      "oos_trade_count",
+      "oos_profit_factor",
+      "positive_fold_ratio",
+      "stressed_profit_factor",
+      "stressed_net_return"
+    ],
+    "missingEvidence": [
+      "regime_sample_size"
+    ],
+    "warnings": [],
+    "checks": [
+      {
+        "name": "data_quality",
+        "status": "PASS",
+        "actual": "PASS",
+        "threshold": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "oos_trade_count",
+        "status": "FAIL",
+        "actual": 57,
+        "threshold": 100,
+        "detail": ""
+      },
+      {
+        "name": "oos_profit_factor",
+        "status": "FAIL",
+        "actual": 1.0971870862037556,
+        "threshold": 1.2,
+        "detail": ""
+      },
+      {
+        "name": "oos_net_return",
+        "status": "PASS",
+        "actual": 0.6048858089780305,
+        "threshold": "> 0",
+        "detail": ""
+      },
+      {
+        "name": "oos_max_drawdown",
+        "status": "PASS",
+        "actual": 7.715235872329437,
+        "threshold": "<= 20",
+        "detail": ""
+      },
+      {
+        "name": "positive_fold_ratio",
+        "status": "FAIL",
+        "actual": 0.16666666666666666,
+        "threshold": 0.6,
+        "detail": ""
+      },
+      {
+        "name": "regime_sample_size",
+        "status": "PENDING",
+        "actual": null,
+        "threshold": null,
+        "detail": "Each reported regime needs at least 20 trades; underpowered groups: BEARISH_HIGH, BEARISH_NORMAL, BULLISH_HIGH, SIDEWAYS_HIGH, SIDEWAYS_NORMAL."
+      },
+      {
+        "name": "stressed_profit_factor",
+        "status": "FAIL",
+        "actual": 0.6583994542644735,
+        "threshold": 1,
+        "detail": ""
+      },
+      {
+        "name": "stressed_net_return",
+        "status": "FAIL",
+        "actual": -2.232686644338262,
+        "threshold": "> 0",
+        "detail": ""
+      },
+      {
+        "name": "bootstrap_p95_drawdown",
+        "status": "PASS",
+        "actual": 16.086801338801585,
+        "threshold": "<= 30",
+        "detail": ""
+      }
+    ]
+  },
+  "limitations": [
+    "Out-of-sample here means no parameter fitting in this pipeline; the strategy rules themselves may have been designed with knowledge of past markets.",
+    "Equal-weight portfolio of independent per-symbol sub-accounts; maxDrawdownPct is the worst per-symbol marked drawdown (upper bound for the portfolio).",
+    "OHLC event simulation with conservative same-bar ordering; no order-book depth, partial fills or exchange filters.",
+    "Bootstrap quantiles assume exchangeable blocks of trades; they are diagnostics, not guarantees."
+  ]
+}
