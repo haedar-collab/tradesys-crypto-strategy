@@ -34,7 +34,10 @@ export function evaluateMultiTimeframeSetup(input, options = {}) {
   if (!["Bullish","Neutral","Sideways","Mixed","Bearish"].includes(weekly.trend)) return wait("INVALID_WEEKLY_BIAS");
   if (weekly.trend === "Bearish") return wait("WEEKLY_BIAS_BEARISH");
   if (daily.bias !== "Bullish") return wait("DAILY_BIAS_NOT_BULLISH");
-  if (regime.confirmed !== true) return wait("MARKET_REGIME_UNCONFIRMED", { regime });
+  // Research option (default true): with requireConfirmedRegime === false an
+  // unconfirmed regime is allowed, but a raw Downtrend still blocks entries.
+  if (options.requireConfirmedRegime !== false && regime.confirmed !== true) return wait("MARKET_REGIME_UNCONFIRMED", { regime });
+  if (options.requireConfirmedRegime === false && regime.raw === "Downtrend") return wait("MARKET_REGIME_DOWNTREND", { regime });
   if (!["Uptrend","Sideways","Kompresi","Kapitulasi","Downtrend"].includes(regime.effective)) return wait("INVALID_MARKET_REGIME", { regime });
   if (regime.effective === "Downtrend") return wait("MARKET_REGIME_DOWNTREND", { regime });
   if (!h4.series || !Number.isFinite(h4.price) || h4.price <= 0 || !Number.isFinite(h4.close) || h4.close <= 0 ||

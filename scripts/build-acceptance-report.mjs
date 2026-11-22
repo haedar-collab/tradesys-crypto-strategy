@@ -18,11 +18,18 @@ import { STRATEGY_ENGINE_VERSION } from "../src/engine/multi-timeframe.js";
 import { BINANCE_SPOT_SCREENER_LOOKBACK_BARS } from "../src/screener/binance-spot-mtf-screener.js";
 
 const BASE = "https://data-api.binance.vision";
+// Pre-registered research variants (research/strategy-research/PROTOCOL.md).
+export const VARIANTS = Object.freeze({
+  V0: { description: "baseline", strategyOptions: {}, execution: {} },
+  V1: { description: "unconfirmed regime allowed, raw downtrend still blocked", strategyOptions: { requireConfirmedRegime: false }, execution: {} },
+  V2: { description: "exit model SINGLE_TP2", strategyOptions: {}, execution: { exitModel: "SINGLE_TP2" } },
+  V3: { description: "minRR 2.0", strategyOptions: { minRR: 2, plan: { minRR: 2 } }, execution: { minRR: 2 } }
+});
 const STEP = { "1w": 604_800_000, "1d": 86_400_000, "4h": 14_400_000, "1h": 3_600_000 };
 
 if (!isMainThread) {
-  const { timeframes, start, end } = workerData;
-  const result = replayCandidates(timeframes, { start, end });
+  const { timeframes, start, end, strategyOptions } = workerData;
+  const result = replayCandidates(timeframes, { start, end, strategyOptions });
   parentPort.postMessage(result);
 } else {
   await main();
@@ -68,6 +75,9 @@ async function main() {
   const end = arg("--end") ? Date.parse(arg("--end")) : Math.floor(Date.now() / STEP["1h"]) * STEP["1h"];
   const folds = Number(arg("--folds", "6"));
   const out = resolve(arg("--out", "research/acceptance/strategy-acceptance-report.json"));
+  const variantId = arg("--variant", "V0");
+  const variant = VARIANTS[variantId];
+  if (!variant) throw new Error("unknown --variant " + variantId + " (expected " + Object.keys(VARIANTS).join(", ") + ")");
   if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) throw new Error("invalid --start/--end");
   const log = m => process.stderr.write("[acceptance] " + m + "\n");
   const t0 = Date.now();
@@ -93,7 +103,7 @@ async function main() {
 
   // Causal replays in parallel (one worker per symbol).
   const replays = await Promise.all(symbols.map(symbol => new Promise((resolveWorker, reject) => {
-    const worker = new Worker(new URL(import.meta.url), { workerData: { timeframes: data[symbol], start, end } });
+    const worker = new Worker(new URL(import.meta.url), { workerData: { timeframes: data[symbol], start, end, strategyOptions: variant.strategyOptions } });
     worker.once("message", result => { log(symbol + ": " + result.stats.computed + " evaluations computed, " +
       result.stats.skippedByDailyGate + " skipped by daily gate, " + result.stats.candidates + " candidates"); resolveWorker(result); });
     worker.once("error", reject);
@@ -101,7 +111,7 @@ async function main() {
 
   const evidence = buildAcceptanceEvidence({
     symbols: symbols.map((symbol, i) => ({ symbol, h1: data[symbol].h1, decisions: replays[i].decisions })),
-    start, end, folds, benchmarkDaily, dataQuality
+    start, end, folds, benchmarkDaily, dataQuality, execution: variant.execution
   });
   const decision = evaluateStrategyAcceptance(evidence);
   const digest = createHash("sha256").update(JSON.stringify(Object.fromEntries(symbols.map(s => [s,
@@ -112,6 +122,7 @@ async function main() {
     evaluatedAt: new Date().toISOString(),
     provenance: {
       source: BASE + "/api/v3/klines (public Binance Spot market data)",
+      variant: { id: variantId, ...variant },
       symbols, period: { start: new Date(start).toISOString(), end: new Date(end).toISOString() },
       strategyEngineVersion: STRATEGY_ENGINE_VERSION, lookbackBars: BINANCE_SPOT_SCREENER_LOOKBACK_BARS,
       evaluation: "causal replay at every closed H1 bar; entry at next H1 open",

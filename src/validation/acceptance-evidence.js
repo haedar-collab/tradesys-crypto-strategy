@@ -43,7 +43,7 @@ function closedCount(candles, t) {
  * candle set has the same outcome, so it is recorded without re-evaluating.
  */
 export function replayCandidates(timeframes, { start, end, stepHours = 1, lookbacks = BINANCE_SPOT_SCREENER_LOOKBACK_BARS,
-  minimumBars = BINANCE_SPOT_SCREENER_MINIMUM_BARS, skipDailyGates = true } = {}) {
+  minimumBars = BINANCE_SPOT_SCREENER_MINIMUM_BARS, skipDailyGates = true, strategyOptions = {} } = {}) {
   const decisions = [];
   const stats = { evaluations: 0, computed: 0, skippedByDailyGate: 0, candidates: 0, reasons: {} };
   let blockedDailyCount = -1, blockedReason = null;
@@ -64,7 +64,7 @@ export function replayCandidates(timeframes, { start, end, stepHours = 1, lookba
         daily: closedWindow(timeframes.daily, t, lookbacks.daily),
         h4: closedWindow(timeframes.h4, t, lookbacks.h4),
         h1: closedWindow(timeframes.h1, t, lookbacks.h1)
-      }, { evaluationTime: t, minimumBars, requireContiguous: false });
+      }, { ...strategyOptions, evaluationTime: t, minimumBars, requireContiguous: false });
       reason = decision.reasons?.[0] ?? (decision.candidate ? "BUY_CANDIDATE" : "NO_REASON");
       if (DAILY_LEVEL_GATES.has(reason)) { blockedDailyCount = dailyCount; blockedReason = reason; }
       else blockedDailyCount = -1;
@@ -95,14 +95,15 @@ export function candidatesToSignals(h1, decisions) {
 }
 
 /** Event backtest over H1 bars with openTime in [from, to). */
-export function backtestRange(h1, decisions, { from, to, initialCapital = 10_000, riskPct = 1, feeBps = 10, slippageBps = 5 } = {}) {
+export function backtestRange(h1, decisions, { from, to, initialCapital = 10_000, riskPct = 1, feeBps = 10, slippageBps = 5, exitModel, minRR } = {}) {
   const bars = h1.filter(c => c.openTime >= from && c.openTime < to);
   if (bars.length < 2) return null;
   const inRange = decisions.filter(d => d.evaluationTime > bars[0].openTime && d.evaluationTime <= bars.at(-1).closeTime + 1);
   const signals = candidatesToSignals(bars, inRange);
   const result = runEventBacktest({
     bars: bars.map(c => ({ t: c.openTime, o: c.open, h: c.high, l: c.low, c: c.close })),
-    signals, initialCapital, riskPct, feeBps, slippageBps
+    signals, initialCapital, riskPct, feeBps, slippageBps,
+    ...(exitModel ? { exitModel } : {}), ...(minRR ? { minRR } : {})
   });
   return { ...result, signalCount: signals.length };
 }
@@ -178,9 +179,10 @@ export function aggregateBacktests(perSymbol) {
 /** Assemble the evaluateStrategyAcceptance() input from per-symbol replays. */
 export function buildAcceptanceEvidence({ symbols, start, end, folds = 6, benchmarkDaily,
   baseCosts = { feeBps: 10, slippageBps: 5 }, stressCosts = { feeBps: 20, slippageBps: 20 },
-  riskPct = 1, initialCapital = 10_000, dataQuality, bootstrap = { blockLength: 5, simulations: 2_000, seed: 42 } }) {
+  riskPct = 1, initialCapital = 10_000, dataQuality, bootstrap = { blockLength: 5, simulations: 2_000, seed: 42 },
+  execution = {} }) {
   const run = costs => symbols.map(s => ({ symbol: s.symbol,
-    backtest: backtestRange(s.h1, s.decisions, { from: start, to: end, initialCapital, riskPct, ...costs }) }));
+    backtest: backtestRange(s.h1, s.decisions, { from: start, to: end, initialCapital, riskPct, ...execution, ...costs }) }));
   const base = run(baseCosts);
   const stress = run(stressCosts);
   const oos = aggregateBacktests(base);
@@ -188,7 +190,7 @@ export function buildAcceptanceEvidence({ symbols, start, end, folds = 6, benchm
 
   const foldResults = chronologicalFolds(start, end, folds).map(fold => {
     const agg = aggregateBacktests(symbols.map(s => ({ symbol: s.symbol,
-      backtest: backtestRange(s.h1, s.decisions, { from: fold.from, to: fold.to, initialCapital, riskPct, ...baseCosts }) })));
+      backtest: backtestRange(s.h1, s.decisions, { from: fold.from, to: fold.to, initialCapital, riskPct, ...execution, ...baseCosts }) })));
     return { ...fold, fromIso: new Date(fold.from).toISOString(), toIso: new Date(fold.to).toISOString(),
       tradeCount: agg.tradeCount, netReturnPct: agg.netReturnPct, profitFactor: agg.profitFactor, maxDrawdownPct: agg.maxDrawdownPct };
   });

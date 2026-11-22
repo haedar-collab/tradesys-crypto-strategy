@@ -47,6 +47,7 @@ export function runEventBacktest(input) {
   if (![initialCapital,riskPct,feeBps,slippageBps,minRR,maxEntryDriftPct,ddLimitPct,ddRecoverPct,ddReducedMultiplier].every(Number.isFinite) ||
       initialCapital<=0 || riskPct<=0 || riskPct>100 || feeBps<0 || slippageBps<0 ||
       minRR<=0 || maxEntryDriftPct<0 || ddLimitPct<=0 || ddLimitPct>=100 || ddRecoverPct<0 || ddRecoverPct>=ddLimitPct || ddReducedMultiplier<=0 || ddReducedMultiplier>1) throw new RangeError("invalid backtest parameters");
+  const exitModel=input.exitModel??"SCALE_OUT_BREAKEVEN";
   const feeRate=feeBps/10000, slipRate=slippageBps/10000;
   const byIndex=new Map();
   for (const signal of [...signals].sort((a,b)=>a.index-b.index)) {
@@ -66,7 +67,7 @@ export function runEventBacktest(input) {
   const trades=[], skipped=[];
   const processActiveBar=(index,bar)=>{
     if(!active) return;
-    const update=advanceLongPosition(active.state,{low:bar.l,high:bar.h});
+    const update=advanceLongPosition(active.state,{low:bar.l,high:bar.h},{exitModel});
     if(update.status==="WAIT_DATA") throw new Error("exit state machine rejected validated position/bar");
     for(const exit of update.exits||[]) {
       const isStop=exit.reason.includes("STOP") || exit.reason.includes("BREAKEVEN");
