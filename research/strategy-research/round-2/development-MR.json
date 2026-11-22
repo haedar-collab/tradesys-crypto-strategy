@@ -1,0 +1,2608 @@
+{
+  "dataQuality": {
+    "status": "PASS",
+    "policy": {
+      "maxMissingRatio": 0.001,
+      "maxGapHours": 24,
+      "structuralIssuesAllowed": 0
+    },
+    "checks": [
+      {
+        "symbol": "BTCUSDT",
+        "interval": "1d",
+        "barCount": 2882,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "ETHUSDT",
+        "interval": "1d",
+        "barCount": 2882,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "SOLUSDT",
+        "interval": "1d",
+        "barCount": 2294,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "BNBUSDT",
+        "interval": "1d",
+        "barCount": 2882,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      },
+      {
+        "symbol": "XRPUSDT",
+        "interval": "1d",
+        "barCount": 2882,
+        "malformed": 0,
+        "duplicates": 0,
+        "ordered": true,
+        "missingBars": 0,
+        "longestGapHours": 0,
+        "status": "PASS"
+      }
+    ]
+  },
+  "outOfSample": {
+    "tradeCount": 317,
+    "profitFactor": 1.1359936028705437,
+    "netReturnPct": 1.0522660828181873,
+    "maxDrawdownPct": 3.3635169685792214,
+    "winRatePct": 67.82334384858044
+  },
+  "walkForward": {
+    "method": "CHRONOLOGICAL_SEGMENTS_FIXED_PARAMETERS",
+    "folds": [
+      {
+        "index": 0,
+        "from": 1546300800000,
+        "to": 1587801600000,
+        "fromIso": "2019-01-01T00:00:00.000Z",
+        "toIso": "2020-04-25T08:00:00.000Z",
+        "tradeCount": 34,
+        "netReturnPct": 0.04498707150097481,
+        "profitFactor": 1.0521250484610243,
+        "maxDrawdownPct": 1.3869335443738804
+      },
+      {
+        "index": 1,
+        "from": 1587801600000,
+        "to": 1629302400000,
+        "fromIso": "2020-04-25T08:00:00.000Z",
+        "toIso": "2021-08-18T16:00:00.000Z",
+        "tradeCount": 63,
+        "netReturnPct": 0.7144811389130146,
+        "profitFactor": 1.5498679239867523,
+        "maxDrawdownPct": 1.5820792809530366
+      },
+      {
+        "index": 2,
+        "from": 1629302400000,
+        "to": 1670803200000,
+        "fromIso": "2021-08-18T16:00:00.000Z",
+        "toIso": "2022-12-12T00:00:00.000Z",
+        "tradeCount": 28,
+        "netReturnPct": -0.31470690762202214,
+        "profitFactor": 0.6052614965117734,
+        "maxDrawdownPct": 1.2276460068117803
+      },
+      {
+        "index": 3,
+        "from": 1670803200000,
+        "to": 1712304000000,
+        "fromIso": "2022-12-12T00:00:00.000Z",
+        "toIso": "2024-04-05T08:00:00.000Z",
+        "tradeCount": 73,
+        "netReturnPct": 0.936985414260807,
+        "profitFactor": 1.6282778632049506,
+        "maxDrawdownPct": 1.9073441624241392
+      },
+      {
+        "index": 4,
+        "from": 1712304000000,
+        "to": 1753804800000,
+        "fromIso": "2024-04-05T08:00:00.000Z",
+        "toIso": "2025-07-29T16:00:00.000Z",
+        "tradeCount": 73,
+        "netReturnPct": -0.8923284605684902,
+        "profitFactor": 0.6397837572347321,
+        "maxDrawdownPct": 2.980357354814243
+      },
+      {
+        "index": 5,
+        "from": 1753804800000,
+        "to": 1795305600000,
+        "fromIso": "2025-07-29T16:00:00.000Z",
+        "toIso": "2026-11-22T00:00:00.000Z",
+        "tradeCount": 45,
+        "netReturnPct": 0.5419208708721879,
+        "profitFactor": 1.7249799414487523,
+        "maxDrawdownPct": 1.0881084294500059
+      }
+    ]
+  },
+  "regimeAnalysis": {
+    "benchmark": "BTCUSDT daily close, 20-bar trend and realized volatility",
+    "groups": [
+      {
+        "regime": "BEARISH_HIGH",
+        "tradeCount": 91,
+        "meanNetReturnPct": 0.04042386243207014,
+        "winRatePct": 70.32967032967034,
+        "totalCompoundedReturnPct": 3.692977369147643
+      },
+      {
+        "regime": "BEARISH_NORMAL",
+        "tradeCount": 41,
+        "meanNetReturnPct": 0.0561035035461319,
+        "winRatePct": 73.17073170731707,
+        "totalCompoundedReturnPct": 2.293943946235144
+      },
+      {
+        "regime": "BULLISH_HIGH",
+        "tradeCount": 90,
+        "meanNetReturnPct": -0.03453216093969392,
+        "winRatePct": 62.22222222222222,
+        "totalCompoundedReturnPct": -3.133508240928362
+      },
+      {
+        "regime": "BULLISH_NORMAL",
+        "tradeCount": 18,
+        "meanNetReturnPct": 0.10305649821202593,
+        "winRatePct": 77.77777777777779,
+        "totalCompoundedReturnPct": 1.8599548753584605
+      },
+      {
+        "regime": "SIDEWAYS_HIGH",
+        "tradeCount": 39,
+        "meanNetReturnPct": 0.07866595705410427,
+        "winRatePct": 71.7948717948718,
+        "totalCompoundedReturnPct": 3.098868232019769
+      },
+      {
+        "regime": "SIDEWAYS_NORMAL",
+        "tradeCount": 38,
+        "meanNetReturnPct": -0.06245130801675249,
+        "winRatePct": 60.526315789473685,
+        "totalCompoundedReturnPct": -2.378015966572311
+      }
+    ]
+  },
+  "costStress": {
+    "feeBps": 20,
+    "slippageBps": 20,
+    "profitFactor": 0.8920501843447592,
+    "netReturnPct": -0.8966425515417553,
+    "tradeCount": 317
+  },
+  "blockBootstrap": {
+    "blockLength": 5,
+    "simulations": 2000,
+    "seed": 42,
+    "maxDrawdownPct": {
+      "p50": 7.242928862745582,
+      "p95": 15.02999659675245,
+      "p99": 18.86677466436894
+    },
+    "netReturnPct": {
+      "p05": -9.38705440259895,
+      "median": 4.609041627008326,
+      "p95": 19.391989265980552
+    },
+    "probabilityOfLoss": 0.2815
+  },
+  "perSymbol": [
+    {
+      "symbol": "BTCUSDT",
+      "tradeCount": 75,
+      "netReturnPct": 1.7660606973711523,
+      "maxDrawdownPct": 2.8931281279634935,
+      "profitFactor": 1.1805303207157756,
+      "winRatePct": 73.33333333333333,
+      "signalCount": 0,
+      "stressNetReturnPct": -1.2904472905395092
+    },
+    {
+      "symbol": "ETHUSDT",
+      "tradeCount": 67,
+      "netReturnPct": 1.7919300618418843,
+      "maxDrawdownPct": 3.3635169685792214,
+      "profitFactor": 1.2196132407180724,
+      "winRatePct": 68.65671641791045,
+      "signalCount": 0,
+      "stressNetReturnPct": -0.25408921897642767
+    },
+    {
+      "symbol": "SOLUSDT",
+      "tradeCount": 48,
+      "netReturnPct": -0.24495896527439998,
+      "maxDrawdownPct": 1.6314375772503793,
+      "profitFactor": 0.9528962223492202,
+      "winRatePct": 58.333333333333336,
+      "signalCount": 0,
+      "stressNetReturnPct": -1.3148950969729456
+    },
+    {
+      "symbol": "BNBUSDT",
+      "tradeCount": 73,
+      "netReturnPct": 2.457419927825444,
+      "maxDrawdownPct": 2.980357354814258,
+      "profitFactor": 1.2911867540316087,
+      "winRatePct": 68.4931506849315,
+      "signalCount": 0,
+      "stressNetReturnPct": 0.143001693532252
+    },
+    {
+      "symbol": "XRPUSDT",
+      "tradeCount": 54,
+      "netReturnPct": -0.5091213076731438,
+      "maxDrawdownPct": 2.6362509279905337,
+      "profitFactor": 0.9283556312655734,
+      "winRatePct": 66.66666666666666,
+      "signalCount": 0,
+      "stressNetReturnPct": -1.766782844752146
+    }
+  ],
+  "tradeLog": [
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1551139200000,
+      "exitTime": 1551398400000,
+      "netPnl": 24.6101,
+      "accountReturnPct": 0.2461
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1553212800000,
+      "exitTime": 1553299200000,
+      "netPnl": 28.9406,
+      "accountReturnPct": 0.2887
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1554768000000,
+      "exitTime": 1555113600000,
+      "netPnl": 8.5149,
+      "accountReturnPct": 0.0847
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1556236800000,
+      "exitTime": 1556668800000,
+      "netPnl": 24.1738,
+      "accountReturnPct": 0.2417
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1557273600000,
+      "exitTime": 1557619200000,
+      "netPnl": 1.4731,
+      "accountReturnPct": 0.0146
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1559692800000,
+      "exitTime": 1559952000000,
+      "netPnl": 18.2346,
+      "accountReturnPct": 0.1823
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1559692800000,
+      "exitTime": 1559952000000,
+      "netPnl": 11.4266,
+      "accountReturnPct": 0.114
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1559692800000,
+      "exitTime": 1559865600000,
+      "netPnl": 23.6194,
+      "accountReturnPct": 0.2347
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1560124800000,
+      "exitTime": 1560211200000,
+      "netPnl": 28.525,
+      "accountReturnPct": 0.2842
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1560124800000,
+      "exitTime": 1560384000000,
+      "netPnl": 14.4344,
+      "accountReturnPct": 0.1443
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1561680000000,
+      "exitTime": 1561852800000,
+      "netPnl": 15.3579,
+      "accountReturnPct": 0.1523
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1561680000000,
+      "exitTime": 1562544000000,
+      "netPnl": -15.3502,
+      "accountReturnPct": -0.1533
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1562803200000,
+      "exitTime": 1562976000000,
+      "netPnl": 9.0892,
+      "accountReturnPct": 0.09
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1562803200000,
+      "exitTime": 1563494400000,
+      "netPnl": -50.124,
+      "accountReturnPct": -0.5013
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1562889600000,
+      "exitTime": 1563148800000,
+      "netPnl": -101.5249,
+      "accountReturnPct": -1.0088
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1563148800000,
+      "exitTime": 1563494400000,
+      "netPnl": 14.4281,
+      "accountReturnPct": 0.144
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1563321600000,
+      "exitTime": 1563494400000,
+      "netPnl": 35.4513,
+      "accountReturnPct": 0.3558
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1563321600000,
+      "exitTime": 1563494400000,
+      "netPnl": 51.0497,
+      "accountReturnPct": 0.5049
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1563926400000,
+      "exitTime": 1564617600000,
+      "netPnl": 6.7254,
+      "accountReturnPct": 0.067
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1564272000000,
+      "exitTime": 1564617600000,
+      "netPnl": 18.0845,
+      "accountReturnPct": 0.1809
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1564272000000,
+      "exitTime": 1564617600000,
+      "netPnl": -1.291,
+      "accountReturnPct": -0.0127
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1565395200000,
+      "exitTime": 1565568000000,
+      "netPnl": 12.1837,
+      "accountReturnPct": 0.1216
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1565740800000,
+      "exitTime": 1566172800000,
+      "netPnl": -32.2912,
+      "accountReturnPct": -0.3216
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1565827200000,
+      "exitTime": 1566172800000,
+      "netPnl": 16.5451,
+      "accountReturnPct": 0.1628
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1566691200000,
+      "exitTime": 1567036800000,
+      "netPnl": -103.1898,
+      "accountReturnPct": -1.0139
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1567123200000,
+      "exitTime": 1567382400000,
+      "netPnl": 11.5182,
+      "accountReturnPct": 0.1151
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1568160000000,
+      "exitTime": 1568332800000,
+      "netPnl": 19.3429,
+      "accountReturnPct": 0.1931
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1568764800000,
+      "exitTime": 1568937600000,
+      "netPnl": 2.166,
+      "accountReturnPct": 0.0216
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1569110400000,
+      "exitTime": 1569283200000,
+      "netPnl": -102.4588,
+      "accountReturnPct": -1.0205
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1569369600000,
+      "exitTime": 1569888000000,
+      "netPnl": -15.7742,
+      "accountReturnPct": -0.1587
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1581984000000,
+      "exitTime": 1582070400000,
+      "netPnl": 37.8183,
+      "accountReturnPct": 0.3812
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1582675200000,
+      "exitTime": 1583193600000,
+      "netPnl": -9.5262,
+      "accountReturnPct": -0.0946
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1582761600000,
+      "exitTime": 1583193600000,
+      "netPnl": 7.7593,
+      "accountReturnPct": 0.0779
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1582761600000,
+      "exitTime": 1583193600000,
+      "netPnl": 12.5516,
+      "accountReturnPct": 0.1252
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1588809600000,
+      "exitTime": 1588896000000,
+      "netPnl": 32.0623,
+      "accountReturnPct": 0.3193
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1589155200000,
+      "exitTime": 1589414400000,
+      "netPnl": 27.4752,
+      "accountReturnPct": 0.2728
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1589241600000,
+      "exitTime": 1589414400000,
+      "netPnl": 41.8452,
+      "accountReturnPct": 0.4198
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1590105600000,
+      "exitTime": 1590624000000,
+      "netPnl": 6.4493,
+      "accountReturnPct": 0.0644
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1592784000000,
+      "exitTime": 1592870400000,
+      "netPnl": 47.9559,
+      "accountReturnPct": 0.4748
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1593302400000,
+      "exitTime": 1593475200000,
+      "netPnl": 14.7658,
+      "accountReturnPct": 0.1474
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1593302400000,
+      "exitTime": 1593475200000,
+      "netPnl": 20.2135,
+      "accountReturnPct": 0.1992
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1594944000000,
+      "exitTime": 1595203200000,
+      "netPnl": 7.0294,
+      "accountReturnPct": 0.0701
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1594944000000,
+      "exitTime": 1595203200000,
+      "netPnl": 19.4967,
+      "accountReturnPct": 0.1917
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1594944000000,
+      "exitTime": 1595203200000,
+      "netPnl": 33.8341,
+      "accountReturnPct": 0.3361
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1597881600000,
+      "exitTime": 1598313600000,
+      "netPnl": -1.3602,
+      "accountReturnPct": -0.0134
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1598572800000,
+      "exitTime": 1598745600000,
+      "netPnl": 14.8408,
+      "accountReturnPct": 0.1492
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1599177600000,
+      "exitTime": 1599523200000,
+      "netPnl": 13.9513,
+      "accountReturnPct": 0.139
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1599177600000,
+      "exitTime": 1599436800000,
+      "netPnl": 53.796,
+      "accountReturnPct": 0.5327
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1599177600000,
+      "exitTime": 1599696000000,
+      "netPnl": -9.7093,
+      "accountReturnPct": -0.0974
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1599350400000,
+      "exitTime": 1599696000000,
+      "netPnl": 13.6315,
+      "accountReturnPct": 0.1338
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1600732800000,
+      "exitTime": 1600992000000,
+      "netPnl": 22.3716,
+      "accountReturnPct": 0.2226
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1600732800000,
+      "exitTime": 1600992000000,
+      "netPnl": 8.6695,
+      "accountReturnPct": 0.085
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1600732800000,
+      "exitTime": 1600992000000,
+      "netPnl": 17.2447,
+      "accountReturnPct": 0.1699
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1600732800000,
+      "exitTime": 1601078400000,
+      "netPnl": 22.6966,
+      "accountReturnPct": 0.228
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1601683200000,
+      "exitTime": 1601856000000,
+      "netPnl": 8.2517,
+      "accountReturnPct": 0.0808
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1601683200000,
+      "exitTime": 1601856000000,
+      "netPnl": 37.5876,
+      "accountReturnPct": 0.3768
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1601769600000,
+      "exitTime": 1601856000000,
+      "netPnl": 9.1591,
+      "accountReturnPct": 0.0909
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1602720000000,
+      "exitTime": 1603152000000,
+      "netPnl": -13.1967,
+      "accountReturnPct": -0.1318
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1602892800000,
+      "exitTime": 1603065600000,
+      "netPnl": 21.6458,
+      "accountReturnPct": 0.2119
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1603238400000,
+      "exitTime": 1603411200000,
+      "netPnl": 36.3529,
+      "accountReturnPct": 0.3575
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1604102400000,
+      "exitTime": 1604620800000,
+      "netPnl": -19.3284,
+      "accountReturnPct": -0.1894
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1604102400000,
+      "exitTime": 1604448000000,
+      "netPnl": -0.601,
+      "accountReturnPct": -0.006
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1607472000000,
+      "exitTime": 1607817600000,
+      "netPnl": 7.6762,
+      "accountReturnPct": 0.0754
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1607817600000,
+      "exitTime": 1608163200000,
+      "netPnl": 31.2153,
+      "accountReturnPct": 0.3121
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1608595200000,
+      "exitTime": 1608940800000,
+      "netPnl": 15.659,
+      "accountReturnPct": 0.1529
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1608595200000,
+      "exitTime": 1608681600000,
+      "netPnl": -100.8143,
+      "accountReturnPct": -1.0049
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1610409600000,
+      "exitTime": 1610668800000,
+      "netPnl": 37.6782,
+      "accountReturnPct": 0.3696
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1610496000000,
+      "exitTime": 1610582400000,
+      "netPnl": 32.9037,
+      "accountReturnPct": 0.3263
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1610496000000,
+      "exitTime": 1610668800000,
+      "netPnl": 48.1112,
+      "accountReturnPct": 0.4692
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1611273600000,
+      "exitTime": 1611619200000,
+      "netPnl": 12.7834,
+      "accountReturnPct": 0.1264
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1611273600000,
+      "exitTime": 1611532800000,
+      "netPnl": 29.0549,
+      "accountReturnPct": 0.2839
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1611792000000,
+      "exitTime": 1611878400000,
+      "netPnl": 30.2535,
+      "accountReturnPct": 0.2987
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1614124800000,
+      "exitTime": 1614643200000,
+      "netPnl": 4.4518,
+      "accountReturnPct": 0.0438
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1614124800000,
+      "exitTime": 1614643200000,
+      "netPnl": -2.4896,
+      "accountReturnPct": -0.0242
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1614297600000,
+      "exitTime": 1614643200000,
+      "netPnl": 3.1914,
+      "accountReturnPct": 0.0321
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1615593600000,
+      "exitTime": 1615939200000,
+      "netPnl": 13.014,
+      "accountReturnPct": 0.131
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1616457600000,
+      "exitTime": 1616803200000,
+      "netPnl": 6.9245,
+      "accountReturnPct": 0.0681
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1616457600000,
+      "exitTime": 1616803200000,
+      "netPnl": 3.3502,
+      "accountReturnPct": 0.0325
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1616457600000,
+      "exitTime": 1616803200000,
+      "netPnl": -0.7978,
+      "accountReturnPct": -0.0078
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1616716800000,
+      "exitTime": 1616803200000,
+      "netPnl": 39.6515,
+      "accountReturnPct": 0.3965
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1618790400000,
+      "exitTime": 1619481600000,
+      "netPnl": -23.4998,
+      "accountReturnPct": -0.2311
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1618790400000,
+      "exitTime": 1619481600000,
+      "netPnl": -7.7461,
+      "accountReturnPct": -0.0779
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1618876800000,
+      "exitTime": 1618963200000,
+      "netPnl": 34.2877,
+      "accountReturnPct": 0.3328
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1620691200000,
+      "exitTime": 1621036800000,
+      "netPnl": 0.7122,
+      "accountReturnPct": 0.0072
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1620864000000,
+      "exitTime": 1621382400000,
+      "netPnl": -102.3957,
+      "accountReturnPct": -1.0091
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1621296000000,
+      "exitTime": 1621382400000,
+      "netPnl": -103.9864,
+      "accountReturnPct": -1.0059
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1621296000000,
+      "exitTime": 1621382400000,
+      "netPnl": -103.1563,
+      "accountReturnPct": -1.0054
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1621468800000,
+      "exitTime": 1621900800000,
+      "netPnl": 15.1913,
+      "accountReturnPct": 0.1484
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1621468800000,
+      "exitTime": 1621900800000,
+      "netPnl": 4.5221,
+      "accountReturnPct": 0.0445
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1623196800000,
+      "exitTime": 1623283200000,
+      "netPnl": 12.4025,
+      "accountReturnPct": 0.122
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1624060800000,
+      "exitTime": 1624838400000,
+      "netPnl": -32.5026,
+      "accountReturnPct": -0.3171
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1624060800000,
+      "exitTime": 1624320000000,
+      "netPnl": -100.8026,
+      "accountReturnPct": -1.004
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1624147200000,
+      "exitTime": 1624579200000,
+      "netPnl": -27.4382,
+      "accountReturnPct": -0.276
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1624320000000,
+      "exitTime": 1624579200000,
+      "netPnl": 29.7888,
+      "accountReturnPct": 0.2928
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1624406400000,
+      "exitTime": 1624579200000,
+      "netPnl": 23.4618,
+      "accountReturnPct": 0.2361
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1626220800000,
+      "exitTime": 1626307200000,
+      "netPnl": 19.6707,
+      "accountReturnPct": 0.1975
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1626739200000,
+      "exitTime": 1626912000000,
+      "netPnl": 21.3335,
+      "accountReturnPct": 0.2137
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1631059200000,
+      "exitTime": 1631491200000,
+      "netPnl": -5.601,
+      "accountReturnPct": -0.0548
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1631059200000,
+      "exitTime": 1631491200000,
+      "netPnl": -3.4867,
+      "accountReturnPct": -0.0342
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1631318400000,
+      "exitTime": 1631491200000,
+      "netPnl": 15.7383,
+      "accountReturnPct": 0.1588
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1631577600000,
+      "exitTime": 1632009600000,
+      "netPnl": -1.3165,
+      "accountReturnPct": -0.0132
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1632182400000,
+      "exitTime": 1632441600000,
+      "netPnl": 22.6091,
+      "accountReturnPct": 0.2214
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1633910400000,
+      "exitTime": 1633996800000,
+      "netPnl": 18.0297,
+      "accountReturnPct": 0.1762
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1633996800000,
+      "exitTime": 1634083200000,
+      "netPnl": 15.2425,
+      "accountReturnPct": 0.1524
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1634515200000,
+      "exitTime": 1634774400000,
+      "netPnl": 19.6109,
+      "accountReturnPct": 0.1975
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1635379200000,
+      "exitTime": 1635465600000,
+      "netPnl": 52.4483,
+      "accountReturnPct": 0.5142
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1636761600000,
+      "exitTime": 1636848000000,
+      "netPnl": 22.679,
+      "accountReturnPct": 0.2264
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1637020800000,
+      "exitTime": 1637366400000,
+      "netPnl": -43.2141,
+      "accountReturnPct": -0.4215
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1637107200000,
+      "exitTime": 1637452800000,
+      "netPnl": -5.9309,
+      "accountReturnPct": -0.059
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1637107200000,
+      "exitTime": 1637452800000,
+      "netPnl": -3.9541,
+      "accountReturnPct": -0.0394
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1637107200000,
+      "exitTime": 1637452800000,
+      "netPnl": 12.9434,
+      "accountReturnPct": 0.1262
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1637107200000,
+      "exitTime": 1637452800000,
+      "netPnl": 2.261,
+      "accountReturnPct": 0.0227
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1638576000000,
+      "exitTime": 1638576000000,
+      "netPnl": -101.6878,
+      "accountReturnPct": -1.013
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1638576000000,
+      "exitTime": 1638835200000,
+      "netPnl": -7.9151,
+      "accountReturnPct": -0.0771
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1638662400000,
+      "exitTime": 1639008000000,
+      "netPnl": 10.4299,
+      "accountReturnPct": 0.105
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1638662400000,
+      "exitTime": 1638835200000,
+      "netPnl": 22.3272,
+      "accountReturnPct": 0.2187
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1638835200000,
+      "exitTime": 1639612800000,
+      "netPnl": -23.3463,
+      "accountReturnPct": -0.2326
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1639094400000,
+      "exitTime": 1639267200000,
+      "netPnl": 16.5528,
+      "accountReturnPct": 0.1664
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1640736000000,
+      "exitTime": 1641081600000,
+      "netPnl": -5.6926,
+      "accountReturnPct": -0.0556
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1640736000000,
+      "exitTime": 1641081600000,
+      "netPnl": 2.6878,
+      "accountReturnPct": 0.0268
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1641427200000,
+      "exitTime": 1641945600000,
+      "netPnl": -47.5061,
+      "accountReturnPct": -0.4646
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1641427200000,
+      "exitTime": 1641945600000,
+      "netPnl": -36.1113,
+      "accountReturnPct": -0.3606
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1641427200000,
+      "exitTime": 1641945600000,
+      "netPnl": -14.3971,
+      "accountReturnPct": -0.1403
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1642636800000,
+      "exitTime": 1642723200000,
+      "netPnl": -103.72,
+      "accountReturnPct": -1.0125
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1666224000000,
+      "exitTime": 1666396800000,
+      "netPnl": 10.0701,
+      "accountReturnPct": 0.1012
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1674086400000,
+      "exitTime": 1674259200000,
+      "netPnl": 49.7687,
+      "accountReturnPct": 0.4908
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1674604800000,
+      "exitTime": 1674691200000,
+      "netPnl": 26.3861,
+      "accountReturnPct": 0.2593
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1675641600000,
+      "exitTime": 1675814400000,
+      "netPnl": 10.6918,
+      "accountReturnPct": 0.1073
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1675641600000,
+      "exitTime": 1675814400000,
+      "netPnl": 7.0896,
+      "accountReturnPct": 0.0712
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1675987200000,
+      "exitTime": 1676332800000,
+      "netPnl": -3.8286,
+      "accountReturnPct": -0.0384
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1675987200000,
+      "exitTime": 1676505600000,
+      "netPnl": 25.3874,
+      "accountReturnPct": 0.2491
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1676073600000,
+      "exitTime": 1676419200000,
+      "netPnl": 17.9369,
+      "accountReturnPct": 0.1758
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1677283200000,
+      "exitTime": 1677542400000,
+      "netPnl": 8.1445,
+      "accountReturnPct": 0.0817
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1677283200000,
+      "exitTime": 1677456000000,
+      "netPnl": 14.1229,
+      "accountReturnPct": 0.1383
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1677369600000,
+      "exitTime": 1677456000000,
+      "netPnl": 19.9067,
+      "accountReturnPct": 0.1947
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1677888000000,
+      "exitTime": 1678406400000,
+      "netPnl": -101.6709,
+      "accountReturnPct": -1.0189
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1677888000000,
+      "exitTime": 1678233600000,
+      "netPnl": -6.2388,
+      "accountReturnPct": -0.061
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1678320000000,
+      "exitTime": 1678665600000,
+      "netPnl": 24.2252,
+      "accountReturnPct": 0.2365
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1678492800000,
+      "exitTime": 1678665600000,
+      "netPnl": 68.7175,
+      "accountReturnPct": 0.6957
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1680566400000,
+      "exitTime": 1680739200000,
+      "netPnl": 12.1765,
+      "accountReturnPct": 0.1191
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1681776000000,
+      "exitTime": 1681862400000,
+      "netPnl": 30.8664,
+      "accountReturnPct": 0.3103
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1682035200000,
+      "exitTime": 1682467200000,
+      "netPnl": -6.7058,
+      "accountReturnPct": -0.0672
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1682121600000,
+      "exitTime": 1682467200000,
+      "netPnl": 30.4227,
+      "accountReturnPct": 0.3049
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1682121600000,
+      "exitTime": 1682467200000,
+      "netPnl": 4.7957,
+      "accountReturnPct": 0.0467
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1682121600000,
+      "exitTime": 1682467200000,
+      "netPnl": 22.0085,
+      "accountReturnPct": 0.2208
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1682812800000,
+      "exitTime": 1682899200000,
+      "netPnl": 44.493,
+      "accountReturnPct": 0.4347
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1682985600000,
+      "exitTime": 1683158400000,
+      "netPnl": 26.2663,
+      "accountReturnPct": 0.2625
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1683244800000,
+      "exitTime": 1683331200000,
+      "netPnl": 7.1188,
+      "accountReturnPct": 0.0713
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1683590400000,
+      "exitTime": 1684195200000,
+      "netPnl": -18.0482,
+      "accountReturnPct": -0.1799
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1683590400000,
+      "exitTime": 1683936000000,
+      "netPnl": 5.2222,
+      "accountReturnPct": 0.0524
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1683590400000,
+      "exitTime": 1684022400000,
+      "netPnl": -13.5286,
+      "accountReturnPct": -0.1316
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1683590400000,
+      "exitTime": 1683936000000,
+      "netPnl": 1.3202,
+      "accountReturnPct": 0.0132
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1683849600000,
+      "exitTime": 1684195200000,
+      "netPnl": 7.1039,
+      "accountReturnPct": 0.0692
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1684713600000,
+      "exitTime": 1684886400000,
+      "netPnl": 11.3712,
+      "accountReturnPct": 0.114
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1685664000000,
+      "exitTime": 1685923200000,
+      "netPnl": -106.3858,
+      "accountReturnPct": -1.0363
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1686009600000,
+      "exitTime": 1686096000000,
+      "netPnl": 55.7975,
+      "accountReturnPct": 0.5571
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1686009600000,
+      "exitTime": 1686096000000,
+      "netPnl": 41.1477,
+      "accountReturnPct": 0.4004
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1686441600000,
+      "exitTime": 1686960000000,
+      "netPnl": -21.4083,
+      "accountReturnPct": -0.2075
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1686787200000,
+      "exitTime": 1686960000000,
+      "netPnl": 43.0731,
+      "accountReturnPct": 0.4277
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1686787200000,
+      "exitTime": 1687132800000,
+      "netPnl": 5.5396,
+      "accountReturnPct": 0.0554
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1688688000000,
+      "exitTime": 1689033600000,
+      "netPnl": 14.9363,
+      "accountReturnPct": 0.1477
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1688688000000,
+      "exitTime": 1689033600000,
+      "netPnl": 15.0666,
+      "accountReturnPct": 0.1463
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1688688000000,
+      "exitTime": 1689033600000,
+      "netPnl": 21.1422,
+      "accountReturnPct": 0.2113
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1689724800000,
+      "exitTime": 1690156800000,
+      "netPnl": 5.3865,
+      "accountReturnPct": 0.0532
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1689811200000,
+      "exitTime": 1690156800000,
+      "netPnl": -3.2568,
+      "accountReturnPct": -0.0316
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1690243200000,
+      "exitTime": 1690416000000,
+      "netPnl": 29.4745,
+      "accountReturnPct": 0.2951
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1690243200000,
+      "exitTime": 1690588800000,
+      "netPnl": 4.4227,
+      "accountReturnPct": 0.0441
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1690761600000,
+      "exitTime": 1690934400000,
+      "netPnl": 0.0564,
+      "accountReturnPct": 0.0006
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1691107200000,
+      "exitTime": 1691366400000,
+      "netPnl": 10.06,
+      "accountReturnPct": 0.1004
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1691107200000,
+      "exitTime": 1691539200000,
+      "netPnl": -17.1058,
+      "accountReturnPct": -0.1706
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1692230400000,
+      "exitTime": 1692230400000,
+      "netPnl": -105.6849,
+      "accountReturnPct": -1.0428
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1692230400000,
+      "exitTime": 1692230400000,
+      "netPnl": -107.5523,
+      "accountReturnPct": -1.0432
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1692230400000,
+      "exitTime": 1692230400000,
+      "netPnl": -101.3876,
+      "accountReturnPct": -1.0127
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1692316800000,
+      "exitTime": 1692835200000,
+      "netPnl": 0.1116,
+      "accountReturnPct": 0.0011
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1692316800000,
+      "exitTime": 1692576000000,
+      "netPnl": 22.6705,
+      "accountReturnPct": 0.2287
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1696896000000,
+      "exitTime": 1697328000000,
+      "netPnl": -4.4277,
+      "accountReturnPct": -0.0442
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1700006400000,
+      "exitTime": 1700092800000,
+      "netPnl": 64.245,
+      "accountReturnPct": 0.6406
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1700611200000,
+      "exitTime": 1700697600000,
+      "netPnl": 25.5347,
+      "accountReturnPct": 0.2571
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1702339200000,
+      "exitTime": 1702512000000,
+      "netPnl": 35.5104,
+      "accountReturnPct": 0.3518
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1702425600000,
+      "exitTime": 1702598400000,
+      "netPnl": 40.4485,
+      "accountReturnPct": 0.3965
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1702857600000,
+      "exitTime": 1703030400000,
+      "netPnl": 49.7533,
+      "accountReturnPct": 0.4897
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1704326400000,
+      "exitTime": 1704758400000,
+      "netPnl": -6.1594,
+      "accountReturnPct": -0.0618
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1704672000000,
+      "exitTime": 1704758400000,
+      "netPnl": 26.2423,
+      "accountReturnPct": 0.2618
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1704672000000,
+      "exitTime": 1704931200000,
+      "netPnl": 4.9654,
+      "accountReturnPct": 0.0486
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1705104000000,
+      "exitTime": 1705449600000,
+      "netPnl": 3.2905,
+      "accountReturnPct": 0.0325
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1705968000000,
+      "exitTime": 1706313600000,
+      "netPnl": 39.5399,
+      "accountReturnPct": 0.3903
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1705968000000,
+      "exitTime": 1706313600000,
+      "netPnl": -16.5045,
+      "accountReturnPct": -0.1611
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1705968000000,
+      "exitTime": 1706140800000,
+      "netPnl": 17.686,
+      "accountReturnPct": 0.176
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1706054400000,
+      "exitTime": 1706313600000,
+      "netPnl": 6.1228,
+      "accountReturnPct": 0.0599
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1708560000000,
+      "exitTime": 1708819200000,
+      "netPnl": -6.8186,
+      "accountReturnPct": -0.0677
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1708732800000,
+      "exitTime": 1708819200000,
+      "netPnl": 15.0504,
+      "accountReturnPct": 0.148
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1710547200000,
+      "exitTime": 1710892800000,
+      "netPnl": -103.6118,
+      "accountReturnPct": -1.0132
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1710633600000,
+      "exitTime": 1710979200000,
+      "netPnl": 21.9523,
+      "accountReturnPct": 0.2155
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1710633600000,
+      "exitTime": 1710806400000,
+      "netPnl": 26.0526,
+      "accountReturnPct": 0.2618
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1710892800000,
+      "exitTime": 1710979200000,
+      "netPnl": 37.5154,
+      "accountReturnPct": 0.3671
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1712102400000,
+      "exitTime": 1712275200000,
+      "netPnl": 27.8881,
+      "accountReturnPct": 0.2732
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1712102400000,
+      "exitTime": 1712275200000,
+      "netPnl": 32.6083,
+      "accountReturnPct": 0.3179
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1712102400000,
+      "exitTime": 1712448000000,
+      "netPnl": 4.8177,
+      "accountReturnPct": 0.0483
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1712361600000,
+      "exitTime": 1712620800000,
+      "netPnl": 13.5409,
+      "accountReturnPct": 0.1346
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1712966400000,
+      "exitTime": 1713657600000,
+      "netPnl": -14.343,
+      "accountReturnPct": -0.1417
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1712966400000,
+      "exitTime": 1713484800000,
+      "netPnl": -27.6411,
+      "accountReturnPct": -0.2744
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1713052800000,
+      "exitTime": 1713571200000,
+      "netPnl": -2.7846,
+      "accountReturnPct": -0.0272
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1713052800000,
+      "exitTime": 1713484800000,
+      "netPnl": -2.5045,
+      "accountReturnPct": -0.0243
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1714176000000,
+      "exitTime": 1714694400000,
+      "netPnl": -5.0211,
+      "accountReturnPct": -0.05
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1714348800000,
+      "exitTime": 1714435200000,
+      "netPnl": 6.4033,
+      "accountReturnPct": 0.0626
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1714521600000,
+      "exitTime": 1714780800000,
+      "netPnl": 14.1942,
+      "accountReturnPct": 0.1404
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1714521600000,
+      "exitTime": 1714780800000,
+      "netPnl": 8.0899,
+      "accountReturnPct": 0.0786
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1714608000000,
+      "exitTime": 1714780800000,
+      "netPnl": 46.2274,
+      "accountReturnPct": 0.4514
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1715212800000,
+      "exitTime": 1715644800000,
+      "netPnl": -6.6299,
+      "accountReturnPct": -0.0655
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1715731200000,
+      "exitTime": 1715990400000,
+      "netPnl": 17.9002,
+      "accountReturnPct": 0.1738
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1716768000000,
+      "exitTime": 1716854400000,
+      "netPnl": 18.4254,
+      "accountReturnPct": 0.1835
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1717200000000,
+      "exitTime": 1717286400000,
+      "netPnl": 11.8769,
+      "accountReturnPct": 0.1151
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1717372800000,
+      "exitTime": 1717545600000,
+      "netPnl": 28.7793,
+      "accountReturnPct": 0.2861
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1717891200000,
+      "exitTime": 1718582400000,
+      "netPnl": -25.368,
+      "accountReturnPct": -0.2514
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1718064000000,
+      "exitTime": 1718496000000,
+      "netPnl": -24.1515,
+      "accountReturnPct": -0.2339
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1718150400000,
+      "exitTime": 1718668800000,
+      "netPnl": -16.6255,
+      "accountReturnPct": -0.1616
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1718150400000,
+      "exitTime": 1718496000000,
+      "netPnl": 14.5498,
+      "accountReturnPct": 0.1438
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1718755200000,
+      "exitTime": 1719187200000,
+      "netPnl": -105.288,
+      "accountReturnPct": -1.0252
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1718755200000,
+      "exitTime": 1719100800000,
+      "netPnl": 0.9916,
+      "accountReturnPct": 0.0096
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1718928000000,
+      "exitTime": 1719360000000,
+      "netPnl": 9.1242,
+      "accountReturnPct": 0.0907
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1719187200000,
+      "exitTime": 1719532800000,
+      "netPnl": 4.8942,
+      "accountReturnPct": 0.0483
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1719273600000,
+      "exitTime": 1719532800000,
+      "netPnl": 20.4859,
+      "accountReturnPct": 0.2015
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1719273600000,
+      "exitTime": 1719532800000,
+      "netPnl": 17.8423,
+      "accountReturnPct": 0.1732
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1720051200000,
+      "exitTime": 1720137600000,
+      "netPnl": -103.4953,
+      "accountReturnPct": -1.0212
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1720137600000,
+      "exitTime": 1720483200000,
+      "netPnl": -7.2144,
+      "accountReturnPct": -0.0699
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1721952000000,
+      "exitTime": 1722038400000,
+      "netPnl": 12.3349,
+      "accountReturnPct": 0.1196
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1722470400000,
+      "exitTime": 1722729600000,
+      "netPnl": -103.9823,
+      "accountReturnPct": -1.021
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1722470400000,
+      "exitTime": 1722729600000,
+      "netPnl": -101.9415,
+      "accountReturnPct": -1.012
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1722643200000,
+      "exitTime": 1722816000000,
+      "netPnl": -105.1339,
+      "accountReturnPct": -1.0181
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1722643200000,
+      "exitTime": 1722816000000,
+      "netPnl": -100.9372,
+      "accountReturnPct": -1.011
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1724716800000,
+      "exitTime": 1725580800000,
+      "netPnl": -64.5531,
+      "accountReturnPct": -0.6316
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1724803200000,
+      "exitTime": 1725148800000,
+      "netPnl": -2.2126,
+      "accountReturnPct": -0.0224
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1729728000000,
+      "exitTime": 1730073600000,
+      "netPnl": 4.6904,
+      "accountReturnPct": 0.0462
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1730505600000,
+      "exitTime": 1730851200000,
+      "netPnl": 0.0793,
+      "accountReturnPct": 0.0008
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1730505600000,
+      "exitTime": 1730851200000,
+      "netPnl": -21.4288,
+      "accountReturnPct": -0.2109
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1730764800000,
+      "exitTime": 1730851200000,
+      "netPnl": 20.7218,
+      "accountReturnPct": 0.2056
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1732147200000,
+      "exitTime": 1732233600000,
+      "netPnl": 18.3473,
+      "accountReturnPct": 0.1809
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1732579200000,
+      "exitTime": 1732752000000,
+      "netPnl": 24.4931,
+      "accountReturnPct": 0.2425
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1732579200000,
+      "exitTime": 1732924800000,
+      "netPnl": 17.9514,
+      "accountReturnPct": 0.18
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1733184000000,
+      "exitTime": 1733443200000,
+      "netPnl": 21.9123,
+      "accountReturnPct": 0.2194
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1733788800000,
+      "exitTime": 1733961600000,
+      "netPnl": 20.7207,
+      "accountReturnPct": 0.207
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1733875200000,
+      "exitTime": 1734048000000,
+      "netPnl": 38.7952,
+      "accountReturnPct": 0.3867
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1733875200000,
+      "exitTime": 1734048000000,
+      "netPnl": 20.2985,
+      "accountReturnPct": 0.1998
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1734566400000,
+      "exitTime": 1734998400000,
+      "netPnl": -35.3809,
+      "accountReturnPct": -0.3513
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1734566400000,
+      "exitTime": 1734998400000,
+      "netPnl": 4.9837,
+      "accountReturnPct": 0.049
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1734652800000,
+      "exitTime": 1735084800000,
+      "netPnl": 7.0608,
+      "accountReturnPct": 0.0697
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1734652800000,
+      "exitTime": 1734998400000,
+      "netPnl": -8.8982,
+      "accountReturnPct": -0.0887
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1736380800000,
+      "exitTime": 1736985600000,
+      "netPnl": 21.2665,
+      "accountReturnPct": 0.2119
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1736467200000,
+      "exitTime": 1736899200000,
+      "netPnl": 5.0752,
+      "accountReturnPct": 0.0506
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1737936000000,
+      "exitTime": 1738195200000,
+      "netPnl": 5.6484,
+      "accountReturnPct": 0.0572
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1738022400000,
+      "exitTime": 1738281600000,
+      "netPnl": 9.8345,
+      "accountReturnPct": 0.0978
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1738022400000,
+      "exitTime": 1738281600000,
+      "netPnl": 4.26,
+      "accountReturnPct": 0.0425
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1738108800000,
+      "exitTime": 1738195200000,
+      "netPnl": 16.6017,
+      "accountReturnPct": 0.1638
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1738454400000,
+      "exitTime": 1738540800000,
+      "netPnl": -99.8333,
+      "accountReturnPct": -1.0098
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1738540800000,
+      "exitTime": 1739232000000,
+      "netPnl": -4.6185,
+      "accountReturnPct": -0.0455
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1738540800000,
+      "exitTime": 1739059200000,
+      "netPnl": -7.7836,
+      "accountReturnPct": -0.0776
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1738540800000,
+      "exitTime": 1738540800000,
+      "netPnl": -103.6203,
+      "accountReturnPct": -1.0176
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1738627200000,
+      "exitTime": 1739059200000,
+      "netPnl": -6.6621,
+      "accountReturnPct": -0.0661
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1738800000000,
+      "exitTime": 1739059200000,
+      "netPnl": 3.4814,
+      "accountReturnPct": 0.0356
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1739491200000,
+      "exitTime": 1739577600000,
+      "netPnl": 8.8252,
+      "accountReturnPct": 0.088
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1740441600000,
+      "exitTime": 1740700800000,
+      "netPnl": -103.7366,
+      "accountReturnPct": -1.0225
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1740441600000,
+      "exitTime": 1740960000000,
+      "netPnl": 104.3249,
+      "accountReturnPct": 1.0657
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1741564800000,
+      "exitTime": 1741824000000,
+      "netPnl": 12.3209,
+      "accountReturnPct": 0.1245
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1743120000000,
+      "exitTime": 1743811200000,
+      "netPnl": -44.046,
+      "accountReturnPct": -0.4446
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1744070400000,
+      "exitTime": 1744243200000,
+      "netPnl": 27.2257,
+      "accountReturnPct": 0.2761
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1746403200000,
+      "exitTime": 1746748800000,
+      "netPnl": 50.6328,
+      "accountReturnPct": 0.512
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1747526400000,
+      "exitTime": 1747612800000,
+      "netPnl": 16.9387,
+      "accountReturnPct": 0.1682
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1748563200000,
+      "exitTime": 1748822400000,
+      "netPnl": -2.9282,
+      "accountReturnPct": -0.0292
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1748649600000,
+      "exitTime": 1748908800000,
+      "netPnl": 14.176,
+      "accountReturnPct": 0.1405
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1749168000000,
+      "exitTime": 1749340800000,
+      "netPnl": 43.2991,
+      "accountReturnPct": 0.4313
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1750464000000,
+      "exitTime": 1750723200000,
+      "netPnl": 20.009,
+      "accountReturnPct": 0.1985
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1753315200000,
+      "exitTime": 1753660800000,
+      "netPnl": 7.1875,
+      "accountReturnPct": 0.0723
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1753920000000,
+      "exitTime": 1754352000000,
+      "netPnl": -28.9514,
+      "accountReturnPct": -0.2885
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1754006400000,
+      "exitTime": 1754352000000,
+      "netPnl": -12.7176,
+      "accountReturnPct": -0.1259
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1754006400000,
+      "exitTime": 1754352000000,
+      "netPnl": 6.9712,
+      "accountReturnPct": 0.0701
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1754092800000,
+      "exitTime": 1754352000000,
+      "netPnl": 41.9427,
+      "accountReturnPct": 0.4167
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1754092800000,
+      "exitTime": 1754352000000,
+      "netPnl": 9.6708,
+      "accountReturnPct": 0.0957
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1755561600000,
+      "exitTime": 1755907200000,
+      "netPnl": 4.2867,
+      "accountReturnPct": 0.0425
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1755648000000,
+      "exitTime": 1755734400000,
+      "netPnl": 37.3677,
+      "accountReturnPct": 0.3697
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1755648000000,
+      "exitTime": 1755734400000,
+      "netPnl": 33.9062,
+      "accountReturnPct": 0.3389
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1755648000000,
+      "exitTime": 1755907200000,
+      "netPnl": 37.1916,
+      "accountReturnPct": 0.3736
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1756684800000,
+      "exitTime": 1756857600000,
+      "netPnl": 15.9662,
+      "accountReturnPct": 0.1598
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1756771200000,
+      "exitTime": 1756944000000,
+      "netPnl": 7.2327,
+      "accountReturnPct": 0.0715
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1758585600000,
+      "exitTime": 1759104000000,
+      "netPnl": -12.3103,
+      "accountReturnPct": -0.122
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1758585600000,
+      "exitTime": 1759104000000,
+      "netPnl": -13.0878,
+      "accountReturnPct": -0.129
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1758585600000,
+      "exitTime": 1759104000000,
+      "netPnl": -29.8327,
+      "accountReturnPct": -0.2972
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1758585600000,
+      "exitTime": 1758758400000,
+      "netPnl": 17.706,
+      "accountReturnPct": 0.1769
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1759881600000,
+      "exitTime": 1760054400000,
+      "netPnl": -102.0517,
+      "accountReturnPct": -1.018
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1760140800000,
+      "exitTime": 1760400000000,
+      "netPnl": 16.4117,
+      "accountReturnPct": 0.1628
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1760140800000,
+      "exitTime": 1760313600000,
+      "netPnl": 43.0708,
+      "accountReturnPct": 0.4251
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1760140800000,
+      "exitTime": 1760400000000,
+      "netPnl": 43.2486,
+      "accountReturnPct": 0.4321
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1760140800000,
+      "exitTime": 1760313600000,
+      "netPnl": 77.7991,
+      "accountReturnPct": 0.7687
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1760659200000,
+      "exitTime": 1760918400000,
+      "netPnl": 0.9795,
+      "accountReturnPct": 0.0097
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1760745600000,
+      "exitTime": 1761264000000,
+      "netPnl": 17.4456,
+      "accountReturnPct": 0.1711
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1761868800000,
+      "exitTime": 1762128000000,
+      "netPnl": 13.7124,
+      "accountReturnPct": 0.1348
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1761868800000,
+      "exitTime": 1762560000000,
+      "netPnl": -58.9373,
+      "accountReturnPct": -0.5863
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1762214400000,
+      "exitTime": 1762560000000,
+      "netPnl": -29.2129,
+      "accountReturnPct": -0.2867
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1762214400000,
+      "exitTime": 1762560000000,
+      "netPnl": -2.7078,
+      "accountReturnPct": -0.0265
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1762992000000,
+      "exitTime": 1763510400000,
+      "netPnl": -12.9948,
+      "accountReturnPct": -0.1272
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1765584000000,
+      "exitTime": 1765670400000,
+      "netPnl": 10.5102,
+      "accountReturnPct": 0.103
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1789084800000,
+      "exitTime": 1789430400000,
+      "netPnl": 21.0227,
+      "accountReturnPct": 0.2082
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1789084800000,
+      "exitTime": 1789171200000,
+      "netPnl": 26.7235,
+      "accountReturnPct": 0.263
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1789084800000,
+      "exitTime": 1789171200000,
+      "netPnl": 24.8017,
+      "accountReturnPct": 0.2482
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1789084800000,
+      "exitTime": 1789430400000,
+      "netPnl": 37.908,
+      "accountReturnPct": 0.382
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1791417600000,
+      "exitTime": 1791763200000,
+      "netPnl": 3.0947,
+      "accountReturnPct": 0.0306
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1791417600000,
+      "exitTime": 1791763200000,
+      "netPnl": -17.587,
+      "accountReturnPct": -0.1727
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1791417600000,
+      "exitTime": 1791763200000,
+      "netPnl": -37.9697,
+      "accountReturnPct": -0.379
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1791417600000,
+      "exitTime": 1791763200000,
+      "netPnl": -6.9302,
+      "accountReturnPct": -0.0696
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1791504000000,
+      "exitTime": 1791763200000,
+      "netPnl": 22.0084,
+      "accountReturnPct": 0.2155
+    },
+    {
+      "symbol": "XRPUSDT",
+      "entryTime": 1791849600000,
+      "exitTime": 1792540800000,
+      "netPnl": -4.9793,
+      "accountReturnPct": -0.05
+    },
+    {
+      "symbol": "BNBUSDT",
+      "entryTime": 1792195200000,
+      "exitTime": 1792454400000,
+      "netPnl": 12.6816,
+      "accountReturnPct": 0.1239
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1792886400000,
+      "exitTime": 1793232000000,
+      "netPnl": -1.7037,
+      "accountReturnPct": -0.0171
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1792972800000,
+      "exitTime": 1793145600000,
+      "netPnl": 8.4013,
+      "accountReturnPct": 0.083
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1792972800000,
+      "exitTime": 1793145600000,
+      "netPnl": 4.8979,
+      "accountReturnPct": 0.0482
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entryTime": 1793318400000,
+      "exitTime": 1793750400000,
+      "netPnl": 5.5104,
+      "accountReturnPct": 0.0542
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entryTime": 1793318400000,
+      "exitTime": 1793836800000,
+      "netPnl": -2.5095,
+      "accountReturnPct": -0.0252
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entryTime": 1793404800000,
+      "exitTime": 1793836800000,
+      "netPnl": 45.7266,
+      "accountReturnPct": 0.4514
+    }
+  ],
+  "evaluatedAt": "2026-11-22T03:50:03.362Z",
+  "provenance": {
+    "protocol": "research/strategy-research/PROTOCOL-ROUND-2.md",
+    "strategy": {
+      "id": "MR",
+      "name": "RSI(2) < 10 pullback above SMA200",
+      "trendSma": 200,
+      "rsiPeriod": 2,
+      "rsiEntry": 10,
+      "exitSma": 5,
+      "maxHoldBars": 10,
+      "stopAtr": 3
+    },
+    "set": "development",
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT",
+      "BNBUSDT",
+      "XRPUSDT"
+    ],
+    "source": "https://data-api.binance.vision/api/v3/klines (public Binance Spot daily bars)",
+    "period": {
+      "start": "2019-01-01T00:00:00.000Z",
+      "end": "2026-11-22T00:00:00.000Z"
+    },
+    "execution": {
+      "initialCapitalPerSymbol": 10000,
+      "riskPct": 1,
+      "feeBps": 10,
+      "slippageBps": 5,
+      "stress": "20/20 bps"
+    },
+    "parameterFitting": "NONE: textbook parameters fixed in the pre-registered protocol",
+    "datasetFingerprintSha256": "9ef40ab57d8e017b82324fc28b66155722852600137d4a8cfe18108811df4df9"
+  },
+  "acceptance": {
+    "decision": "REJECT",
+    "eligibleForPaperTrading": false,
+    "failures": [
+      "oos_profit_factor",
+      "stressed_profit_factor",
+      "stressed_net_return"
+    ],
+    "missingEvidence": [
+      "regime_sample_size"
+    ],
+    "checks": [
+      {
+        "name": "data_quality",
+        "status": "PASS",
+        "actual": "PASS",
+        "threshold": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "oos_trade_count",
+        "status": "PASS",
+        "actual": 317,
+        "threshold": 100,
+        "detail": ""
+      },
+      {
+        "name": "oos_profit_factor",
+        "status": "FAIL",
+        "actual": 1.1359936028705437,
+        "threshold": 1.2,
+        "detail": ""
+      },
+      {
+        "name": "oos_net_return",
+        "status": "PASS",
+        "actual": 1.0522660828181873,
+        "threshold": "> 0",
+        "detail": ""
+      },
+      {
+        "name": "oos_max_drawdown",
+        "status": "PASS",
+        "actual": 3.3635169685792214,
+        "threshold": "<= 20",
+        "detail": ""
+      },
+      {
+        "name": "positive_fold_ratio",
+        "status": "PASS",
+        "actual": 0.6666666666666666,
+        "threshold": 0.6,
+        "detail": ""
+      },
+      {
+        "name": "regime_sample_size",
+        "status": "PENDING",
+        "actual": null,
+        "threshold": null,
+        "detail": "Each reported regime needs at least 20 trades; underpowered groups: BULLISH_NORMAL."
+      },
+      {
+        "name": "stressed_profit_factor",
+        "status": "FAIL",
+        "actual": 0.8920501843447592,
+        "threshold": 1,
+        "detail": ""
+      },
+      {
+        "name": "stressed_net_return",
+        "status": "FAIL",
+        "actual": -0.8966425515417553,
+        "threshold": "> 0",
+        "detail": ""
+      },
+      {
+        "name": "bootstrap_p95_drawdown",
+        "status": "PASS",
+        "actual": 15.02999659675245,
+        "threshold": "<= 30",
+        "detail": ""
+      }
+    ]
+  }
+}
