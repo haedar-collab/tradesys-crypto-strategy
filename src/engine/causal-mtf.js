@@ -56,6 +56,17 @@ function makeFrameSeries(frame) {
   return {...frame.prepared,t:frame.series.t,ct:frame.series.ct,o:frame.series.o,
     h:frame.series.h,l:frame.series.l,c:frame.series.c,v:frame.series.v};
 }
+/**
+ * findLiquidityLevels() only reports a sweep when a closed 4H candle wicked
+ * below a confirmed pivot low AND closed back above it, i.e. the reclaim is
+ * already confirmed. evaluateSmcSetup() expects { confirmed: true }, so the
+ * primitive is mapped explicitly here (a bare boolean silently disabled the
+ * LIQUIDITY_SWEEP entry trigger).
+ */
+export function toSweepEvidence(sweep) {
+  if(!sweep||!Number.isFinite(sweep.px)||!Number.isFinite(sweep.at))return null;
+  return {confirmed:true,px:sweep.px,at:sweep.at,kind:"SELL_SIDE_SWEEP_RECLAIM"};
+}
 export function buildCausalMultiTimeframeContext(input,options={}) {
   const evaluationTime=options.evaluationTime;
   if(!Number.isFinite(evaluationTime))throw new TypeError("evaluationTime must be a finite UTC millisecond timestamp");
@@ -85,7 +96,7 @@ export function buildCausalMultiTimeframeContext(input,options={}) {
       orderBlocks:findBullishOrderBlocks(h4.prepared,h4.structure.events,options.orderBlockLookback??150),
       fvgs:findBullishFvgs(h4.prepared,options.fvgLookback??80),
       targetLevels:liquidity.buySideLiquidity.map(level=>level.px),
-      liquiditySweep:!!liquidity.sweep,rejection:h4.candles.at(-1).close>h4.candles.at(-1).open},
+      liquiditySweep:toSweepEvidence(liquidity.sweep),rejection:h4.candles.at(-1).close>h4.candles.at(-1).open},
     h1:{closed:true,asOf:h1.asOf,series:h1Series}
   };
   const temporal=validateMultiTimeframeAsOf(context,{evaluationTime,maxAgeMs:options.maxAgeMs});

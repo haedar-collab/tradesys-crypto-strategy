@@ -102,6 +102,29 @@ export function createPaperRiskMonitor({
       haltReasons: Object.freeze([...haltReasons]), haltAt });
   }
 
+  /**
+   * Side-effect-free pre-trade check of a hypothetical (projected) portfolio.
+   * It never moves peak/day baselines and never latches the kill switch, so a
+   * rejected order cannot halt the session. Baselines come from the last real
+   * evaluation; call evaluate() with the actual portfolio first.
+   */
+  function preview(snapshot) {
+    if (!snapshot || !positive(snapshot.equity) || !Array.isArray(snapshot.positions)) {
+      return Object.freeze({ status: "WAIT_DATA", allowed: false, halted, allowNewEntries: false, reasons: ["INVALID_PORTFOLIO_SNAPSHOT"] });
+    }
+    if (!positive(peakEquity) || !positive(dayStartEquity)) {
+      return Object.freeze({ status: "WAIT_DATA", allowed: false, halted, allowNewEntries: false, reasons: ["RISK_BASELINE_UNAVAILABLE"] });
+    }
+    const result = evaluatePaperRisk({
+      equity: snapshot.equity,
+      peakEquity: Math.max(peakEquity, snapshot.equity),
+      dayStartEquity,
+      openPositions: snapshot.positions
+    }, limits);
+    return Object.freeze({ ...result, halted, allowNewEntries: result.allowed && !halted,
+      haltReasons: Object.freeze([...haltReasons]), haltAt });
+  }
+
   function activate(reason = "MANUAL_KILL_SWITCH") {
     if (!halted) {
       halted = true; haltReasons = [String(reason)]; haltAt = now();
@@ -131,5 +154,5 @@ export function createPaperRiskMonitor({
     return Object.freeze({ halted, haltReasons: Object.freeze([...haltReasons]), haltAt,
       peakEquity, dayStartEquity, dayKey, events: Object.freeze(events.map(e => structuredClone(e))) });
   }
-  return Object.freeze({ evaluate, activate, reset, status });
+  return Object.freeze({ evaluate, preview, activate, reset, status });
 }

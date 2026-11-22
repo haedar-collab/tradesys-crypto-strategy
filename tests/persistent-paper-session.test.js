@@ -122,8 +122,11 @@ test("persistent risk gate blocks a projected entry above maximum exposure", asy
     await assert.rejects(session.submitMarketOrder(input), /MAX_EXPOSURE_LIMIT_EXCEEDED/);
     const state = await session.snapshot();
     assert.equal(state.broker.positions.length, 0);
-    assert.equal(state.risk.halted, true);
+    // The oversized order is rejected on its own; the session is NOT halted.
+    assert.equal(state.risk.halted, false);
     assert.ok(state.ledger.events.some(e => e.type === "RISK_EVENT"));
+    const small = await session.submitMarketOrder(await orderInput(f.now, "session_risk_exp_002"));
+    assert.equal(small.status, "FILLED");
     await session.close();
   } finally { await rm(dir, { recursive: true, force: true }); }
 });

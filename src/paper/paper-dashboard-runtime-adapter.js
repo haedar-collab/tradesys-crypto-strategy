@@ -4,6 +4,34 @@ import { buildPaperDashboardViewModel } from "./paper-dashboard-view-model.js";
 const clone = value => value == null ? value : structuredClone(value);
 const isRecord = value => value !== null && typeof value === "object" && !Array.isArray(value);
 
+/**
+ * Await a read-only provider for at most timeoutMs. A slow or failing provider
+ * degrades to a fail-closed fallback (DISCONNECTED feed / no signal) instead of
+ * stalling or failing the whole dashboard snapshot.
+ */
+async function boundedProvider(provider, timeoutMs, fallback) {
+  let timer;
+  const timedOut = new Promise(resolve => {
+    timer = setTimeout(() => resolve(fallback("PROVIDER_TIMEOUT")), timeoutMs);
+    timer.unref?.();
+  });
+  try {
+    const result = await Promise.race([
+      Promise.resolve().then(() => provider()).then(
+        value => isRecord(value) ? value : fallback("PROVIDER_INVALID_RESPONSE"),
+        () => fallback("PROVIDER_ERROR")
+      ),
+      timedOut
+    ]);
+    return result;
+  } finally { clearTimeout(timer); }
+}
+const feedFallback = reason => ({ status: { state: "DISCONNECTED", reason }, quote: null });
+const strategyFallback = reason => ({
+  signal: null, acceptance: null,
+  screener: { status: reason, symbolCount: 0, candidateCount: 0, waitCount: 0, dataErrorCount: 0, results: [] }
+});
+
 function validateSessionSnapshot(snapshot) {
   if (!isRecord(snapshot) || snapshot.mode !== "PAPER_ONLY" ||
       !isRecord(snapshot.broker) || !isRecord(snapshot.ledger) ||
@@ -32,8 +60,12 @@ export async function createPaperDashboardRuntimeSnapshot({
   feedProvider = async () => ({ status: { state: "DISCONNECTED" }, quote: null }),
   strategyProvider = async () => ({ signal: null, acceptance: null }),
   maxQuoteAgeMs = 5_000,
-  now = () => Date.now()
+  now = () => Date.now(),
+  providerTimeoutMs = 2_500
 } = {}) {
+  if (!Number.isSafeInteger(providerTimeoutMs) || providerTimeoutMs < 1 || providerTimeoutMs > 60_000) {
+    throw new RangeError("providerTimeoutMs must be between 1 and 60000");
+  }
   if (!session || typeof session.snapshot !== "function") {
     throw new TypeError("a read-only compatible paper session is required");
   }
@@ -41,13 +73,14 @@ export async function createPaperDashboardRuntimeSnapshot({
     throw new TypeError("providers and clock must be functions");
   }
 
+  // The session snapshot is authoritative and must succeed; external market
+  // data providers are bounded and degrade fail-closed.
   const [rawSession, rawFeed, rawStrategy] = await Promise.all([
-    session.snapshot(), feedProvider(), strategyProvider()
+    session.snapshot(),
+    boundedProvider(feedProvider, providerTimeoutMs, feedFallback),
+    boundedProvider(strategyProvider, providerTimeoutMs, strategyFallback)
   ]);
   const state = validateSessionSnapshot(rawSession);
-  if (!isRecord(rawFeed) || !isRecord(rawStrategy)) {
-    throw new TypeError("feed and strategy providers must return objects");
-  }
   // Use risk from the same atomic session snapshot; a second status read could
   // race with an order or mark update and display mismatched portfolio/risk.
   const riskStatus = clone(state.risk ?? null);

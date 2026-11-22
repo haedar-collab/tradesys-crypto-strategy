@@ -7,9 +7,10 @@
   "scripts": {
     "test": "node --test",
     "test:coverage": "node --experimental-test-coverage --test",
-    "start:dashboard": "node scripts/start-binance-spot-dashboard.js"
+    "start:dashboard": "node scripts/start-binance-spot-dashboard.js",
+    "paper:resolve-review": "node scripts/resolve-paper-order-review.js"
   },
   "engines": {
-    "node": ">=22.0.0"
+    "node": "22.x"
   }
 }

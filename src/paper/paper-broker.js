@@ -40,7 +40,10 @@ export function createPaperBroker({
   if(orders.has(clientOrderId))return freeze(clone(orders.get(clientOrderId)));
   if(side!=="BUY"&&side!=="SELL")throw new RangeError("only BUY and SELL spot orders are supported");
   if(!positive(quantity))throw new RangeError("quantity must be positive");
-  if(strategyAcceptance?.decision!=="ACCEPT"||strategyAcceptance?.eligibleForPaperTrading!==true)
+  // Strategy acceptance authorizes NEW exposure only. Reducing or closing an
+ // existing spot position must stay possible even after acceptance is revoked;
+ // SELL is still bounded by held quantity, quote freshness and the risk gate.
+ if(side==="BUY"&&(strategyAcceptance?.decision!=="ACCEPT"||strategyAcceptance?.eligibleForPaperTrading!==true))
    throw new Error("strategy acceptance gate did not authorize paper trading");
   if(riskGate?.allowed!==true)throw new Error("portfolio risk gate did not authorize this order");
   validateQuote(symbol,quote);

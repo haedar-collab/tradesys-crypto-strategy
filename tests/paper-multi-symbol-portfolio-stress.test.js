@@ -75,6 +75,9 @@ test("multi-symbol portfolio marks, aggregate exposure gate and recovery remain 
       clientOrderId: "multi_over_exposure", symbol: "BTCUSDT", side: "BUY", quantity: 3,
       quote: quote(clock.now(), 1_000, 1_001), strategyAcceptance: ACCEPT
     }), /MAX_EXPOSURE_LIMIT_EXCEEDED/);
+    // A rejected pre-trade check must not latch the session-wide kill switch.
+    assert.equal(session.riskStatus().halted, false);
+    await session.activateKillSwitch("OPERATOR_STOP");
     assert.equal(session.riskStatus().halted, true);
 
     // The kill switch blocks entries, not exits; flatten all three symbols.

@@ -1,7 +1,8 @@
 import { open, readFile, stat, access, link, unlink } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { randomUUID, createHash } from "node:crypto";
-import { verifyPaperLedger } from "./persistent-paper-ledger.js";
+import { createPersistentPaperLedger, verifyPaperLedger, PAPER_LEDGER_EVENT_TYPES } from "./persistent-paper-ledger.js";
+import { isManualReviewRejection, OPERATOR_REVIEW_RESOLUTIONS } from "./paper-recovery-audit.js";
 import { prepareLegacyPaperLedgerMigration, validateLegacyMigrationConfig } from "./legacy-paper-ledger-migration.js";
 
 /**
@@ -25,7 +26,7 @@ export async function inspectPaperLedgerFile({ filePath } = {}) {
   } catch (error) { if (error.code !== "ENOENT") throw error; }
   const headerPresent = verified.events[0]?.type === "SESSION_STARTED";
   const unsupportedTypes = [...new Set(verified.events.map(event => event.type)
-    .filter(type => !["SESSION_STARTED", "ORDER_SUBMITTED", "ORDER_FILLED", "ORDER_REJECTED", "POSITION_MARKED", "RISK_EVENT", "SESSION_STOPPED"].includes(type)))];
+    .filter(type => !PAPER_LEDGER_EVENT_TYPES.includes(type)))];
   return Object.freeze({
     status: lock.present ? "LOCKED_OR_STALE" : headerPresent ? "HEADERED_LEDGER" : "LEGACY_LEDGER",
     filePath: path, byteLength: metadata.size, eventCount: verified.events.length,
@@ -156,4 +157,69 @@ export async function verifyPaperLedgerBackup({ sourcePath, backupPath } = {}) {
     sourceLedgerError, backupLedgerError,
     note: "Read-only verification only. PASS confirms byte identity and valid local hash chains; it does not prove external execution truth or storage durability."
   });
+}
+
+
+function pendingReviews(events) {
+  const resolved = new Set(events.filter(e => e.type === "OPERATOR_REVIEW_RESOLVED").map(e => e.payload?.clientOrderId));
+  const filled = new Set(events.filter(e => e.type === "ORDER_FILLED").map(e => e.payload?.clientOrderId));
+  return events.filter(e => isManualReviewRejection(e) && !resolved.has(e.payload?.clientOrderId) && !filled.has(e.payload?.clientOrderId));
+}
+
+/**
+ * List interrupted paper submissions that still block session activation.
+ * Takes the ledger lock, so it cannot run while the dashboard is up.
+ */
+export async function listPendingPaperOrderReviews({ filePath } = {}) {
+  const ledger = await createPersistentPaperLedger({ filePath });
+  try {
+    const { events } = await ledger.snapshot();
+    return Object.freeze(pendingReviews(events).map(e => Object.freeze({
+      clientOrderId: e.payload.clientOrderId,
+      rejectedAt: e.timestamp,
+      message: e.payload.message,
+      orderInput: structuredClone(e.payload.orderInput ?? null)
+    })));
+  } finally { await ledger.close(); }
+}
+
+/**
+ * Record an operator's resolution of an interrupted paper submission as an
+ * append-only, hash-chained ledger event. Nothing is replayed, repaired or
+ * deleted: paper balances are rebuilt from durable fills only, and an
+ * interrupted intent never produced one. The recovery audit then reports the
+ * order as INFO instead of blocking activation.
+ */
+export async function resolveInterruptedPaperOrder({
+  filePath, clientOrderId, reviewer, note,
+  resolution = "CONFIRMED_NOT_FILLED", now = Date.now
+} = {}) {
+  if (typeof clientOrderId !== "string" || !/^[A-Za-z0-9_-]{8,64}$/.test(clientOrderId)) {
+    throw new TypeError("clientOrderId must be 8-64 safe characters");
+  }
+  if (typeof reviewer !== "string" || !reviewer.trim() || reviewer.length > 120) {
+    throw new TypeError("reviewer is required (max 120 characters)");
+  }
+  if (typeof note !== "string" || note.trim().length < 10 || note.length > 2000) {
+    throw new TypeError("note must explain the review evidence (10-2000 characters)");
+  }
+  if (!OPERATOR_REVIEW_RESOLUTIONS.includes(resolution)) {
+    throw new RangeError("resolution must be one of: " + OPERATOR_REVIEW_RESOLUTIONS.join(", "));
+  }
+  if (typeof now !== "function") throw new TypeError("now must be a function");
+  const ledger = await createPersistentPaperLedger({ filePath });
+  try {
+    const { events } = await ledger.snapshot();
+    if (!pendingReviews(events).some(e => e.payload.clientOrderId === clientOrderId)) {
+      throw new Error("no pending manual review exists for clientOrderId " + clientOrderId);
+    }
+    const timestamp = now();
+    const entry = await ledger.append({
+      eventId: "review_" + createHash("sha256").update(clientOrderId).digest("hex").slice(0, 32),
+      type: "OPERATOR_REVIEW_RESOLVED",
+      timestamp,
+      payload: { clientOrderId, resolution, reviewer: reviewer.trim(), note: note.trim() }
+    });
+    return Object.freeze({ status: "REVIEW_RESOLVED", clientOrderId, resolution, eventId: entry.eventId, sequence: entry.sequence });
+  } finally { await ledger.close(); }
 }

@@ -194,7 +194,7 @@ test("exclusive ledger lock is enforced across separate Node.js processes", asyn
 });
 
 
-test("an abruptly terminated lock owner leaves a stale lock that blocks recovery", async () => {
+test("an abruptly terminated lock owner's stale lock is reclaimed on the next start", async () => {
   const f = await fixture();
   const moduleUrl = new URL("../src/paper/persistent-paper-ledger.js", import.meta.url).href;
   const script = [
@@ -218,10 +218,14 @@ test("an abruptly terminated lock owner leaves a stale lock that blocks recovery
     assert.equal(code, 77);
     const lock = JSON.parse(await readFile(f.filePath + ".lock", "utf8"));
     assert.ok(Number.isInteger(lock.pid));
-    await assert.rejects(
-      createPersistentPaperLedger({ filePath: f.filePath }),
-      /stale lock; manual review required/
-    );
+    assert.equal(typeof lock.bootId, "string");
+    assert.equal(typeof lock.processStartTime, "string");
+    const reopened = await createPersistentPaperLedger({ filePath: f.filePath });
+    assert.equal(reopened.reclaimedStaleLock.pid, lock.pid);
+    const ownLock = JSON.parse(await readFile(f.filePath + ".lock", "utf8"));
+    assert.notEqual(ownLock.token, lock.token);
+    assert.equal(ownLock.pid, process.pid);
+    await reopened.close();
   } finally {
     if (child && child.exitCode === null) child.kill("SIGKILL");
     await rm(f.dir, { recursive: true, force: true });
