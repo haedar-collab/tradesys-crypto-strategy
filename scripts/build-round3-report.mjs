@@ -30,7 +30,7 @@ const candidateId = arg("--candidate", "TF-R");
 const candidate = CANDIDATES[candidateId];
 if (!candidate) throw new Error("--candidate must be TF-R or TF-R2");
 const out = resolve(arg("--out", `research/strategy-research/round-${candidate.round}/${setName}-${candidateId}.json`));
-const log = m => process.stderr.write("[round-3] " + m + "\n");
+const log = m => process.stderr.write("[portfolio-research] " + m + "\n");
 
 const series = {}, dropped = [];
 for (const symbol of requested) {
