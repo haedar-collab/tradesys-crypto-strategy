@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { readFile } from "node:fs/promises";
 import {
   BINANCE_SPOT_DASHBOARD_CLI_USAGE,
   parseBinanceSpotDashboardCliArgs
@@ -27,7 +28,11 @@ try {
   if (config.help) {
     process.stdout.write(BINANCE_SPOT_DASHBOARD_CLI_USAGE);
   } else {
+    const acceptanceReport = config.acceptanceReportPath
+      ? JSON.parse(await readFile(config.acceptanceReportPath, "utf8"))
+      : null;
     runtime = await startBinanceSpotPaperDashboardRuntime({
+      paperTrading: config.paperTrading ? { acceptanceReport } : null,
       filePath: config.filePath,
       symbols: config.symbols,
       selectedSymbol: config.selectedSymbol,

@@ -169,7 +169,14 @@ export async function createPersistentPaperSession({
   }
 
   function prepareMarketQuote(symbol, quote) {
-    if (!requireMarketDataProvenance) return { quote, provenance: null };
+    // A raw feed quote (eventTime, no normalized timestamp) is always
+    // validated and normalized, even when provenance is not required. Such a
+    // quote was previously unusable by the broker, so this only changes
+    // inputs that used to fail, and lets live feed quotes drive sessions
+    // whose immutable header predates the provenance requirement.
+    const carriesProvenance = quote && typeof quote === "object" &&
+      quote.timestamp === undefined && quote.eventTime !== undefined;
+    if (!requireMarketDataProvenance && !carriesProvenance) return { quote, provenance: null };
     const result = validateBinanceSpotQuote({ quote, symbol, now: now(), maxAgeMs: maxQuoteAgeMs });
     if (!result.valid) throw new Error("market data provenance rejected: " + result.reason);
     return result;

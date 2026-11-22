@@ -49,3 +49,13 @@ npm run start:dashboard -- --ledger ./var/paper-ledger.jsonl
 ```
 
 It binds to loopback by default and does not require remote credentials.
+
+## PAPER_ONLY trading engine (optional)
+
+The dashboard is read-only by default. To let the paper engine mark positions and manage exits, append `--paper-trading` to the Render start command:
+
+```
+npm run start:dashboard -- --ledger /var/data/paper-ledger.jsonl --host 0.0.0.0 --port $PORT --paper-trading
+```
+
+New entries additionally require a strategy validation report that passes the acceptance gate (`src/validation/strategy-acceptance.js`): out-of-sample trades, walk-forward folds, regime coverage, cost stress and block-bootstrap drawdown. Store it on the persistent disk and add `--acceptance-report /var/data/strategy-acceptance.json`. Without an accepted report the log shows `entries BLOCKED (acceptance …)` and no position is opened. All orders are simulated in the paper ledger; no exchange order endpoint or API key is used.
