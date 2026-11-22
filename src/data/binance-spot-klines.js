@@ -9,16 +9,26 @@ function parseKline(row){
  if(!Number.isSafeInteger(parsed.t)||!Number.isSafeInteger(parsed.closeTime)||![parsed.o,parsed.h,parsed.l,parsed.c,parsed.v].every(Number.isFinite)||![parsed.o,parsed.h,parsed.l,parsed.c].every(x=>x>0)||parsed.v<0||parsed.h<Math.max(parsed.o,parsed.c,parsed.l)||parsed.l>Math.min(parsed.o,parsed.c,parsed.h))throw new TypeError("Binance kline contains invalid OHLCV values");
  return parsed;
 }
-export async function fetchBinanceSpotKlines({symbol,interval,startTime,endTime,fetchFn=globalThis.fetch,baseUrl=BASE_URL,limit=MAX_LIMIT}){
+const DEFAULT_TIMEOUT_MS=10_000;
+export async function fetchBinanceSpotKlines({symbol,interval,startTime,endTime,fetchFn=globalThis.fetch,baseUrl=BASE_URL,limit=MAX_LIMIT,timeoutMs=DEFAULT_TIMEOUT_MS,signal}){
  if(typeof symbol!=="string"||!/^[A-Z0-9]{5,20}$/.test(symbol))throw new TypeError("symbol must be an uppercase Binance spot symbol");
  if(!INTERVALS.has(interval))throw new RangeError("supported intervals: 1h, 4h, 1d, 1w");
  assertTimestamp(startTime,"startTime");assertTimestamp(endTime,"endTime");
  if(endTime<=startTime)throw new RangeError("endTime must be greater than startTime");
  if(!Number.isInteger(limit)||limit<1||limit>MAX_LIMIT)throw new RangeError("limit must be between 1 and 1000");
  if(typeof fetchFn!=="function")throw new TypeError("fetchFn is required");
+ if(!Number.isSafeInteger(timeoutMs)||timeoutMs<1||timeoutMs>120_000)throw new RangeError("timeoutMs must be between 1 and 120000");
  const root=baseUrl.replace(/\/$/,"");
  const get=async path=>{
-  const response=await fetchFn(root+path);
+  // Every request is bounded: a hung Binance connection must never stall callers.
+  const timeout=AbortSignal.timeout(timeoutMs);
+  const requestSignal=signal?AbortSignal.any([signal,timeout]):timeout;
+  let response;
+  try{response=await fetchFn(root+path,{signal:requestSignal});}
+  catch(error){
+   if(timeout.aborted)throw new Error("Binance public API request timed out after "+timeoutMs+" ms");
+   throw error;
+  }
   if(!response?.ok)throw new Error("Binance public API request failed: HTTP "+(response?.status??"unknown"));
   return response.json();
  };

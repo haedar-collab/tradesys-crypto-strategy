@@ -5,6 +5,8 @@
  *  #3 provably stale ledger locks are reclaimed; live or unprovable locks are not
  *  #5 a failed ledger write poisons the handle and rolls back unacknowledged bytes
  *  #6 the 4H liquidity-sweep trigger reaches the SMC decision gate
+ *  #7 slow/failing market-data providers can never stall the dashboard
+ *  #10 exits (SELL) never depend on strategy acceptance
  */
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -21,6 +23,10 @@ import {
 } from "../src/paper/paper-recovery-operations.js";
 import { buildCausalMultiTimeframeContext, toSweepEvidence, CAUSAL_MTF_INTERVALS } from "../src/engine/causal-mtf.js";
 import { evaluateSmcSetup } from "../src/structure/decision.js";
+import { fetchBinanceSpotKlines } from "../src/data/binance-spot-klines.js";
+import { createBinanceSpotMtfScreenerProvider } from "../src/data/binance-spot-mtf-screener-provider.js";
+import { createPaperDashboardRuntimeSnapshot } from "../src/paper/paper-dashboard-runtime-adapter.js";
+import { createPaperBroker } from "../src/paper/paper-broker.js";
 
 const ACCEPT = { decision: "ACCEPT", eligibleForPaperTrading: true };
 const T0 = 1_800_000_000_000;
@@ -329,4 +335,165 @@ test("#6 the causal 4H context carries a confirmed sweep object, not a boolean",
   assert.equal(sweep.confirmed, true);
   assert.equal(sweep.at, h4[k].openTime);
   assert.ok(sweep.px > h4[k].low && sweep.px < h4[k].close);
+});
+
+// ---------------------------------------------------------------- #7
+// AbortSignal.timeout() and the provider timers are unref'd by design (they must
+// not keep a process alive). In production the HTTP server / sockets keep the
+// event loop running; these tests use in-memory fakes, so hold a ref'd timer.
+const keepAlive = setInterval(() => {}, 1_000);
+test.after(() => clearInterval(keepAlive));
+const hangUntilAborted = (calls = []) => (url, options = {}) => {
+  calls.push({ url, signal: options.signal });
+  return new Promise((_, reject) => {
+    options.signal?.addEventListener("abort", () => reject(options.signal.reason), { once: true });
+  });
+};
+
+test("#7 Binance REST requests are aborted after timeoutMs", async () => {
+  const calls = [];
+  const started = Date.now();
+  await assert.rejects(fetchBinanceSpotKlines({
+    symbol: "BTCUSDT", interval: "1h", startTime: 1, endTime: 3_600_001,
+    fetchFn: hangUntilAborted(calls), timeoutMs: 50
+  }), /timed out after 50 ms/);
+  assert.ok(Date.now() - started < 2_000);
+  assert.ok(calls[0].signal instanceof AbortSignal);
+  await assert.rejects(fetchBinanceSpotKlines({
+    symbol: "BTCUSDT", interval: "1h", startTime: 1, endTime: 2, fetchFn: async () => ({}), timeoutMs: 0
+  }), /timeoutMs/);
+});
+
+test("#7 a caller abort signal is honoured as well", async () => {
+  const controller = new AbortController();
+  const pending = fetchBinanceSpotKlines({
+    symbol: "BTCUSDT", interval: "1h", startTime: 1, endTime: 3_600_001,
+    fetchFn: hangUntilAborted(), timeoutMs: 60_000, signal: controller.signal
+  });
+  controller.abort(new Error("shutdown"));
+  await assert.rejects(pending, /shutdown/);
+});
+
+test("#7 dashboard snapshot degrades instead of hanging on slow or failing providers", async () => {
+  const dir = await tempDir(), filePath = join(dir, "events.jsonl");
+  const session = await createPersistentPaperSession({ filePath, now: () => T0 });
+  try {
+    const never = () => new Promise(() => {});
+    const started = Date.now();
+    const slow = await createPaperDashboardRuntimeSnapshot({
+      session, feedProvider: never, strategyProvider: never, now: () => T0, providerTimeoutMs: 50
+    });
+    assert.ok(Date.now() - started < 2_000);
+    assert.equal(slow.snapshot.feedStatus.state, "DISCONNECTED");
+    assert.equal(slow.snapshot.feedStatus.reason, "PROVIDER_TIMEOUT");
+    assert.equal(slow.snapshot.screener.status, "PROVIDER_TIMEOUT");
+    assert.equal(slow.viewModel.market.state, "DISCONNECTED");
+    assert.equal(slow.snapshot.signal, null);
+
+    const failing = await createPaperDashboardRuntimeSnapshot({
+      session,
+      feedProvider: async () => { throw new Error("socket exploded"); },
+      strategyProvider: async () => "not an object",
+      now: () => T0, providerTimeoutMs: 50
+    });
+    assert.equal(failing.snapshot.feedStatus.reason, "PROVIDER_ERROR");
+    assert.equal(failing.snapshot.screener.status, "PROVIDER_INVALID_RESPONSE");
+
+    // The paper session itself remains authoritative: its failure still fails.
+    await assert.rejects(createPaperDashboardRuntimeSnapshot({
+      session: { snapshot: async () => { throw new Error("ledger unreadable"); } }, now: () => T0
+    }), /ledger unreadable/);
+  } finally {
+    await session.close();
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test("#7 screener provider serves cached results while refreshing and never blocks polls", async () => {
+  let time = 2_000_000_000_000;
+  const releases = [];
+  let mode = "slow";
+  let calls = 0;
+  const provider = createBinanceSpotMtfScreenerProvider({
+    symbols: ["BTCUSDT"], now: () => time, refreshIntervalMs: 60_000, firstLoadTimeoutMs: 20,
+    fetchKlines: () => {
+      calls++;
+      if (mode === "hang") return new Promise(() => {});
+      return new Promise(resolve => { const done = () => resolve({ bars: [] }); if (mode === "slow") releases.push(done); else done(); });
+    }
+  });
+
+  // First load slower than firstLoadTimeoutMs -> LOADING placeholder, not a hang.
+  const first = await provider();
+  assert.equal(first.screener.status, "LOADING");
+  assert.equal(first.signal, null);
+  assert.equal(calls, 4);
+  mode = "fast";
+  releases.forEach(done => done());
+  await new Promise(resolve => setTimeout(resolve, 10));
+  const loaded = await provider();
+  assert.equal(loaded.screener.status, "COMPLETE");
+  assert.equal(calls, 4, "a poll within the refresh interval reuses the cache");
+
+  // Refresh due but Binance hangs: the cached result is returned immediately.
+  mode = "hang";
+  time += 60_001;
+  const started = Date.now();
+  const during = await provider();
+  assert.ok(Date.now() - started < 1_000);
+  assert.equal(during.screener.status, "COMPLETE");
+  assert.equal(calls, 8);
+  await provider();
+  assert.equal(calls, 8, "only one refresh is in flight");
+
+  // Once older than staleAfterMs, the result is labelled STALE and no signal is surfaced.
+  time += 180_001;
+  const stale = await provider();
+  assert.equal(stale.screener.status, "STALE");
+  assert.equal(stale.signal, null);
+  assert.equal(calls, 8);
+});
+
+test("#7 screener provider validates its timing options", () => {
+  assert.throws(() => createBinanceSpotMtfScreenerProvider({ symbols: ["BTCUSDT"], staleAfterMs: 1_000 }), /staleAfterMs/);
+  assert.throws(() => createBinanceSpotMtfScreenerProvider({ symbols: ["BTCUSDT"], firstLoadTimeoutMs: -1 }), /firstLoadTimeoutMs/);
+});
+
+// ---------------------------------------------------------------- #10
+test("#10 broker: SELL exits do not require strategy acceptance; BUY entries still do", () => {
+  const now = () => T0;
+  const broker = createPaperBroker({ now });
+  const q = { timestamp: T0, bid: 100, ask: 100.1 };
+  assert.throws(() => broker.submitMarketOrder({ clientOrderId: "remed_b_buy_01", symbol: "BTCUSDT", side: "BUY", quantity: 1, quote: q, riskGate: { allowed: true } }), /acceptance gate/);
+  broker.submitMarketOrder({ clientOrderId: "remed_b_buy_02", symbol: "BTCUSDT", side: "BUY", quantity: 1, quote: q, strategyAcceptance: ACCEPT, riskGate: { allowed: true } });
+  const sell = broker.submitMarketOrder({ clientOrderId: "remed_b_sell_1", symbol: "BTCUSDT", side: "SELL", quantity: 1, quote: q, strategyAcceptance: { decision: "REJECT" }, riskGate: { allowed: true } });
+  assert.equal(sell.status, "FILLED");
+  assert.equal(broker.snapshot().positions.length, 0);
+});
+
+test("#10 session: a position can be closed after acceptance is revoked and while halted, and replays after restart", async () => {
+  const dir = await tempDir(), filePath = join(dir, "events.jsonl");
+  const now = () => T0;
+  try {
+    let session = await createPersistentPaperSession({ filePath, now });
+    await session.submitMarketOrder(buy("remed_s_buy_001", 10));
+    await session.activateKillSwitch("OPERATOR_STOP");
+    const exit = await session.submitMarketOrder({
+      clientOrderId: "remed_s_sell_01", symbol: "BTCUSDT", side: "SELL", quantity: 4,
+      quote: { timestamp: T0, bid: 100, ask: 100.1 }, strategyAcceptance: { decision: "REJECT", eligibleForPaperTrading: false }
+    });
+    assert.equal(exit.status, "FILLED");
+    const exit2 = await session.submitMarketOrder({
+      clientOrderId: "remed_s_sell_02", symbol: "BTCUSDT", side: "SELL", quantity: 6,
+      quote: { timestamp: T0, bid: 100, ask: 100.1 }
+    });
+    assert.equal(exit2.status, "FILLED");
+    await assert.rejects(session.submitMarketOrder(buy("remed_s_buy_002", 1)), /KILL_SWITCH_LATCHED/);
+    await session.close();
+
+    session = await createPersistentPaperSession({ filePath, now });
+    assert.equal(session.recoveryAudit().status, "PASS");
+    assert.equal((await session.snapshot()).broker.positions.length, 0);
+    await session.close();
+  } finally { await rm(dir, { recursive: true, force: true }); }
 });

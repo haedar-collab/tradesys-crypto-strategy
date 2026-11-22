@@ -7,6 +7,8 @@
 - Fix: a ledger lock left by a crashed process (OOM, SIGKILL, container restart with PID reuse) is reclaimed when the owner is provably dead (hostname + Linux boot id + PID + process start time). Live, foreign-host, legacy and malformed locks still fail closed.
 - Fix: a failed ledger write/fsync rolls the file back to the last acknowledged record and poisons the handle, so a later append can no longer extend a torn or unacknowledged hash chain.
 - Fix: the 4H liquidity-sweep entry trigger now reaches the SMC decision gate (`toSweepEvidence`); previously a boolean was passed where `{ confirmed: true }` was expected, disabling that trigger. Signal frequency changes, so re-run prior validation reports.
+- Fix (#7): the dashboard can no longer hang on Binance. REST requests time out (`timeoutMs`, default 10 s, plus optional caller `signal`); feed/strategy providers are bounded (`providerTimeoutMs`, default 2.5 s) and degrade fail-closed to `DISCONNECTED` / `PROVIDER_TIMEOUT`; the screener serves its cached result while refreshing in the background (stale-while-revalidate), shows `LOADING` on a slow first scan, labels results older than `staleAfterMs` as `STALE` without surfacing their signal, and backs off after failures.
+- Fix (#10): SELL exits no longer require strategy acceptance, so a position can always be reduced or closed (still bounded by held quantity, quote freshness and the session risk gate). BUY entries still require `ACCEPT`.
 - Improve: remote-binding startup errors name the unmet requirement (e.g. password length) without echoing secrets.
 
 ## 0.1.0 — Foundation
