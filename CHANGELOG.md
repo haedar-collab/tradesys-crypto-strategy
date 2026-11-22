@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — 2026-11-22 audit follow-up (#8, #9, #11)
+
+- Perf (#8): the ledger verifies its hash chain once at open and then serves deep-frozen in-memory snapshots (cached until the next append). Each snapshot does an O(1) file-size check, and `ledger.verify()` performs a full re-read. Same-size tampering is detected by `verify()` and on reopen, no longer on every poll. The dashboard adapter shares the frozen ledger instead of cloning it and caches the performance report per ledger version. At 172,800 events: snapshot 1,448 ms → 0.3 ms; dashboard poll 1,732 ms → 4.8 ms.
+- Fix (#9): the screener and dashboard provider fetch 1,000 weekly/daily bars (was 230), so SMA-seeded EMA200 converges (seed weight 74% → < 0.1%). Before, EMA200 could deviate ~3% and flip the daily-regime and bias gates near crossovers. Causal context diagnostics now report `bars`, `ema200SeedWeight` and `ema200Converged`.
+- Security (#11): Basic-auth brute-force limiting. 10 failed logins per client in 15 min → 15 min lockout (HTTP 429, `Retry-After`), plus a global ceiling of 100 failures per 15 min. Behind Render's proxy, clients are keyed by the proxy-appended (last) `X-Forwarded-For` entry (`--trust-proxy`, automatic when `RENDER=true`).
+
 ## Unreleased — 2026-11-22 Render restart fix
 
 - Fix: `npm run start:dashboard` now `exec`s Node. Previously `npm` did not forward SIGTERM through `sh -c`, so every Render restart or deploy killed Node without a clean shutdown and left the ledger lock behind (the 01:43 UTC deploy failed with "ledger is locked").
